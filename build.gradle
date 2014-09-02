@@ -1,0 +1,63 @@
+apply plugin: 'eclipse'
+apply plugin: 'java'
+apply plugin: 'groovy'
+ 
+apply plugin:'application'
+mainClassName = "com.otl.reports.test.FetchReportsTest"
+ def enc = 'UTF-8'
+[compileJava, compileGroovy, compileTestJava, compileTestGroovy].each{ it.options.encoding = enc }
+[compileGroovy, compileTestGroovy].each{ it.groovyOptions.encoding = enc }
+
+
+
+ repositories {
+    mavenCentral()
+}
+ 
+configurations {
+    testCompile.transitive = true
+
+}
+
+processResources{
+	exclude 'config.properties'
+}
+
+
+
+dependencies {
+  compile( "org.codehaus.groovy:groovy-all:2.2.1")
+  //compile('org.mapdb:mapdb:1.0.6')
+  compile( "org.xerial:sqlite-jdbc:3.7.2")
+  
+  	
+compile("org.eclipse.jetty.aggregate:jetty-all:7.6.15.v20140411")
+		
+		compile("net.sourceforge.htmlunit:htmlunit:2.15"	) 
+		
+	
+	
+}
+ 
+task initProject () << {
+    if (hasProperty(initPlugins)) {
+        initPlugins.split(',').each { plug -> 
+            project.apply { 
+                plugin(plug.trim()) 
+            } 
+        }
+    }
+ 
+    project.sourceSets*.allSource.srcDirTrees.flatten().dir.each { dir ->
+        dir.mkdirs()
+    }
+}
+
+task uberjar(type: Jar,dependsOn:[':compileJava',':compileGroovy']) {
+	from files(sourceSets.main.output.classesDir)
+	from configurations.runtime.asFileTree.files.collect { zipTree(it) }
+
+	manifest {
+		attributes 'Main-Class': 'com.otl.reports.application.FetchReports'
+	}
+}

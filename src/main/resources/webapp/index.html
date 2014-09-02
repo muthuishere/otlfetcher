@@ -1,0 +1,39 @@
+    <div id ="overlay" style="padding-top:20px;">
+	   
+	   <h3>Update User Credentials</h3>
+	   <table cellpadding="0" cellspacing="0" border="0">
+	   <tr>
+	   <td>User </td>
+	   <td colspan="3"><input name="user" id="user" size="80"> </td>
+	   </tr>	
+		<tr>
+	   <td>Password </td>
+	   <td colspan="3"><input name="pwd" id="pwd" type="password" size="80"> </td>
+	   </tr>	   
+	   
+	   <tr>
+	   
+	  <td colspan="4" style="text-align:right"><input id="updateuser" type="button" value="Submit" style="width:120px"> </td>
+	   </tr>
+	   </table>
+	  </div>
+	  <div id="resultcontainer">
+	  
+	  <div id="result1"></div>
+	  <div id="result2"></div>
+	  
+	  </div>
+	  </div>
+        <script>
+  $(function() {
+    
+	$( "input#updateuser" )
+      .button()
+      .click(function( event ) {
+		alert("Update user results")
+        event.preventDefault();
+      });
+	  
+	
+  });
+  </script>
