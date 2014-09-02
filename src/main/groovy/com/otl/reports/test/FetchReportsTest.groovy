@@ -47,15 +47,15 @@ class FetchReportsTest {
 	static void updatetimesheettest(){
 
 			/*
-			 * =======<com.otl.reports.beans.TimeEntry@c67308 entryDate=Wed Aug 12 00:00:00 IST 1970 user=mnavaneethakrishnan@corpuk.net projectcode=101185 projecttask=Software Maintenance tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=2 details=null>=========
-=======<com.otl.reports.beans.TimeEntry@65657e entryDate=Fri Aug 14 00:00:00 IST 1970 user=mnavaneethakrishnan@corpuk.net projectcode=101185 projecttask=Software Maintenance tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=1 details=null>=========
-=======<com.otl.reports.beans.TimeEntry@1c9b008 entryDate=Thu Aug 13 00:00:00 IST 1970 user=mnavaneethakrishnan@corpuk.net projectcode=101681 projecttask=BDP2 08 tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=2 details=null>=========
-=======<com.otl.reports.beans.TimeEntry@30173b entryDate=Fri Aug 14 00:00:00 IST 1970 user=mnavaneethakrishnan@corpuk.net projectcode=101681 projecttask=BDP2 08 tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=4 details=null>=========
-=======<com.otl.reports.beans.TimeEntry@1de69f2 entryDate=Wed Aug 12 00:00:00 IST 1970 user=mnavaneethakrishnan@corpuk.net projectcode=101681 projecttask=BDP2 08 tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=6 details=null>=========
-=======<com.otl.reports.beans.TimeEntry@c71fda entryDate=Thu Aug 13 00:00:00 IST 1970 user=mnavaneethakrishnan@corpuk.net projectcode=101681 projecttask=BDP2 08 tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=6 details=null>=========
-=======<com.otl.reports.beans.TimeEntry@4820da entryDate=Fri Aug 14 00:00:00 IST 1970 user=mnavaneethakrishnan@corpuk.net projectcode=101681 projecttask=BDP2 08 tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=3 details=null>=========
-=======<com.otl.reports.beans.TimeEntry@115da09 entryDate=Tue Aug 11 00:00:00 IST 1970 user=mnavaneethakrishnan@corpuk.net projectcode=101183 projecttask=Unpaid Absence tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=8 details=null>=========
-=======<com.otl.reports.beans.TimeEntry@1a95c64 entryDate=Sat Aug 15 00:00:00 IST 1970 user=mnavaneethakrishnan@corpuk.net projectcode=101183 projecttask=Unpaid Absence tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=8 details=null>=========
+			 * =======<com.otl.reports.beans.TimeEntry@c67308 entryDate=Wed Aug 12 00:00:00 IST 1970 user=mnk@testorac.net projectcode=101185 projecttask=Software Maintenance tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=2 details=null>=========
+=======<com.otl.reports.beans.TimeEntry@65657e entryDate=Fri Aug 14 00:00:00 IST 1970 user=mnk@testorac.net projectcode=101185 projecttask=Software Maintenance tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=1 details=null>=========
+=======<com.otl.reports.beans.TimeEntry@1c9b008 entryDate=Thu Aug 13 00:00:00 IST 1970 user=mnk@testorac.net projectcode=101681 projecttask=task2 08 tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=2 details=null>=========
+=======<com.otl.reports.beans.TimeEntry@30173b entryDate=Fri Aug 14 00:00:00 IST 1970 user=mnk@testorac.net projectcode=101681 projecttask=task2 08 tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=4 details=null>=========
+=======<com.otl.reports.beans.TimeEntry@1de69f2 entryDate=Wed Aug 12 00:00:00 IST 1970 user=mnk@testorac.net projectcode=101681 projecttask=task2 08 tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=6 details=null>=========
+=======<com.otl.reports.beans.TimeEntry@c71fda entryDate=Thu Aug 13 00:00:00 IST 1970 user=mnk@testorac.net projectcode=101681 projecttask=task2 08 tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=6 details=null>=========
+=======<com.otl.reports.beans.TimeEntry@4820da entryDate=Fri Aug 14 00:00:00 IST 1970 user=mnk@testorac.net projectcode=101681 projecttask=task2 08 tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=3 details=null>=========
+=======<com.otl.reports.beans.TimeEntry@115da09 entryDate=Tue Aug 11 00:00:00 IST 1970 user=mnk@testorac.net projectcode=101183 projecttask=Unpaid Absence tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=8 details=null>=========
+=======<com.otl.reports.beans.TimeEntry@1a95c64 entryDate=Sat Aug 15 00:00:00 IST 1970 user=mnk@testorac.net projectcode=101183 projecttask=Unpaid Absence tasktype=Normal Hours - E&D Vendor - (Straight Time) hours=8 details=null>=========
 webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldPage_=HtmlPage(about:blank)@4721772 newPage_=null type_=2 source=FrameWindow[name="_pprIFrame"]>
 			 * 
 			 * 	
@@ -66,8 +66,8 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		
 		
 	timeEntries.add(new TimeEntry(
-		user:"mnavaneethakrishnan@corpuk.net",
-		projecttask:"BDP2 08",
+		user:"mnk@testorac.net",
+		projecttask:"task2 08",
 		projectcode:"101185",
 		entryDate: new Date(), 
 		tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
@@ -76,8 +76,8 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		))
 	
 	timeEntries.add(new TimeEntry(
-		user:"mnavaneethakrishnan@corpuk.net",
-		projecttask:"BDP2 08",
+		user:"mnk@testorac.net",
+		projecttask:"task2 08",
 		projectcode:"101185",
 		entryDate: new Date()+1,
 		tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
@@ -86,8 +86,8 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		))
 	
 	timeEntries.add(new TimeEntry(
-		user:"mnavaneethakrishnan@corpuk.net",
-		projecttask:"BDP2 08",
+		user:"mnk@testorac.net",
+		projecttask:"task2 08",
 		projectcode:"101185",
 		entryDate: new Date()+2,
 		tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
@@ -96,8 +96,8 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		))
 	
 	timeEntries.add(new TimeEntry(
-		user:"mnavaneethakrishnan@corpuk.net",
-		projecttask:"BDP2 08",
+		user:"mnk@testorac.net",
+		projecttask:"task2 08",
 		projectcode:"101185",
 		entryDate: new Date()+2,
 		tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
@@ -117,17 +117,17 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 
 	dataManager.addUserEntries(new UserInfo(
 		
-		user: "mnavaneethakrishnan@corpuk.net",
+		user: "mnk@testorac.net",
 		password:"alka" 
 		))
 	
 	dataManager.addUserEntries(new UserInfo(
 		
-		user: "mnavaneethakrishnan2@corpuk.net",
+		user: "mnk2@testorac.net",
 		password:"alka"
 		))
 		
-	 ArrayList<TimeEntry> timeentries=dataManager.getTimesheetEntries("mnavaneethakrishnan@corpuk.net",new Date()-10,new Date()+1)
+	 ArrayList<TimeEntry> timeentries=dataManager.getTimesheetEntries("mnk@testorac.net",new Date()-10,new Date()+1)
 	 
 	 println timeentries
 	 
@@ -145,19 +145,19 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 //		 println timeentry
 //	   }
 //	
-	 UserInfo userinfo =dataManager.findUser("mnavaneethakrishnan@corpuk.net")
+	 UserInfo userinfo =dataManager.findUser("mnk@testorac.net")
 	 println userinfo
 	 
 	 
-	  userinfo =dataManager.findUser("@corpuk.net")
+	  userinfo =dataManager.findUser("@testorac.net")
 	 println userinfo
 	/*
-		UserInfo userInfo=dataManager.findUser("mnavaneethakrishnan2@corpuk.net") 
+		UserInfo userInfo=dataManager.findUser("mnk2@testorac.net") 
 		println(userInfo?.user);
 		
 		
 		
-		userInfo=dataManager.findUser("mjknavaneethakrishnan2@corpuk.net")
+		userInfo=dataManager.findUser("mjknavaneethakrishnan2@testorac.net")
 		println(userInfo?.user);
 		
 		
@@ -198,8 +198,8 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		ArrayList<TimeEntry> timeEntries= new ArrayList<TimeEntry>()
 		
 	timeEntries=fetchUserReport.startFetch(new UserInfo(
-			user: "mnavaneethakrishnan@corpuk.net",
-			password:"welcomeaug1"
+			user: "mnk@testorac.net",
+			password:"wa1"
 			), from, to)
 		
 		
@@ -212,11 +212,11 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		webBrowser.Navigate("http://ebiz.uk.three.com:80/OA_HTML/RF.jsp?function_id=10129&resp_id=51959&resp_appl_id=808&security_group_id=0&lang_code=US")
 		//webBrowser.printAll()
 		
-		//webBrowser.typeOnName("ssousername", "mnavaneethakrishnan@corpuk.net")
-		//webBrowser.typeOnName("password", "welcomeaug1")
+		//webBrowser.typeOnName("ssousername", "mnk@testorac.net")
+		//webBrowser.typeOnName("password", "wa1")
 		
-		webBrowser.typeOnName("ssousername", "mnavaneesdsdthakrishnan@corpuk.net")
-		webBrowser.typeOnName("password", "welcomeaug1")
+		webBrowser.typeOnName("ssousername", "mnavaneesdsdthakrishnan@testorac.net")
+		webBrowser.typeOnName("password", "wa1")
 		//webBrowser.clickOnInputName(webBrowser)
 		
 		
