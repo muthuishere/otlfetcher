@@ -3,12 +3,45 @@
  */
 
 
-	  
+
+function showinfo(divid,content){
+	
+	$( "#"+divid ).html('<div class="notify"><span class="symbol icon-info"></span>' + content +'!</div>')
+			
+
+	
+}
+
+function showerror(divid,content){
+	
+	$( "#"+divid ).html('<div class="notify notify-red"><span class="symbol icon-error"></span>' + content +'!</div>')
+			
+	
+}
+
+function showsuccess(divid,content){
+	
+	
+	$( "#"+divid ).html('<div class="notify notify-green"><span class="symbol icon-tick"></span>' + content +'!</div>')
+			
+	
+	
+}
+
+function showwarning(divid,content){
+	
+	$( "#"+divid ).html('<div class="notify notify-yellow"><span class="symbol icon-excl"></span>' + content +'!</div>')
+			
+	
+	
+}
+
+
 function showpage(pageName){
 	
 	
 	/*
-	if( pageName !="index"){
+	if( pageName !="home"){
 		
 		if($( "#sessioncookie" ).val() ==""){
 			

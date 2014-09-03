@@ -3,6 +3,7 @@ package com.otl.reports.controller
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.model.DataStore
+
 import java.util.TreeMap.Entry
 
 class DataManager {
@@ -10,12 +11,19 @@ class DataManager {
 	DataStore dataStore=null
 	String TIMESHEET_TABLE="timesheet"
 	String USER_TABLE="users"
+	private boolean initialized=false
 	
-	public void init(String filename){
+	
+	
 		
-		dataStore=new DataStore()
-		dataStore.init(filename )
+	public void init(){
 		
+		if(!initialized){
+			dataStore=new DataStore()
+			dataStore.init(Configurator.dbname )
+			initialized=true
+		
+		}
 	}
 	
 	def print(){
@@ -34,6 +42,9 @@ class DataManager {
 	
 		dataStore.insertUser(userInfo)
 	}
+	
+
+	
 	
 	public ArrayList<UserInfo> getUserEntries(){
 		

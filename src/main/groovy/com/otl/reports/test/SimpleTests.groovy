@@ -6,8 +6,8 @@ class SimpleTests {
 	def printme(){
 		
 		ClassLoader loader = this.getClass().getClassLoader();
-		File indexLoc = new File(loader.getResource(".."+File.separator).getFile());
-		String htmlLoc = indexLoc.getParentFile().getAbsolutePath();
+		File indexLoc = new File(loader.getResource("."+File.separator).getFile());
+		String htmlLoc = indexLoc.getParentFile().getParentFile().getParentFile().absolutePath
 		
 		println(htmlLoc)
 	}

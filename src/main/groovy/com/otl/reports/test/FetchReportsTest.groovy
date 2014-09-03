@@ -21,7 +21,8 @@ class FetchReportsTest {
 		server.init(2111, "//pages//")
 		server.startServer()
 		
-		while(1==1){
+		
+		while(!getbreakSignal()){
 			
 			Thread.currentThread().sleep(100000);
 		}
@@ -38,7 +39,7 @@ class FetchReportsTest {
 			cons = javax.swing.JOptionPane.&showInputDialog
 			yn = {((cons(it + " (y/n) ")?:"n").trim()?:"n")?.charAt(0).toLowerCase().toString() }
 		}
-		if (yn("Did you want to do something?") == 'y'){
+		if (yn("Press y to stop server?") == 'y'){
 			
 			return true
 		}

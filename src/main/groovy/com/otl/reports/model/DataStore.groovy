@@ -36,7 +36,7 @@ class DataStore {
 		 def password
 		 def ip
 		 */
-		db.execute("create table if not exists userInfo (user string, password string,ip string)")
+		db.execute("create table if not exists userInfo (user string, password string,ip string,locked string,lastupdated date)")
 
 		/*
 		 * Date entryDate
@@ -185,6 +185,9 @@ class DataStore {
 
 
 	}
+	
+	
+	
 	void insertUser(UserInfo userInfo){
 
 
@@ -205,6 +208,8 @@ class DataStore {
 			Log.error("Key Already exists ${userInfo.user} overWriting ");
 			query="delete from userInfo  where user='${userInfo.user}'"
 			db.executeUpdate(query, []);
+			
+			return
 
 		}
 
@@ -214,7 +219,9 @@ class DataStore {
 		curUserInfo.add(
 				user:userInfo.user,
 				password:userInfo.password,
-				ip:userInfo.ip
+				ip:userInfo.ip,
+				locked:"false",
+				lastupdated:new Date()
 
 				)
 

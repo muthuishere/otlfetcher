@@ -1,5 +1,6 @@
 package com.otl.reports.model
 
+import com.otl.reports.controller.Responder
 import javax.servlet.http.HttpServlet
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,21 +16,51 @@ class ServiceServlet extends HttpServlet {
  
     private static final long serialVersionUID = 1L;
  
-   
+	Responder responder=null
+	
+   public ServiceServlet(){
+	    responder=new Responder()
+		
+	   }
 	protected void doGet(HttpServletRequest request,
 		HttpServletResponse response)
 throws ServletException, IOException
 {
 // Set response content type
-response.setContentType("text/html");
+response.setContentType("text/xml");
 
-// Actual logic goes here.
-PrintWriter out = response.getWriter();
-out.println("<h1>" + message + "</h1>");
+String path=request.getPathInfo()
+String[] servicedata=path.split("/")
+
+println servicedata.length
+
+for ( e in servicedata ) {
+	println e
 }
 
 
- 
+String actionname=servicedata.getAt(1)
+
+
+def result = ""
+
+switch ( actionname ) {
+	case "updateuser":
+		result = responder.updateuser(request.getParameterMap(),request.getLocalAddr())
+		
+		break;
+
+	default:
+		result = "<reply><status code='1' error='true' description='Invalid Service specified'/></reply>"
+}
+
+// Actual logic goes here.
+PrintWriter out = response.getWriter();
+out.println(result);
+}
+
+
+
     /***************************************************
      * URL: /jsonservlet
      * doPost(): receives JSON data, parse it, map it and send back as JSON
@@ -37,21 +68,6 @@ out.println("<h1>" + message + "</h1>");
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException{
  
-        // 1. get received JSON data from request
-        BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream()));
-        String json = "";
-        if(br != null){
-            json = br.readLine();
-        }
- 
- 
-        // 4. Set response type to JSON
-        response.setContentType("application/json");            
- 
-        // 5. Add article to List<Article>
- //       articles.add(article);
- 
-        // 6. Send List<Article> as JSON to client
-   //     mapper.writeValue(response.getOutputStream(), articles);
+       doGet( request, response);
     }
 }
