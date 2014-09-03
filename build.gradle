@@ -10,6 +10,7 @@ mainClassName = "com.otl.reports.test.FetchReportsTest"
 
 
 
+
  repositories {
     mavenCentral()
 }
@@ -23,6 +24,35 @@ processResources{
 	exclude 'config.properties'
 }
 
+
+
+	
+
+
+sourceSets {
+    main {
+        groovy {
+            srcDirs = ['src/main/groovy']
+			
+        }
+		 java {
+            srcDir 'src/main/java'
+        }
+		 resources {
+            srcDir 'src/main/resources'
+        }
+    }
+
+    test {
+        groovy {
+            srcDirs = ['src/test/groovy']
+        }
+		 java {
+            srcDir 'src/test/java'
+        }
+
+    }
+}
 
 
 dependencies {
@@ -55,8 +85,18 @@ task initProject () << {
 
 task uberjar(type: Jar,dependsOn:[':compileJava',':compileGroovy']) {
 	from files(sourceSets.main.output.classesDir)
-	from configurations.runtime.asFileTree.files.collect { zipTree(it) }
-
+	from files(sourceSets.main.output.resourcesDir)
+	from(configurations.runtime.asFileTree.files.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+	
+ from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
 	manifest {
 		attributes 'Main-Class': 'com.otl.reports.test.FetchReportsTest'
 	}
