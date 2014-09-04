@@ -22,30 +22,48 @@
   $(function() {
     $( "#fromdate" ).datepicker({
 	
-	dateFormat: 'yyyy-mm-dd'
+	dateFormat: 'yy-mm-dd'
 	}	
 	);
   
     $( "#todate" ).datepicker({
 	
-	dateFormat: 'yyyy-mm-dd'
+	dateFormat: 'yy-mm-dd'
 	}	
 	);
 	
 
-	$( "input#reqsearch" )
-      .button()
-      .click(function( event ) {
-		alert("Show request results")
-        event.preventDefault();
-      });
-
+	
 
 	  
 	$( "input#search" )
       .button()
       .click(function( event ) {
-		alert("Show results")
+		
+    	  var formdata=$("form#frmuser").serializeArray()
+  		
+  		$('#frmuser')[0].reset();
+  		$.post( "/services/fetchreports", formdata)
+  		  .done(function( data ) {
+  		    
+  			
+  			//parse xml
+  			  $xml = $( data )
+  			  $status = $xml.find( "status" )
+  			  
+  			  
+  			  
+  			  if( $status.attr("error") =="true"){
+  				  
+  				  showerror("resultcontainer",$status.attr("description"))
+  				  
+  			  } else{
+  				  
+  				  showsuccess("resultcontainer",$status.attr("description"))
+  				  
+  			  }
+  		  });
+    	  
         event.preventDefault();
       });
 	  

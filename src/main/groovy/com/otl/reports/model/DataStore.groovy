@@ -13,6 +13,7 @@ import groovy.sql.Sql
 
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
+import com.otl.reports.beans.UserTimeSummary
 import com.otl.reports.helpers.Log
 
 class DataStore {
@@ -36,6 +37,8 @@ class DataStore {
 		 def password
 		 def ip
 		 */
+		
+		
 		db.execute("create table if not exists userInfo (user string, password string,ip string,locked string,lastupdated date)")
 
 		/*
@@ -97,7 +100,95 @@ class DataStore {
 		return userInfo
 	}
 
-	//return dataStore.getUserEntries()
+
+	public ArrayList<UserTimeSummary> getuserstatusList(String user){
+		ArrayList<UserTimeSummary> userstatuslist=new ArrayList<UserTimeSummary>()
+			String cond=" where 1=1 "
+				if(null != user)
+					cond=cond + " AND user like '${user}' "
+					
+					db.rows("select user,locked from userInfo " + cond ).each{
+						
+									userstatuslist.add(
+											new UserTimeSummary(											
+											user: it.user,
+											userLocked: Boolean.parseBoolean(it.locked)										
+											)
+											);
+								}
+					
+		return userstatuslist
+		
+	}
+	public def getTimesheetEntriesSummary(String user,Date from,Date to,def leavecodes){
+		
+		def timeEntries=new HashMap<String,UserTimeSummary>()
+		
+		//		ArrayList<UserTimeSummary> timeEntries=new ArrayList<UserTimeSummary>()
+		
+				String cond=" where 1=1 "
+				if(null != user)
+					cond=cond + " AND user like '${user}' "
+		
+		
+				if(null != from )
+					cond=cond + " AND entryDate >= "+ from.getTime()
+		
+				if(null != to)
+					cond=cond + " AND entryDate <= "+ to.getTime()
+
+					
+					String maxdateQuery="Select user,max(entryDate) from timentries ${cond}  group by user "
+					
+					
+					String workhrsQuery="Select user,total(hours) as totalhrs from timentries ${cond} and projectcode not in($leavecodes)  group by user "
+					
+					String leavehrsQuery="Select user,total(hours) as totalhrs from timentries ${cond} and projectcode  in($leavecodes)  group by user "
+					
+					
+					
+					//Select user,max(entryDate)from timentries group by user 
+		
+					// group by user where projectcode not in[leavecodes]
+					
+					//Select user,total(hours) as totalhrs from timentries group by user where projectcode in[ leavecodes]
+					
+					
+					//Merge and Add entries
+					//user, workinghours leavehours,lastupdated entry
+		
+				db.rows(maxdateQuery).each{
+		
+					timeEntries.put(it.user, new TimeEntry(
+						user: it.user,
+						lastupdated:new Date(it.entryDate)
+						))
+					
+				}
+		
+				db.rows(workhrsQuery).each{
+				
+						timeEntries.get(it.user).workhours=it.hours
+					
+						}
+					
+				db.rows(leavehrsQuery).each{
+					
+							timeEntries.get(it.user).leavehours=it.hours
+						
+							}
+				
+				getuserstatusList( user).each{
+					
+							timeEntries.get(it.user).userLocked=it.userLocked
+							
+						
+							}
+				return timeEntries
+			}
+	
+	
+		//return dataStore.getUserEntries()
 	//return dataStore.findUser(user)
 
 	public ArrayList<TimeEntry> getTimesheetEntries(String user,Date from,Date to){

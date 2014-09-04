@@ -25,14 +25,15 @@ class OTLServer {
 		 
 		// String webDir = this.class.getClassLoader().getResource(".").toExternalForm();
 		 
-		 ClassLoader loader = this.getClass().getClassLoader();
-		 File indexLoc = new File(loader.getResource("."+File.separator).getFile());
-		 String webDir = indexLoc.getParentFile().getParentFile().getParentFile().absolutePath + "\\resources\\main\\webapp";
+		// ClassLoader loader = this.getClass().getClassLoader();
+	//	 File indexLoc = new File(loader.getResource("."+File.separator).getFile());
+		// String webDir = indexLoc.getParentFile().getParentFile().getParentFile().absolutePath + "\\resources\\main\\webapp";
 		 
 		 
 		// println(webDir)
 		 
-		 context.setResourceBase(webDir);
+		 context.setResourceBase("./build/webapp");
+			 
 		 server.setHandler(context);
 	 
 	 

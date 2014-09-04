@@ -60,6 +60,16 @@ class DataManager {
 		
 	}
 	
+	public def getTimesheetEntriesSummary(String user,Date from,Date to){
+		
+			
+			
+			return dataStore.getTimesheetEntriesSummary(user,from,to,Configurator.leavecodes)
+			
+			
+		}
+	
+	
 	public ArrayList<TimeEntry> getTimesheetEntries(String user,Date from,Date to){
 	
 		

@@ -17,7 +17,33 @@ class Responder {
 	
 	 
 	
+	public String fetchreports(def params){
+		
+		StringBuffer response= new StringBuffer()
+		
+		response.append("<reply>")
+		
+		
+		
+		
+		try{
+		def list=dataManager.getTimesheetEntriesSummary( params.user, params.fromdate,params.todate)
+		// Add information as xml
+		
+		response.append("<status code='0' error='false' description='Successfully updated user information'/>")
+		}catch(Exception e){
+		
+		
+		response.append("<status code='1' error='true' description='${e.getMessage()}'/>")
+		}
 	
+	
+		response.append("</reply>")
+		
+		return response;
+		
+		
+	}
 	public String updateuser(def params,String ip){
 		
 		StringBuffer response= new StringBuffer()

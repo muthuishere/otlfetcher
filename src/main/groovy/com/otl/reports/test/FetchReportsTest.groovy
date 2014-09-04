@@ -22,11 +22,26 @@ class FetchReportsTest {
 		server.startServer()
 		
 		
+		def CLEANUP_REQUIRED = true
+		Runtime.runtime.addShutdownHook {
+		  println "Shutting down..."
+		  server.stopServer()
+		  if( CLEANUP_REQUIRED ) {
+		
+		  }
+		}
+		(1..10).each {
+		  sleep( 1000 )
+		}
+		CLEANUP_REQUIRED = false
+		
+		/*
 		while(!getbreakSignal()){
 			
 			Thread.currentThread().sleep(100000);
 		}
-		server.stopServer()
+		*/
+		
 	}
 	
 	static def getbreakSignal(){

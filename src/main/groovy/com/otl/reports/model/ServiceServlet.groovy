@@ -49,6 +49,13 @@ switch ( actionname ) {
 		result = responder.updateuser(request.getParameterMap(),request.getLocalAddr())
 		
 		break;
+	
+		case "fetchreports":
+		result = responder.fetchreports(request.getParameterMap())
+		
+		break;
+	
+		
 
 	default:
 		result = "<reply><status code='1' error='true' description='Invalid Service specified'/></reply>"

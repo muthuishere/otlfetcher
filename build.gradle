@@ -29,8 +29,12 @@ processResources{
 	
 
 
+	
 sourceSets {
     main {
+		
+		output.resourcesDir="build/"
+		
         groovy {
             srcDirs = ['src/main/groovy']
 			
