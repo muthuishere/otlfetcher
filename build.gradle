@@ -15,18 +15,15 @@ mainClassName = "com.otl.reports.test.FetchReportsTest"
     mavenCentral()
 }
  
-configurations {
-    testCompile.transitive = true
 
+
+//Use gradle run -PappArgs="['C:\\muthu\\gitworkspace\\otlfetcher\\otlfetcher.conf']"
+
+run {
+	if ( project.hasProperty("appArgs") ) {
+		args Eval.me(appArgs)
+	}
 }
-
-processResources{
-	exclude 'config.properties'
-}
-
-
-
-	
 
 
 	

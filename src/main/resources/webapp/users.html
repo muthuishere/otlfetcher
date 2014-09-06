@@ -1,22 +1,145 @@
-      <div id ="overlay" style="">
+        <div class="top_slogan">
+	User Entries	
+  </div>
+       <div id ="overlay" class="main_content"  style="">
 	   
+	     <div style="height:300px" >
 	  
-	   <table cellpadding="10" cellspacing="10" border="2">
-	  	
-	  	<td>Valid Creds.. </td>   
-	   <td>Name </td>
-	   <td >Information from </td>
-	   <td>Information To </td>
-	   <td >Latest Timesheet date </td>
-	   </tr>
-	   
-	   
-	   </table>
+			<span id="resultdetailcontainer"/>
+	  
+	  </div>
+
 	  </div>
  <script>
+ 
+
+ function showuserreport( ){
+ 	
+ 	$("#resultdetailcontainer").show()
+ 	  $("#resultdetailcontainer").html("<img src='images/loadingajax.gif'/>")
+ 	  
+ 	  
+ 	      var formdata=null
+ 	 
+ 		
+ 		
+ 	$.post( "/services/getallusers", formdata)
+ 	  .done(function( data ) {
+ 	    
+ 		
+ 		//parse xml
+ 		  $xml = $( data )
+ 		  $status = $xml.find( "status" )
+ 		  
+ 		  
+ 		  
+ 		  if( $status.attr("error") =="true"){
+ 			  
+ 			  showerror("resultdetailcontainer",$status.attr("description"))
+ 			  
+ 		  } else{
+ 			  
+ 			  var tbl=""
+ 				  /*
+ 				  response.append("\n<name>${xml_string(val.user)}</name>")
+ 					response.append("\n<projectcode>${val.projectcode}</projectcode>")
+ 					response.append("\n<projecttask>${xml_string(val.projecttask)}</projecttask>")
+ 					response.append("\n<tasktype>${xml_string(val.tasktype)}</tasktype>")
+ 					response.append("\n<hours>${val.hours}</hours>")
+ 					response.append("\n<details>${val.details}</details>")
+ 					response.append("\n<isLeave>${val.isLeave}</isLeave>")
+ 					response.append("\n<entryDate>${val.entryDate}</entryDate>")
+ 					response.append("\n<fetchedDate>${val.fetchedDate}</fetchedDate>")
+ 					
+ 					
+ 					*/
+ 					
+
+ 				 tbl=tbl + '<div style="float:left"> <table id="tblusers" style="width:400px" class="display" cellspacing="0" >' 
+ 				 tbl=tbl + "    <thead>" 
+ 				 tbl=tbl + "      <tr>" 
+ 				 tbl=tbl + "        <th><span>S.No</span></th>"
+ 				 tbl=tbl + "        <th><span>User</span></th>" 
+ 				 tbl=tbl + "        <th><span>Credential Status</span></th>" 
+
+ 				 tbl=tbl + "      </tr>" 
+ 				 tbl=tbl + "    </thead>" 
+ 				 tbl=tbl + "    <tbody>" 
+ 			
+ 				var dataCount=0
+				
+				
+ 				 
+ 			 $xml.find('entry').each(function(index){
+ 				dataCount++
+ 	            var userName = $(this).find('name').text();
+ 	      
+ 				
+ 				 var userlocked = $(this).find('userLocked').text();
+		           
+ 	  		    var privacyImg="<img src='images/valid.png'>"
+ 	  		            if(undefined == userlocked ||  userlocked == "true")
+ 	  		            	privacyImg="<img src='images/invalid.png'>"   
+ 	  		            	
+ 	  		            	
+ 	      	
+ 	       
+ 				  
+ 	     	 tbl=tbl + "      <tr>" 
+ 				 tbl=tbl + "        <td class='calign'>"+dataCount+"</td>" 
+ 				 tbl=tbl + "        <td class='lalign'>"+userName+"</td>" 
+ 				 tbl=tbl + "        <td class='calign'>"+privacyImg+"</td>"
+ 				
+ 				 tbl=tbl + "      </tr>" 
+ 				 
+ 	        });
+ 			
+ 				 tbl=tbl + "	      </tbody>" 
+ 				 tbl=tbl + "  </table></div>"
+ 				 
+ 				 if( dataCount >0){
+ 				 	$("#resultdetailcontainer").html(tbl)
+ 				 	
+ 				  if( dataCount >10){
+ 					  
+ 					  
+ 					$.extend( $.fn.dataTable.defaults, {
+ 					    "searching": true,
+ 					    "ordering": true,
+ 					  "paging":   true,  				        
+ 				        "info":     true
+ 					} );
+ 					$('#tblusers').dataTable();
+ 				  }
+   					  
+ 				  else{
+ 					  
+ 					$.extend( $.fn.dataTable.defaults, {
+ 					    "searching": false,
+ 					    "ordering": false,
+ 						"paging":   false,  				        
+ 				        "info":     false
+ 					} );
+ 					
+ 					
+ 					$('#tblusers').dataTable();
+ 				  }	
+ 				 }
+ 				 else
+ 					 showerror("resultdetailcontainer","No Users Available to show")
+ 				
+ 					
+ 					// $('#example').dataTable();
+ 			  
+ 		  }
+ 	  });
+ 	  
+ 	
+ 	
+ }
   $(function() {
  
-	  
+	  showuserreport()
 
   });
   </script>

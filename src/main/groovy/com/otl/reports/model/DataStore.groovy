@@ -14,6 +14,7 @@ import groovy.sql.Sql
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.beans.UserTimeSummary
+import com.otl.reports.exceptions.ServiceException
 import com.otl.reports.helpers.Log
 
 class DataStore {
@@ -53,6 +54,8 @@ class DataStore {
 		 */
 		db.execute("create table if not exists timeentry (user string, entryDate date,projectcode string,projecttask string,tasktype string,hours integer,details string,key string)")
 
+		
+		//println(db.dump())
 	}
 
 	public ArrayList<UserInfo> getUserEntries(){
@@ -66,7 +69,9 @@ class DataStore {
 					new UserInfo(
 					user: it.user,
 					password: it.password,
-					ip: it.ip
+					ip: it.ip,
+					locked: it.locked
+					
 
 					)
 					);
@@ -74,6 +79,28 @@ class DataStore {
 
 		return userEntries
 	}
+	
+	public ArrayList<UserInfo> getValidUserEntries(){
+		
+		
+				ArrayList<UserInfo> userEntries=new ArrayList<UserInfo>()
+		
+				db.rows("select * from userInfo where locked='false' " ).each{
+		
+					userEntries.add(
+							new UserInfo(
+							user: it.user,
+							password: it.password,
+							ip: it.ip,
+							locked: it.locked
+							
+		
+							)
+							);
+				}
+		
+				return userEntries
+			}
 
 	public UserInfo findUser(String user){
 
@@ -92,7 +119,8 @@ class DataStore {
 			userInfo=new UserInfo(
 					user: it.user,
 					password: it.password,
-					ip: it.ip
+					ip: it.ip,					
+					locked: it.locked
 
 					)
 		}
@@ -138,20 +166,63 @@ class DataStore {
 					cond=cond + " AND entryDate <= "+ to.getTime()
 
 					
-					String maxdateQuery="Select user,max(entryDate) from timentries ${cond}  group by user "
+					String maxdateQuery="Select user,max(entryDate) as maxentrydate from timeentry ${cond}  group by user "
 					
 					
-					String workhrsQuery="Select user,total(hours) as totalhrs from timentries ${cond} and projectcode not in($leavecodes)  group by user "
+					String workhrsQuery="Select user,total(hours) as totalhrs from timeentry ${cond} and projectcode not in($leavecodes)  group by user "
 					
-					String leavehrsQuery="Select user,total(hours) as totalhrs from timentries ${cond} and projectcode  in($leavecodes)  group by user "
+					String leavehrsQuery="Select user,total(hours) as totalhrs from timeentry ${cond} and projectcode  in($leavecodes)  group by user "
+					
+					
+					println maxdateQuery
+					println workhrsQuery
+					println leavehrsQuery
 					
 					
 					
-					//Select user,max(entryDate)from timentries group by user 
+					//Select user,max(entryDate)from timeentry group by user
 		
 					// group by user where projectcode not in[leavecodes]
 					
-					//Select user,total(hours) as totalhrs from timentries group by user where projectcode in[ leavecodes]
+					//Select user,total(hours) as totalhrs from timeentry group by user where projectcode in[ leavecodes]
+					
+					
+					//Merge and Add entries
+					//user, workinghours leavehours,lastupdated entry
+		
+				db.rows(maxdateQuery).each{
+		
+					timeEntries.put(it.user, new UserTimeSummary(
+						user: it.user,
+						lastupdated:new Date(it.maxentrydate)
+						))
+					
+				}
+		
+				db.rows(workhrsQuery).each{
+				
+						timeEntries.get(it.user)?.workhours=it.totalhrs
+					
+						}
+					
+				db.rows(leavehrsQuery).each{
+					
+							timeEntries.get(it.user)?.leavehours=it.totalhrs
+						
+							}
+				
+				getuserstatusList( user).each{
+					
+							timeEntries.get(it.user)?.userLocked=it.userLocked
+							
+						
+							}
+				return timeEntries
+					//Select user,max(entryDate)from timeentry group by user 
+		
+					// group by user where projectcode not in[leavecodes]
+					
+					//Select user,total(hours) as totalhrs from timeentry group by user where projectcode in[ leavecodes]
 					
 					
 					//Merge and Add entries
@@ -161,37 +232,32 @@ class DataStore {
 		
 					timeEntries.put(it.user, new TimeEntry(
 						user: it.user,
-						lastupdated:new Date(it.entryDate)
+						lastupdated:new Date(it.maxentrydate)
 						))
 					
 				}
 		
-				db.rows(workhrsQuery).each{
 				
-						timeEntries.get(it.user).workhours=it.hours
-					
-						}
-					
-				db.rows(leavehrsQuery).each{
-					
-							timeEntries.get(it.user).leavehours=it.hours
-						
-							}
 				
 				getuserstatusList( user).each{
 					
-							timeEntries.get(it.user).userLocked=it.userLocked
+					
+							timeEntries.get(it.user)?.userLocked=it.userLocked
 							
 						
 							}
+				
+				
 				return timeEntries
 			}
+	
+	
 	
 	
 		//return dataStore.getUserEntries()
 	//return dataStore.findUser(user)
 
-	public ArrayList<TimeEntry> getTimesheetEntries(String user,Date from,Date to){
+	public ArrayList<TimeEntry> getTimesheetEntries(String user,Date from,Date to,String leavecodes){
 
 		ArrayList<TimeEntry> timeEntries=new ArrayList<TimeEntry>()
 
@@ -206,10 +272,18 @@ class DataStore {
 		if(null != to)
 			cond=cond + " AND entryDate <= "+ to.getTime()
 
-
-
+Log.info("Query select * from timeentry " + cond)
+			
 		db.rows("select * from timeentry " + cond).each{
 
+			
+			
+				boolean isLeave=false
+					if(leavecodes.contains("" + it.projectcode))
+						isLeave=true
+			
+			
+			
 			timeEntries.add(
 					new TimeEntry(
 					entryDate: new Date(it.entryDate),
@@ -219,10 +293,12 @@ class DataStore {
 					projecttask: it.projecttask,
 					tasktype: it.tasktype,
 					details: it.details,
+					isLeave: isLeave, 
+					fetchedDate: new Date() 
 					)
 					);
 		}
-
+		Log.info("Query returned" + timeEntries.size())
 		return timeEntries
 	}
 	void insertTimesheet(TimeEntry timeEntry){
@@ -256,7 +332,7 @@ class DataStore {
 				hours:timeEntry.hours,
 				details:timeEntry.details,
 				key:timeEntry.key,
-				entryDate:timeEntry.entryDate
+				entryDate:timeEntry.entryDate.getTime()
 				)
 
 
@@ -276,6 +352,41 @@ class DataStore {
 
 
 	}
+	
+	void updateUserLock(UserInfo userInfo){
+		
+		
+		
+				boolean exists =false
+		
+		
+		
+				def query="select user from userInfo  where user='" + userInfo.user + "'"
+		
+			
+				exists=(db.rows(query).size()>0)
+		
+				// boolean exists = db.execute("select user from userInfo  where user='${userInfo.user}'", null);
+		
+		
+				if( exists){
+		
+					Log.error("Key Already exists ${userInfo.user} overWriting ");
+					query="update userInfo set locked='${userInfo.locked}' where user='${userInfo.user}'"
+					println(query)
+					
+					db.executeUpdate(query, []);
+					
+					return
+		
+				}else{
+				
+				throw new ServiceException("User did not exist in DB")
+				}
+		
+		
+		
+			}
 	
 	
 	

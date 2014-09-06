@@ -1,113 +1,106 @@
-<!DOCTYPE HTML>
-<html>
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>OTL Assist</title>
-  <meta name="description" content="website description" />
-  <meta name="keywords" content="website keywords, website keywords" />
-  <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
-  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Tangerine&amp;v1" />
-  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" />
-  <link rel="stylesheet" type="text/css" href="css/style.css" />
-  <link href="js/jquery-ui.min.css" rel="stylesheet">
-  <link href="js/jquery-ui.structure.min.css" rel="stylesheet">
-  <link href="js/jquery-ui.theme.min.css" rel="stylesheet">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<title>OTL Fetcher | Vera vazhiyei illa project</title>
+<link rel="stylesheet" type="text/css" media="all" href="css/style.css" />
+ <link href="css/jquery-ui.min.css" rel="stylesheet"/>
+  <link href="css/jquery-ui.structure.min.css" rel="stylesheet"/>
+  <link href="css/jquery-ui.theme.min.css" rel="stylesheet"/>
+
+      <link href="css/jquery.dataTables.css" rel="stylesheet"/>
+    <link href="css/icons.css" rel="stylesheet"/>
+
+
+</head>
+<body>
+
+  <div id="header">
+        <div class="header_content">
+      
+        <div class="logo"><a href="index.html">OTL Info</a> <span>| a complexified simple crawler</span></div>
+        
+        <div class="menu">
+            <ul>
+			 <li id="home" class="selected"><a  href="#" onclick="showpage('home');return false">Home</a></li>
+			<li id="reports"><a  href="#" onclick="showpage('reports');return false">Reports</a></li>
+           <li id="settings"><a  href="#" onclick="showpage('settings');return false">Settings</a></li>
+           <li id="users"><a  href="#" onclick="showpage('users');return false">Users</a></li>
+		   
+              
+            </ul>
+         </div>
+         
+        </div> 
+  </div><!-- End of Header-->
+
+<div id="wrap">
+
+ <div id="site_content">
+   
+     
+    
+  <div class="top_slogan">
+		
+  </div>	
+ 
+   <div class="main_content">
+
+   
+          
+   </div>
+   
+   </div>
+   <div class="clear"></div> 
   
+   
+</div>
+
+
+        <div class="footer">
+        	<div class="footer_content">
+            <div class="footer_left">
+              
+                <ul class="footer_menu">
+				 <li title="home" ><a  href="#" onclick="showpage('home');return false">Home</a></li>
+			<li title="reports"><a  href="#" onclick="showpage('reports');return false">Reports</a></li>
+           <li title="settings"><a  href="#" onclick="showpage('settings');return false">Settings</a></li>
+           <li title="users"><a  href="#" onclick="showpage('users');return false">Users</a></li>
+		   
+           
+                </ul>
+            </div>
+            
+            <div class="footer_right">
+                <ul class="social_icons">
+                <li><a href="#"><img src="images/icon_rss.png" alt="" title="" /></a></li>
+                <li><a href="#"><img src="images/icon_facebook.png" alt="" title="" /></a></li>
+                <li><a href="#"><img src="images/icon_twitter.png" alt="" title="" /></a></li>
+                <li><a href="#"><img src="images/icon_dribbble.png" alt="" title="" /></a></li>
+                </ul>
+            </div>
+           <div class="clear"></div>
+           </div>
+        </div>
+
+
   <script type="text/javascript" src="js/jquery.js"></script>
     <script type="text/javascript" src="js/utils.js"></script>
   <script type="text/javascript" src="js/jquery-ui.min.js"></script>
-  <style>
-    
-    label, input { display:block; }
-    input.text { margin-bottom:12px; width:95%; padding: .4em; }
-    fieldset { padding:0; border:0; margin-top:25px; }    
-    .ui-dialog .ui-state-error { padding: .3em; }
-	.validateTips { border: 1px solid transparent; padding: 0.3em; }
-    
-  </style>
-</head>
+   <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
 
-<body>
-  <div id="main">
-    <div id="header">
-      <div id="logo">
-        <h1>OTL &nbsp;&nbsp;<a href="#">Assist</a></h1>
-        <div class="slogan">The Report Fetcher !</div>
-      </div>
-     <div id="menubar">
-        <ul id="menu">
-          <!-- put class="current" in the li tag for the selected page - to highlight which page you're on -->
-          <li id="home" class="current"><a  href="#" onclick="showpage('home');return false">Home</a></li>
-          <li id="reports"><a  href="#" onclick="showpage('reports');return false">Reports</a></li>
-           <li id="settings"><a  href="#" onclick="showpage('settings');return false">Settings</a></li>
-           <li id="users"><a  href="#" onclick="showpage('users');return false">Users</a></li>
-          
-        </ul>
-      </div>
-    </div>
-	<div style="clear:both">&nbsp;</div>
-	<input type="hidden" id="sessioncookie" value="" />
-    <div id="site_content">
-   
-     
-    </div>
-	<div style="clear:both">&nbsp;</div>
-	
-	<div id="dialog-form" title="Login as admin">
+     <script>
 
- <p class="validateTips">All form fields are required.</p>
-  <form id="frmadmin">
-    <fieldset>
-      <label for="name">Name</label>
-      <input type="text" name="name" id="adminname" value="" class="text ui-widget-content ui-corner-all">      
-      <label for="password">Password</label>
-      <input type="password" name="password" id="adminpassword" value="" class="text ui-widget-content ui-corner-all">
- 
-      <!-- Allow form submission with keyboard without duplicating the dialog button -->
-      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-    </fieldset>
-  </form>
-</div>
-
-    <div id="footer">
-      <p>Copyright &copy; TCS  |  </p>
-    </div>
-  </div>
-  
-   <script>
-   var dialog
   $(function() {
   
-  showpage('home');
-   var name = $( "#adminname" )
-    
-     var password = $( "#adminpassword" )
-      var allFields = $( [] ).add( name ).add( password );
-      var tips = $( ".validateTips" );
-	  
- dialog = $( "#dialog-form" ).dialog({
-      autoOpen: false,
-      height: 300,
-      width: 350,
-      modal: true,
-      buttons: {
-        "Login": validateadmin,
-        Cancel: function() {
-          $( "#dialog-form" ).dialog( "close" );
-        }
-      },
-      close: function() {
-       $("#adminname").val("");
-	   $("#adminpassword").val("");
-        allFields.removeClass( "ui-state-error" );
-      }
-    });
+	showpage('reports');
+  
 	
   });	
   
   
   
 </script>	
- 
 </body>
 </html>

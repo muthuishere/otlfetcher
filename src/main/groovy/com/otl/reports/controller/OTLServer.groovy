@@ -12,9 +12,12 @@ class OTLServer {
 	
 
 	
-	public init(int port,String path){
+	public init(){
 		
-		 server = new Server(port)
+		
+		
+		
+		 server = new Server(Configurator.globalconfig.server_port)
 		
 		// String webDir = this.class.getClassLoader().getResource("com/otl/reports/webapps").toExternalForm();
 		 
@@ -32,7 +35,7 @@ class OTLServer {
 		 
 		// println(webDir)
 		 
-		 context.setResourceBase("./build/webapp");
+		 context.setResourceBase(Configurator.globalconfig.webapp_path);
 			 
 		 server.setHandler(context);
 	 

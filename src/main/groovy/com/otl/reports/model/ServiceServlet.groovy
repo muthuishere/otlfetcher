@@ -46,14 +46,30 @@ def result = ""
 
 switch ( actionname ) {
 	case "updateuser":
-		result = responder.updateuser(request.getParameterMap(),request.getLocalAddr())
+		result = responder.updateuser(request)
 		
 		break;
-	
-		case "fetchreports":
-		result = responder.fetchreports(request.getParameterMap())
+		case "getallusers":
+		result = responder.getAllusers()
 		
 		break;
+		case "fetchreportsummary":
+		result = responder.fetchreportSummary(request)
+		
+		break;
+		case "fetchdbstatus":
+		result = responder.fetchDbStatus()
+		
+		break;
+		case "fetchreportdetails":
+		result = responder.fetchreportDetails(request)
+		
+		break;
+		case "updatefetchdb":
+		result = responder.updatefetchDb(request)
+		
+		break;
+		
 	
 		
 

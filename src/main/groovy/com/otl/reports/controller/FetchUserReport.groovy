@@ -3,6 +3,7 @@ package com.otl.reports.controller
 import java.text.SimpleDateFormat
 import java.util.ArrayList;
 
+import com.gargoylesoftware.htmlunit.html.DomElement
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -20,19 +21,19 @@ class FetchUserReport {
 	def init(){
 
 		 webBrowser=new WebBrowser()
-		webBrowser.init("firefox")
+		webBrowser.init()
 	}
 
 	def login(UserInfo userInfo){
 
 
-		webBrowser.Navigate("http://ebiz.uk.three.com:80/OA_HTML/RF.jsp?function_id=10129&resp_id=51959&resp_appl_id=808&security_group_id=0&lang_code=US")
+		webBrowser.Navigate(Configurator.globalconfig.timesheet_url)
+
+		
 
 
-
-
-		webBrowser.typeOnName("ssousername", userInfo.user)
-		webBrowser.typeOnName("password",  userInfo.password)
+		webBrowser.typeOnName(Configurator.globalconfig.element_map.loginuser, userInfo.user)
+		webBrowser.typeOnName(Configurator.globalconfig.element_map.loginpwd,  userInfo.password)
 		//webBrowser.clickOnInputName(webBrowser)
 
 
@@ -40,7 +41,7 @@ class FetchUserReport {
 		webBrowser.executeScriptforNewPage("buttonSubmit('OK');")
 
 		webBrowser.waitForPageLoad();
-		if(webBrowser.findElemByName("ssousername") ==null)
+		if(webBrowser.findElemByName(Configurator.globalconfig.element_map.loginuser) ==null)
 			return true
 		else
 			return false
@@ -49,7 +50,7 @@ class FetchUserReport {
 	}
 
 	def gotoTimesheetPage(){
-		webBrowser.NavigateInner("http://ebiz.uk.three.com:80/OA_HTML/RF.jsp?function_id=10129&resp_id=51959&resp_appl_id=808&security_group_id=0&lang_code=US")
+		webBrowser.NavigateInner(Configurator.globalconfig.timesheet_url)
 
 		webBrowser.waitForPageLoad();
 	}
@@ -72,12 +73,18 @@ class FetchUserReport {
 	def parseDate(String dstr){
 		
 		//"		 Mon, Aug 18"
-		Date startdate = new SimpleDateFormat("EEE, MMM d").parse( dstr.trim());
+		Date startdate = new SimpleDateFormat("EEE, MMM d yyyy").parse( dstr.trim());
 		return startdate
 	}
 	def getTimesheetData(def user){
 		
 		//document.querySelectorAll("#Hxctimecard")[0].querySelectorAll("td.x1r")[0].parentNode.parentNode
+		
+		
+		
+		String timeval= webBrowser.findElemById("DISPLAY_START_TIME").getTextContent().trim().replaceAll("\"", "").trim()
+		//Monday, May 26 2014
+		Date startdate = new SimpleDateFormat("EEEE, MMM dd yyyy").parse( timeval.trim());
 		
 		def resultContainer= webBrowser.findElemById("Hxctimecard")
 		
@@ -93,12 +100,14 @@ class FetchUserReport {
 			
 		}
 		
-		String startdateStr= cells.get(3).asText()
+		//String startdateStr= cells.get(3).asText().trim() +" " +yearstring
 		
 		ArrayList<Date> dates= new ArrayList<Date>()
 		//Mon, Aug 18"
-		Date startdate = parseDate(startdateStr);//new SimpleDateFormat("EEE, MMM d").parse( startdateStr);
+		//Date startdate = parseDate(startdateStr);//new SimpleDateFormat("EEE, MMM d").parse( startdateStr);
 		
+		
+		//println("============== $startdate =======================")
 		dates.add(startdate)
 		dates.add(startdate+1)
 		dates.add(startdate+2)
@@ -142,7 +151,8 @@ class FetchUserReport {
 							)
 						
 						timeEntries.add(te)
-						println("=======${te.dump()}=========")
+					//	println("=======${te.dump()}=========")
+						Log.info("Adding for ${user} from ${te.dump()}")
 					}
 					
 				}
@@ -181,21 +191,22 @@ class FetchUserReport {
 			
 			
 		if(!login(userInfo))
-			throw new ServiceException("Invalid User Credentials")
+			throw new ServiceException("INVALID CREDENTIALS:Invalid User Credentials")
 
 
-			Log.info("Valid User identified")
 			
-			Log.info("Opening Timesheet page")
+			
+			Log.info("Opening Timesheet page for ${userInfo.user}")
 			
 		gotoTimesheetPage()
 
 		//Verify Page is valid page, check element name exists
 
-		Log.info("Opening Reports page")
+		Log.info("Opening Reports page [" +from.format("dd-MMM-yyyy") +"    " +  to.format("dd-MMM-yyyy"))
 		ShowReports(from.format("dd-MMM-yyyy") ,to.format("dd-MMM-yyyy"))
 		
-	
+		
+
 		
 		
 		def resultContainer= webBrowser.findElemById("Hxcmytcsearchresults")
@@ -232,7 +243,7 @@ class FetchUserReport {
 			
 		}
 		
-		Log.info("Opening Reports page")
+		Log.info("Opening Reports page for ${userInfo.user}")
 		
 		HtmlPage  resultPage=webBrowser.currentPage
 		
@@ -240,7 +251,8 @@ class FetchUserReport {
 		
 		for(HtmlElement validlink:validlinks){
 			
-			//Click element
+			
+			
 			
 			webBrowser.clickLink(validlink)
 			webBrowser.waitForPageLoad();
@@ -251,31 +263,16 @@ class FetchUserReport {
 			//document.querySelectorAll("#Hxctimecard")[0].querySelectorAll("td.x1r")[0].parentNode.parentNode
 			
 			webBrowser.currentPage=resultPage
-			//wait for page load
 			
-			//read information
-			
-			//print
-			
-			//reset current page
 		}
 		
-		Log.info("Completed" +timeEntries.dump())
-		//Log.info("Printing TImesheet Reports")
 		
-		//Log.info(resultContainer.asXml())
-		
-		//Iterate table
-		
-		
-
-		//webBrowser.printAll()
 
 
 		close()
 
 
-		Log.info "Completed Closed"
+		Log.info "Completed for ${userInfo.user} fetched ${timeEntries.size()} entries from ${from} to  ${to}"
 		return timeEntries
 	}
 

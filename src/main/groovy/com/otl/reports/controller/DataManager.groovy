@@ -2,8 +2,10 @@ package com.otl.reports.controller
 
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
+import com.otl.reports.beans.UserTimeSummary;
 import com.otl.reports.model.DataStore
 
+import java.util.ArrayList;
 import java.util.TreeMap.Entry
 
 class DataManager {
@@ -18,12 +20,12 @@ class DataManager {
 		
 	public void init(){
 		
-		if(!initialized){
-			dataStore=new DataStore()
-			dataStore.init(Configurator.dbname )
-			initialized=true
 		
-		}
+			dataStore=new DataStore()
+			dataStore.init(Configurator.globalconfig.dbname )
+			
+		
+		
 	}
 	
 	def print(){
@@ -38,6 +40,25 @@ class DataManager {
 		}
 	
 	}
+	
+	public void enableUser(String user){
+		
+		dataStore.updateUserLock(
+			new UserInfo(
+				user: user, 
+				locked: "false" 
+				)
+			)
+	}
+	public void disableUser(String user){
+		
+		dataStore.updateUserLock(
+			new UserInfo(
+				user: user,
+				locked: "true"
+				)
+			)
+	}
 	public void addUserEntries(UserInfo userInfo){
 	
 		dataStore.insertUser(userInfo)
@@ -46,12 +67,23 @@ class DataManager {
 
 	
 	
+	public ArrayList<UserInfo> getValidUserEntries(){
+		
+		return dataStore.getValidUserEntries()
+		
+		}
+	
+	
 	public ArrayList<UserInfo> getUserEntries(){
 		
 		return dataStore.getUserEntries()
 		
 		}
-	
+	public ArrayList<UserTimeSummary> getAllUserStatus(){
+		
+		return dataStore.getuserstatusList(null)
+		
+		}
 	
 	public UserInfo findUser(String user){
 	
@@ -59,12 +91,42 @@ class DataManager {
 		return dataStore.findUser(user)
 		
 	}
+		
 	
+	private String getProjectLeaveCodes(){
+		String leavecode=""
+		int i=0
+		for(def bfr:Configurator.globalconfig.leavecodes){
+			
+			
+			
+			if(i > 0)
+				leavecode=leavecode +","
+			
+				
+				
+				leavecode=leavecode +"'$bfr'"
+				
+			i++
+			}
+		return leavecode
+		
+	}
+	
+	public getvalidString(def user){
+		
+		if(null == user || user.trim() =="" || user.trim() =="null")
+			return null
+			
+		return user
+	
+	}
 	public def getTimesheetEntriesSummary(String user,Date from,Date to){
 		
-			
-			
-			return dataStore.getTimesheetEntriesSummary(user,from,to,Configurator.leavecodes)
+	
+	
+		
+			return dataStore.getTimesheetEntriesSummary(getvalidString(user),from,to,getProjectLeaveCodes())
 			
 			
 		}
@@ -74,7 +136,7 @@ class DataManager {
 	
 		
 		
-		return dataStore.getTimesheetEntries(user,from,to)
+		return dataStore.getTimesheetEntries(getvalidString(user),from,to,getProjectLeaveCodes())
 		
 		
 	}

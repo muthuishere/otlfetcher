@@ -8,6 +8,7 @@ class UserInfo {
 	def user
 	def password
 	def ip
+	def locked
 	
 	@Override
 	public boolean equals(Object o) {

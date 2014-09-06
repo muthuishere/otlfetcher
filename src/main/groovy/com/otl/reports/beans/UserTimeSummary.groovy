@@ -16,16 +16,31 @@ class UserTimeSummary {
 	def getWorkdays() throws ServiceException{
 		
 		
-			
-		return (workhours/8)
-		
+		if(workhours)
+		return formatAstext(workhours/8)
+		else
+		return 0
+	}
+	
+	def formatAstext(def num){
+		if(num){
+			def diff=num - num.round()
+			if(diff > 0 || diff < 0)
+				return num
+			else
+				return num.round()+""
+					
+		}
+		return 0
 	}
 	
 	def getLeavedays() throws ServiceException{
 		
 		
-			
-		return (leavehours/8)
+		if(leavehours)	
+		return formatAstext(leavehours/8)
+		else
+		return 0
 		
 	}
 	

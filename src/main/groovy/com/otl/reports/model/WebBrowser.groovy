@@ -20,8 +20,7 @@ class WebBrowser {
 	CurWebWindowListener curWebWindowListener=null;
 
 
-	//Browser the user wishes to run against
-	def String selectedBrowser
+
 
 	//The Navigator item which is currently active, by active we mean it was the last item returned from the browser which is a NonEmptyNavigator
 	HtmlPage  currentPage = null
@@ -29,7 +28,7 @@ class WebBrowser {
 
 
 
-	def init(String selectedBrowser){
+	def init(){
 
 		curWebWindowListener=new CurWebWindowListener()
 

@@ -3,29 +3,82 @@ package com.otl.reports.test
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.controller.DataManager
+import com.otl.reports.controller.DbUpdater
 import com.otl.reports.controller.FetchUserReport;
 import com.otl.reports.controller.OTLServer
 import com.otl.reports.model.WebBrowser
 
+import groovy.json.JsonSlurper
 import java.text.SimpleDateFormat
 import java.util.ArrayList;
 import java.util.Date;
+
+import com.otl.reports.controller.Configurator;
 
 class FetchReportsTest {
 
 	
 	
-	static void  servertest(){
+	static void  integrate(){
+	
 		
-		OTLServer server=new OTLServer()
-		server.init(2111, "//pages//")
-		server.startServer()
 		
+		DataManager dataManager=new DataManager()
+		
+		dataManager.init()
+		
+		dataManager.addUserEntries(new UserInfo(
+			
+			user: "mnavaneethakrishnan@corpuk.net",
+			password:"welcomeaug1"
+			))
+		
+		dataManager.addUserEntries(new UserInfo(
+			
+			user: "pvenkatesan@corpuk.net",
+			password:"welcomeaug1"
+			))
+		
+		
+		Date date = new Date();
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		int dayOfWeek = c.get(Calendar.DAY_OF_WEEK) - c.getFirstDayOfWeek();
+		c.add(Calendar.DAY_OF_MONTH, -dayOfWeek);
+		
+		Date weekStart = c.getTime();
+		// we do not need the same day a week after, that's why use 6, not 7
+		c.add(Calendar.DAY_OF_MONTH, 6);
+		Date weekEnd = c.getTime();
+		
+		
+		
+		Date startdate = new SimpleDateFormat("yyyy.MM.dd").parse("2014.08.12");
+		
+		
+		Date from=startdate;// weekStart;
+		
+		Date to= weekEnd;
+		
+		
+		Thread.start { 
+			
+			new DbUpdater().start(from ,to) 
+			
+			
+		}
+		waitformore()
+			
+	}
+	
+	
+	static void waitformore(def server){
 		
 		def CLEANUP_REQUIRED = true
 		Runtime.runtime.addShutdownHook {
 		  println "Shutting down..."
-		  server.stopServer()
+		  if(null != server)
+		  	server.stopServer()
 		  if( CLEANUP_REQUIRED ) {
 		
 		  }
@@ -34,6 +87,16 @@ class FetchReportsTest {
 		  sleep( 1000 )
 		}
 		CLEANUP_REQUIRED = false
+		
+	}
+	static void  servertest(){
+		
+		OTLServer server=new OTLServer()
+		server.init()
+		server.startServer()
+		
+		
+		waitformore(server)
 		
 		/*
 		while(!getbreakSignal()){
@@ -278,6 +341,61 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 			} 
 		}
 	
+	
+	static parseconfig(def configFileName){
+		
+		
+		
+		
+		
+		
+		
+		
+		// Read the configuration file into a map called "global".
+		// This map is shared with all other threads in order to provide
+		// a centralised configuration store.
+		
+		
+		
+		
+		try
+		{
+			Configurator.globalconfig = new JsonSlurper().parse(new FileReader(configFileName))
+		
+			Configurator.globalconfig.configuration_file = configFileName
+		
+			println "Configuration: ${Configurator.globalconfig}"
+		}
+		catch(Exception e)
+		{
+			println "Error: Unable to load configuration"
+			e.printStackTrace()
+			System.exit(1)
+		}
+		
+	}
+	
+	static void leavecodetest(){
+		
+		
+		String leavecode=""
+		int i=0
+		for(def bfr:Configurator.globalconfig.leavecodes){
+			
+			
+			
+			if(i > 0)
+				leavecode=leavecode +","
+			
+				
+				
+				leavecode=leavecode +"'$bfr'"
+				
+			i++
+			}
+		
+		println leavecode
+	}
 	static main(args) {
 	//	displayClassPath();
 		
@@ -285,6 +403,25 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 	//	apptest()
 		
 	//	updatetimesheettest()
+		
+	//	servertest()
+		
+		def configFileName
+		
+		
+		if(args.size() != 1)
+		{
+			println "Usage: FetchReports.groovy <configuration file>"
+			System.exit(1)
+		}
+		
+		
+		configFileName=args[0]
+		
+		parseconfig(configFileName)
+		
+		//leavecodetest()
+		//integrate()
 		
 		servertest()
 		

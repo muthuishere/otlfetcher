@@ -14,6 +14,8 @@ class TimeEntry {
 	def tasktype
 	def hours
 	def details
+	def isLeave
+	Date fetchedDate
 	
 	
 	@Override
