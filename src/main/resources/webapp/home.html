@@ -1,0 +1,67 @@
+      <div class="top_slogan">
+	Add/Update User details here	
+  </div>
+       <div id ="overlay" class="main_content"  style="">
+	   <form id="frmuser">
+	  
+	   <table cellpadding="10" cellspacing="10" border="0">
+	   <tr>
+	   <td>User </td>
+	   <td colspan="3"><input name="user" id="user" size="80"> </td>
+	   </tr>	
+		<tr>
+	   <td>Password </td>
+	   <td colspan="3"><input name="pwd" id="pwd" type="password" size="80"> </td>
+	   </tr>	   
+	   
+	   <tr>
+	   
+	  <td colspan="4" style="text-align:right"><input id="updateuser" type="button" value="Submit" style="width:120px"> </td>
+	   </tr>
+	   </table>
+	     </form>
+	  </div>
+	  <div style="height:300px" >
+	  
+	<span id="resultcontainer"/>
+	  
+	  </div>
+	
+	
+        <script>
+  $(function() {
+    
+	$( "input#updateuser" )
+      .button()
+      .click(function( event ) {
+		var formdata=$("form#frmuser").serializeArray()
+		
+		$('#frmuser')[0].reset();
+		$.post( "/services/updateuser", formdata)
+		  .done(function( data ) {
+		    
+			
+			//parse xml
+			  $xml = $( data )
+			  $status = $xml.find( "status" )
+			  
+			  
+			  
+			  if( $status.attr("error") =="true"){
+				  
+				  showerror("resultcontainer",$status.attr("description"))
+				  
+			  } else{
+				  
+				  showsuccess("resultcontainer",$status.attr("description"))
+				  
+			  }
+		  });
+		
+		
+        event.preventDefault();
+      });
+	  
+	
+  });
+  </script>
