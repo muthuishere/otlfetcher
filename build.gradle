@@ -1,11 +1,10 @@
 apply plugin: 'eclipse'
-apply plugin: 'java'
 apply plugin: 'groovy'
  
 apply plugin:'application'
 mainClassName = "com.otl.reports.test.FetchReportsTest"
  def enc = 'UTF-8'
-[compileJava, compileGroovy, compileTestJava, compileTestGroovy].each{ it.options.encoding = enc }
+[ compileGroovy,  compileTestGroovy].each{ it.options.encoding = enc }
 [compileGroovy, compileTestGroovy].each{ it.groovyOptions.encoding = enc }
 
 
@@ -15,7 +14,7 @@ mainClassName = "com.otl.reports.test.FetchReportsTest"
     mavenCentral()
 }
  
-
+println sourceSets.main.output.resourcesDir
 
 //Use gradle run -PappArgs="['C:\\muthu\\gitworkspace\\otlfetcher\\otlfetcher.conf']"
 
@@ -27,40 +26,12 @@ run {
 
 
 	
-sourceSets {
-    main {
-		
-		output.resourcesDir="build/"
-		
-        groovy {
-            srcDirs = ['src/main/groovy']
-			
-        }
-		 java {
-            srcDir 'src/main/java'
-        }
-		 resources {
-            srcDir 'src/main/resources'
-        }
-    }
-
-    test {
-        groovy {
-            srcDirs = ['src/test/groovy']
-        }
-		 java {
-            srcDir 'src/test/java'
-        }
-
-    }
-}
 
 
 dependencies {
   compile( "org.codehaus.groovy:groovy-all:2.2.1")
-  //compile('org.mapdb:mapdb:1.0.6')
-  compile( "org.xerial:sqlite-jdbc:3.7.2")
-  
+
+  compile( "org.xerial:sqlite-jdbc:3.7.2") 
   	
 compile("org.eclipse.jetty.aggregate:jetty-all:7.6.15.v20140411")
 		
@@ -83,22 +54,17 @@ task initProject () << {
         dir.mkdirs()
     }
 }
-
-task uberjar(type: Jar,dependsOn:[':compileJava',':compileGroovy']) {
-	from files(sourceSets.main.output.classesDir)
+//,dependsOn:[':compileGroovy']
+task uberjar(type: Jar) {
+    from files(sourceSets.main.output.classesDir)
 	from files(sourceSets.main.output.resourcesDir)
-	from(configurations.runtime.asFileTree.files.collect { it.isDirectory() ? it : zipTree(it) }) {
+    from(configurations.runtime.asFileTree.files.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude "META-INF/*.SF"
         exclude "META-INF/*.DSA"
         exclude "META-INF/*.RSA"
     }
-	
- from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
-        exclude "META-INF/*.SF"
-        exclude "META-INF/*.DSA"
-        exclude "META-INF/*.RSA"
+
+    manifest {
+       attributes 'Main-Class': 'com.otl.reports.test.FetchReportsTest'
     }
-	manifest {
-		attributes 'Main-Class': 'com.otl.reports.test.FetchReportsTest'
-	}
 }

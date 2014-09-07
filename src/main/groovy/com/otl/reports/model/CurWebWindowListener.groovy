@@ -20,14 +20,14 @@ class CurWebWindowListener implements WebWindowListener {
 	@Override
 	public void webWindowOpened(WebWindowEvent event) {
 		// TODO Auto-generated method stub
-		System.out.println("webWindowOpened Page : "+event.dump());
+	//	System.out.println("webWindowOpened Page : "+event.dump());
 		
 	}
 
 	@Override
 	public void webWindowClosed(WebWindowEvent event) {
 		// TODO Auto-generated method stub
-		System.out.println("webWindowClosed Page : "+event.dump());
+	//	System.out.println("webWindowClosed Page : "+event.dump());
 		
 	}
 }

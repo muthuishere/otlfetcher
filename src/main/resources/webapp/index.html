@@ -24,9 +24,9 @@
         <div class="menu">
             <ul>
 			 <li id="home" class="selected"><a  href="#" onclick="showpage('home');return false">Home</a></li>
-			<li id="reports"><a  href="#" onclick="showpage('reports');return false">Reports</a></li>
-           <li id="settings"><a  href="#" onclick="showpage('settings');return false">Settings</a></li>
-           <li id="users"><a  href="#" onclick="showpage('users');return false">Users</a></li>
+			<li id="reports" class="admin"><a  href="#" onclick="showpage('reports');return false">Reports</a></li>
+           <li id="settings" class="admin"><a  href="#" onclick="showpage('settings');return false">Settings</a></li>
+           <li id="users" class="admin"><a  href="#" onclick="showpage('users');return false">Users</a></li>
 		   
               
             </ul>
@@ -64,9 +64,9 @@
               
                 <ul class="footer_menu">
 				 <li title="home" ><a  href="#" onclick="showpage('home');return false">Home</a></li>
-			<li title="reports"><a  href="#" onclick="showpage('reports');return false">Reports</a></li>
-           <li title="settings"><a  href="#" onclick="showpage('settings');return false">Settings</a></li>
-           <li title="users"><a  href="#" onclick="showpage('users');return false">Users</a></li>
+			<li title="reports" class="admin"><a  href="#" onclick="showpage('reports');return false">Reports</a></li>
+           <li title="settings" class="admin"><a  href="#" onclick="showpage('settings');return false">Settings</a></li>
+           <li title="users" class="admin"><a  href="#" onclick="showpage('users');return false">Users</a></li>
 		   
            
                 </ul>
@@ -90,17 +90,51 @@
   <script type="text/javascript" src="js/jquery-ui.min.js"></script>
    <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
 
+
      <script>
 
+     function showadmin(){
+    	 
+    	 $("li.admin").show()
+     }
+     
+function showuser(){
+    	 
+	showpage('home');
+    	 $("li.admin").hide()
+     }
   $(function() {
   
 	showpage('reports');
   
+	  $.get( "/services/getuserStatus/", function( data ) {
+		  
+		  $xml = $( data )
+		  $status = $xml.find( "status" )
+		  
+		  
+		  
+		  if( $status.attr("admin") =="true"){
+			  
+			  showadmin()
+			  
+		  } else{
+			  
+			  showuser()
+			  
+		  }
+		});
+	  
 	
   });	
   
   
   
-</script>	
+</script>
+<form id="frmcsv" name="frmcsv" action="/services/downloadexcel" method="POST" target="_blank">
+
+<input type="hidden" name="repname" id="repname"/>
+<input type="hidden" name="csv" id="csv"/>
+</form>	
 </body>
 </html>

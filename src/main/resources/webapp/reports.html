@@ -114,8 +114,16 @@ function showdetailreport( username){
 					
 					
 					*/
+				
 					 tbl=tbl + '<div style="font-weight:bold"><h6>Timesheet Entries  :'+ username+' </h6></div>' 
 
+						var csvtblname="tblreportdetails"
+ 		  					 tbl=tbl + ' <table  border="0" cellspacing="0" width="100%">'
+ 		  					 tbl=tbl + "      <tr>" 
+ 		 					 tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png'></a></span></th>" 
+ 		 					 tbl=tbl + "      </tr>" 
+ 		  					 tbl=tbl + " </table>"
+ 		  					 
 				 tbl=tbl + ' <table id="tblreportdetails" class="display" cellspacing="0" width="100%">' 
 				 tbl=tbl + "    <thead>" 
 				 tbl=tbl + "      <tr>" 
@@ -161,6 +169,7 @@ function showdetailreport( username){
 				 if( dataCount >0){
 				 	$("#resultdetailcontainer").html(tbl)
 				 	
+				 		preparecsv("tblreportdetails")
 				  if( dataCount >10){
 					  
 					  
@@ -223,6 +232,8 @@ function showdetailreport( username){
 
 	    		$( "#fromdate" ).val($.datepicker.formatDate("yy-mm-dd", firstDay));
 	    		  $( "#todate" ).val($.datepicker.formatDate("yy-mm-dd", new Date()));
+	    		  
+	    		
 	    	  }	    		  
 	    	  else if(data.item.value == "custom"){
 	    		  $( "#fromdate" ).val("")
@@ -275,8 +286,15 @@ function showdetailreport( username){
   				  
   				  var tbl=""
   					  
-  	  				  
-
+  					
+  						var csvtblname="tblreports"
+  		  					 tbl=tbl + ' <table  border="0" cellspacing="0" width="100%">'
+  		  					 tbl=tbl + "      <tr>" 
+  		 					 tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png'></a></span></th>" 
+  		 					 tbl=tbl + "      </tr>" 
+  		  					 tbl=tbl + " </table>"
+ 					
+  					 
   					 tbl=tbl + ' <table id="tblreports" class="display" cellspacing="0" width="100%">' 
   					 tbl=tbl + "    <thead>" 
   					 tbl=tbl + "      <tr>" 
@@ -299,13 +317,13 @@ function showdetailreport( username){
   		      var lastupdated = $(this).find('lastupdated').text();
   		    var userlocked = $(this).find('userlocked').text();
   		           
-  		    var privacyImg="<img src='images/valid.png'>"
+  		    var privacyImg="<img src='images/valid.png' alt='valid'>"
   		            if(undefined == userlocked ||  userlocked == "true")
-  		            	privacyImg="<img src='images/invalid.png'>"    	
+  		            	privacyImg="<img src='images/invalid.png' alt='invalid' >"    	
   		       
 	  				  
   		     	 tbl=tbl + "      <tr>" 
-					 tbl=tbl + "        <td class='lalign'><a href='#' onclick='showdetailreport(\"" +username  +"\")';return false;' >'"+username+"</a></td>" 
+					 tbl=tbl + "        <td class='lalign'><a href='#' onclick='showdetailreport(\"" +username  +"\")';return false;' >"+username+"</a></td>" 
 					 tbl=tbl + "        <td class='calign'>"+workdays+"</td>" 
 					 tbl=tbl + "        <td class='calign'>"+leavedays+"</td>" 
 					 tbl=tbl + "        <td class='calign'>"+lastupdated+"</td>"
@@ -320,7 +338,7 @@ function showdetailreport( username){
   					 
   					 if( dataCount >0){
   					 	$("#resultcontainer").html(tbl)
-  					 	
+  					 	preparecsv("tblreports")
   					  if( dataCount >10){
   						  
   						  

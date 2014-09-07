@@ -40,19 +40,14 @@
  		  } else{
  			  
  			  var tbl=""
- 				  /*
- 				  response.append("\n<name>${xml_string(val.user)}</name>")
- 					response.append("\n<projectcode>${val.projectcode}</projectcode>")
- 					response.append("\n<projecttask>${xml_string(val.projecttask)}</projecttask>")
- 					response.append("\n<tasktype>${xml_string(val.tasktype)}</tasktype>")
- 					response.append("\n<hours>${val.hours}</hours>")
- 					response.append("\n<details>${val.details}</details>")
- 					response.append("\n<isLeave>${val.isLeave}</isLeave>")
- 					response.append("\n<entryDate>${val.entryDate}</entryDate>")
- 					response.append("\n<fetchedDate>${val.fetchedDate}</fetchedDate>")
+ 				
  					
- 					
- 					*/
+ 					var csvtblname="tblusers"
+	  					 tbl=tbl + ' <table  border="0" cellspacing="0" width="100%">'
+	  					 tbl=tbl + "      <tr>" 
+	 					 tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png'></a></span></th>" 
+	 					 tbl=tbl + "      </tr>" 
+	  					 tbl=tbl + " </table>"
  					
 
  				 tbl=tbl + '<div style="float:left"> <table id="tblusers" style="width:400px" class="display" cellspacing="0" >' 
@@ -77,9 +72,9 @@
  				
  				 var userlocked = $(this).find('userLocked').text();
 		           
- 	  		    var privacyImg="<img src='images/valid.png'>"
+ 	  		    var privacyImg="<img src='images/valid.png' alt='valid' >"
  	  		            if(undefined == userlocked ||  userlocked == "true")
- 	  		            	privacyImg="<img src='images/invalid.png'>"   
+ 	  		            	privacyImg="<img src='images/invalid.png' alt='invalid'>"   
  	  		            	
  	  		            	
  	      	

@@ -44,11 +44,30 @@ String actionname=servicedata.getAt(1)
 
 def result = ""
 
+
 switch ( actionname ) {
+	case "getuserStatus":
+		result = responder.getuserStatus(request)
+	
+	break;
+	
 	case "updateuser":
 		result = responder.updateuser(request)
 		
 		break;
+		
+
+	
+}
+
+
+if(result.equals("") && responder.isAdmin(request)){
+	
+
+switch ( actionname ) {
+	
+		
+		
 		case "getallusers":
 		result = responder.getAllusers()
 		
@@ -70,13 +89,27 @@ switch ( actionname ) {
 		
 		break;
 		
-	
+		case "downloadexcel":
+		response.setHeader("Content-Disposition",
+			"attachment; filename="+request.getParameter("repname")+".csv");
+		
+		result = request.getParameter("csv")
+		
+		break;		
+		
+		
 		
 
 	default:
 		result = "<reply><status code='1' error='true' description='Invalid Service specified'/></reply>"
 }
 
+}
+
+if(result.equals("")){
+	result = "<reply><status code='1' error='true' description='Authentication Overruled'/></reply>"
+	
+}
 // Actual logic goes here.
 PrintWriter out = response.getWriter();
 out.println(result);

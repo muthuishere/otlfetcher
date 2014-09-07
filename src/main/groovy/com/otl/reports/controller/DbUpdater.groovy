@@ -35,11 +35,11 @@ class DbUpdater {
 		try{
 		if( null == dbreport_response ||  null == dbreport_response?.timeEntries ||  dbreport_response?.timeEntries?.size() ==0){
 			
-			Log.error("Error getting response for " +dbreport_response?.dump())
+			Log.error("Error getting response for " +dbreport_response?.userInfo?.user)
 			
 			if(dbreport_response?.error.contains("INVALID CREDENTIALS")){
 				
-				Log.error("Error Invalid credentials disabling " +dbreport_response?.dump())
+				Log.error("Error Invalid credentials disabling " +dbreport_response?.userInfo?.user)
 				
 				datamanager.disableUser(dbreport_response?.userInfo?.user)
 				

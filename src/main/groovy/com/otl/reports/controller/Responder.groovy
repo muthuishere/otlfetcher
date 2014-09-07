@@ -4,6 +4,7 @@ import com.otl.reports.beans.UserInfo
 
 import java.text.SimpleDateFormat
 import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest
 
 class Responder {
@@ -186,6 +187,8 @@ class Responder {
 		
 	}
 	
+	
+
 	public String updatefetchDb(HttpServletRequest request){
 		
 		
@@ -266,7 +269,7 @@ class Responder {
 		def summarylist=dataManager.getTimesheetEntriesSummary( params.user, from,to)
 		// Add information as xml
 		
-		println(summarylist.dump())
+		//println(summarylist.dump())
 		summarylist.each{key,val->
 			
 					
@@ -320,6 +323,57 @@ class Responder {
 		
 		
 	}
+	
+	public String getAdmins(){
+		String admins=""
+		int i=0
+		for(def bfr:Configurator.globalconfig.admins){
+			
+			
+			
+			if(i > 0)
+				admins=admins +","
+			
+				
+				
+				admins=admins +"$bfr"
+				
+			i++
+			}
+		return admins
+		
+	}
+	
+	public String getuserStatus(HttpServletRequest request){
+		
+		
+		String ip=request.getLocalAddr()
+		
+		StringBuffer response= new StringBuffer()
+		
+		response.append("<reply>")
+		
+		println(ip)
+		println(getAdmins())
+		
+		if( getAdmins().contains(ip))
+		response.append("<status code='0' admin='true' description='Admin User'/>")
+		else
+		response.append("<status code='0' admin='false' description='Regular User'/>")
+		
+		response.append("</reply>")
+		
+		return response.toString();
+	}
+	
+	
+	public boolean isAdmin(HttpServletRequest request){
+		
+		String ip=request.getLocalAddr()
+		return getAdmins().contains(ip)
+		
+	}
+	
 	public String updateuser(HttpServletRequest request){
 		
 		
