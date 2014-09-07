@@ -2,7 +2,7 @@ apply plugin: 'eclipse'
 apply plugin: 'groovy'
  
 apply plugin:'application'
-mainClassName = "com.otl.reports.test.FetchReportsTest"
+mainClassName = "com.otl.reports.application.OTLReportApplication"
  def enc = 'UTF-8'
 [ compileGroovy,  compileTestGroovy].each{ it.options.encoding = enc }
 [compileGroovy, compileTestGroovy].each{ it.groovyOptions.encoding = enc }
@@ -65,6 +65,6 @@ task uberjar(type: Jar) {
     }
 
     manifest {
-       attributes 'Main-Class': 'com.otl.reports.test.FetchReportsTest'
+       attributes 'Main-Class': 'com.otl.reports.application.OTLReportApplication'
     }
 }

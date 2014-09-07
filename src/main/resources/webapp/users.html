@@ -3,7 +3,7 @@
   </div>
        <div id ="overlay" class="main_content"  style="">
 	   
-	     <div style="height:300px" >
+	     <div  >
 	  
 			<span id="resultdetailcontainer"/>
 	  
@@ -43,14 +43,14 @@
  				
  					
  					var csvtblname="tblusers"
-	  					 tbl=tbl + ' <table  border="0" cellspacing="0" width="100%">'
+	  					 tbl=tbl + ' <div style="float:left">  <table  border="0" cellspacing="0" style="width:400px">'
 	  					 tbl=tbl + "      <tr>" 
-	 					 tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png'></a></span></th>" 
+	 					 tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png' title='Download as excel'></a></span></th>" 
 	 					 tbl=tbl + "      </tr>" 
 	  					 tbl=tbl + " </table>"
  					
 
- 				 tbl=tbl + '<div style="float:left"> <table id="tblusers" style="width:400px" class="display" cellspacing="0" >' 
+ 				 tbl=tbl + '<table id="tblusers" style="width:400px" class="display" cellspacing="0" >' 
  				 tbl=tbl + "    <thead>" 
  				 tbl=tbl + "      <tr>" 
  				 tbl=tbl + "        <th><span>S.No</span></th>"

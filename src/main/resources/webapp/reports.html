@@ -41,7 +41,7 @@
 	   </table>
 	   </form>
 	  </div>
-	   <div style="height:300px" >
+	   <div  >
 	  
 			<span id="resultcontainer"/>
 	  
@@ -101,26 +101,14 @@ function showdetailreport( username){
 		  } else{
 			  
 			  var tbl=""
-				  /*
-				  response.append("\n<name>${xml_string(val.user)}</name>")
-					response.append("\n<projectcode>${val.projectcode}</projectcode>")
-					response.append("\n<projecttask>${xml_string(val.projecttask)}</projecttask>")
-					response.append("\n<tasktype>${xml_string(val.tasktype)}</tasktype>")
-					response.append("\n<hours>${val.hours}</hours>")
-					response.append("\n<details>${val.details}</details>")
-					response.append("\n<isLeave>${val.isLeave}</isLeave>")
-					response.append("\n<entryDate>${val.entryDate}</entryDate>")
-					response.append("\n<fetchedDate>${val.fetchedDate}</fetchedDate>")
-					
-					
-					*/
+				 
 				
-					 tbl=tbl + '<div style="font-weight:bold"><h6>Timesheet Entries  :'+ username+' </h6></div>' 
+					 tbl=tbl + '<div style="font-weight:bold;font-size: 14px;color:#f98740">Timesheet Entries  :'+ username+' </div>' 
 
 						var csvtblname="tblreportdetails"
  		  					 tbl=tbl + ' <table  border="0" cellspacing="0" width="100%">'
  		  					 tbl=tbl + "      <tr>" 
- 		 					 tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png'></a></span></th>" 
+ 		 					 tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png' title='Download as excel'></a></span></th>" 
  		 					 tbl=tbl + "      </tr>" 
  		  					 tbl=tbl + " </table>"
  		  					 
@@ -290,7 +278,7 @@ function showdetailreport( username){
   						var csvtblname="tblreports"
   		  					 tbl=tbl + ' <table  border="0" cellspacing="0" width="100%">'
   		  					 tbl=tbl + "      <tr>" 
-  		 					 tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png'></a></span></th>" 
+  		 					 tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png' title='Download as excel'></a></span></th>" 
   		 					 tbl=tbl + "      </tr>" 
   		  					 tbl=tbl + " </table>"
  					
