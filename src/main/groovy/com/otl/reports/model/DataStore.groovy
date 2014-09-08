@@ -207,6 +207,8 @@ class DataStore {
 					if(null != from && null != to)
 						duration=(getWorkingDaysBetweenTwoDates(from,to)) * 8
 					
+						
+						
 					String maxdateQuery="Select user,max(entryDate) as maxentrydate from timeentry ${cond}  group by user "					
 					
 					String workhrsQuery="Select user,total(hours) as totalhrs from timeentry ${cond} and projectcode not in($leavecodes)  group by user "
@@ -214,6 +216,7 @@ class DataStore {
 					String leavehrsQuery="Select user,total(hours) as totalhrs from timeentry ${cond} and projectcode  in($leavecodes)  group by user "
 					
 					
+					println("Working days $from $to [ $duration]")
 					//calculate total working hours 
 					
 					/*
@@ -240,7 +243,9 @@ class DataStore {
 							
 								timeEntries.put(it.user, new UserTimeSummary(
 									user: it.user,
-									userLocked:it.userLocked
+									userLocked:it.userLocked,
+									leavehours: 0,
+									workhours: 0  
 									))
 								
 								}
@@ -249,7 +254,7 @@ class DataStore {
 				fetcherDB.rows(maxdateQuery).each{
 		
 					
-					timeEntries.get(it.user)?.lastupdated=it.new Date(it.maxentrydate)
+					timeEntries.get(it.user)?.lastupdated=new Date(it.maxentrydate)
 					
 				}
 		
@@ -265,7 +270,9 @@ class DataStore {
 						
 							}
 				
-				timeEntries.each{timeEntry->
+				timeEntries.each{key,timeEntry->
+					
+					
 					
 					int totalhrs=timeEntry.leavehours + timeEntry.workhours
 							if(totalhrs < duration  )

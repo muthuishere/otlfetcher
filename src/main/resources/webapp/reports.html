@@ -280,7 +280,7 @@ function showdetailreport( username){
   					 tbl=tbl + ' <table id="tblreports" class="display" cellspacing="0" width="100%">' 
   					 tbl=tbl + "    <thead>" 
   					 tbl=tbl + "      <tr>"
-  					tbl=tbl + "        <th><span>Defaulter</span></th>" 
+  					tbl=tbl + "        <th><span>Filled All</span></th>" 
   					 tbl=tbl + "        <th><span>User</span></th>" 
   					 tbl=tbl + "        <th><span>WorkDays</span></th>" 
   					 tbl=tbl + "        <th><span>Leaves</span></th>" 
@@ -306,8 +306,8 @@ function showdetailreport( username){
   		            	privacyImg="<img src='images/invalid.png' alt='invalid' >"    	
   		       
 	  		
-  		            		var defaulterImg="<img src='images/nodefaulter.png' alt='No Defaulter'>"
-  		    		            if(undefined == userlocked ||  userlocked == "true")
+  		            		var defaulterImg="<img src='images/nodefaulter.png' alt='Filled All'>"
+  		    		            if(undefined == defaulter ||  defaulter == "true")
   		    		            	defaulterImg="<img src='images/defaulter.png' alt='Defaulter' >"    	
   		    		    
   		    		            	
