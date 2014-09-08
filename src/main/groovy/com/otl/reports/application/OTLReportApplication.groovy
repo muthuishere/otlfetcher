@@ -1,14 +1,20 @@
 package com.otl.reports.application
 
+import com.otl.reports.beans.UserInfo
+import com.otl.reports.controller.FetchUserReport
 import com.otl.reports.controller.OTLServer
 
 import groovy.json.JsonSlurper
 
 
 import com.otl.reports.controller.Configurator;
+import com.otl.reports.model.WebBrowser
 
 class OTLReportApplication {
 
+	
+	
+	
 	static parseconfig(def configFileName){
 		
 		
@@ -91,6 +97,7 @@ class OTLReportApplication {
 		//leavecodetest()
 		//integrate()
 		
+		//browsertest();
 		startAppServer()
 	}
 

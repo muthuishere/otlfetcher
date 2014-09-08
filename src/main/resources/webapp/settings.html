@@ -1,178 +1,252 @@
-      <div class="top_slogan">
-	Update Crawl DB here	
-  </div>
-       <div id ="overlay" class="main_content"  style="">
-	    <form id="frmdbupdate">
-	    <table id="tblprogress"  cellpadding="10" cellspacing="10" border="0">
-	  	   
-	  	   <tr>
-	   <td><img src="images/dbprogress.gif"/> </td>
-	   </tr>
-	   <td><h6>Db Update in progress </h6></td>
-	   
-	   </tr>
-	  
-	   </table>
-	  <br/>
-	   <table id="tbloptions" cellpadding="10" cellspacing="10" border="0">
-	   
-	     <tr>		   
-	   <td>Date </td>
-	   <td >
-	   <select style="width:230px" id="datetypes">
-	   	<option value="curweek">Current Week</option>
-	   	<option value="curmonth">Current Month</option>
-	   	<option value="custom">Custom</option>
-	   </select>
-	    </td>
-	   </tr>
-	   <tr id="dtcustomrow">		   
-	   <td>From </td>
-	   <td ><input name="fromdate" id="fromdate" > </td>
-	   <td>To </td>
-	   <td ><input name="todate" id="todate" > </td>
-	   </tr>
-	   <tr>
-	  	  
-	   <tr>
-	   
-	  <td colspan="4" style="text-align:right"><input type="button" id="updatedb" value="Update DB" style="width:120px"> </td>
-	   </tr>
-	   </table>
-	   
-	    </form>
-	  </div>
- <script>
- 
- function getMonday(d) {
-	  d = new Date(d);
-	  var day = d.getDay(),
-	      diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
-	  return new Date(d.setDate(diff));
+
+<div class="top_slogan">Update Crawl DB here</div>
+<div id="overlay" class="main_content" style="">
+
+
+
+	<form id="frmdbupdate">
+
+					
+		<table width="100%" border="0">
+			<tr>
+				<td>
+				
+				
+	<table id="tblprogress" cellpadding="10" cellspacing="10"
+						border="0" style="width: 100%; text-align: center;">
+
+						<tr>
+							<td align="center"><img align="center"
+								src="images/dbprogress.gif" /></td>
+						</tr>
+						<td><span style="color: rgb(126, 39, 39); font-size: 18px">Db
+								Update in progress </span></td>
+
+						</tr>
+
+					</table> 
+					<table id="tbloptions" cellpadding="10" cellspacing="10" border="0">
+
+						<tr>
+							<td>Date</td>
+							<td><select style="width: 230px" id="datetypes">
+									<option value="curweek">Current Week</option>
+									<option value="curmonth">Current Month</option>
+									<option value="custom">Custom</option>
+							</select></td>
+						</tr>
+						<tr id="dtcustomrow">
+							<td>From</td>
+							<td><input name="fromdate" id="fromdate"></td>
+							<td>To</td>
+							<td><input name="todate" id="todate"></td>
+						</tr>
+						<tr>
+						<tr>
+
+							<td colspan="4" style="text-align: right"><input
+								type="button" id="updatedb" value="Update DB"
+								style="width: 120px"></td>
+						</tr>
+					</table>
+				<td>
+					<table id="tblcurstatus" cellpadding="3" cellspacing="0"
+						border="0">
+
+						<tbody>
+							<tr>
+								<td colspan="2"><span class="curheader" style="font-size: 24px">DB Details </span></td>
+
+
+
+							</tr>
+							<tr>
+								<td><span class="curheader">Last Crawled Status </span></td>
+								<td><span id="curstatus"></span></td>
+
+
+							</tr>
+							<tr>
+
+								<td><span class="curheader">Description </span></td>
+								<td><span id="curdescription"></span></td>
+
+
+							</tr>
+							<tr>
+								<td><span class="curheader">Last Updated </span></td>
+								<td><span id="curlastupdated"></span></td>
+
+
+							</tr>
+
+
+
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+
+	</form>
+	<span id="resultcontainer"/>
+</div>
+<script>
+	function getMonday(d) {
+		d = new Date(d);
+		var day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+		return new Date(d.setDate(diff));
 	}
 
+	function setStatus(stat, desc, lup) {
 
-function setcustom(flgshow){
-	 
-	 if(flgshow == true){
-		 $('#dtcustomrow').show();
-		 
-	 }else{
-		 
-		 $('#dtcustomrow').hide();
-	 }
-}
+		if (undefined == "" || null == lup || lup == "") {
 
+			$('#tblcurstatus').hide();
 
-function showprogress(){
-	  
-	  $("#tblprogress").show()
-	  $("#tbloptions").hide()
-	  
-	  
-	  
-}
+		} else {
+			$('#tblcurstatus').show();
 
-function showdbupdate(){
-	  
-$("#tblprogress").hide()
-$("#tbloptions").show()
-}
+			$('#curstatus').html(stat);
+			$('#curdescription').html(desc);
+			$('#curlastupdated').html(lup);
+		}
+	}
+	function setcustom(flgshow) {
 
+		if (flgshow == true) {
+			$('#dtcustomrow').show();
 
-  $(function() {
-	  
-	  setcustom(false)
-	  $.get( "/services/fetchdbstatus/", function( data ) {
-		  
-		  $xml = $( data )
-		  $status = $xml.find( "updatestatus" )
-		  
-		  
-		  
-		  if( $status.attr("inprogress") =="true"){
-			  
-			  showprogress()
-			  
-		  } else{
-			  
-			  showdbupdate()
-			  
-		  }
+		} else {
+
+			$('#dtcustomrow').hide();
+		}
+	}
+
+	function showprogress() {
+
+		$("#tblprogress").show()
+		$("#tbloptions").hide()
+
+	}
+
+	function showdbupdate() {
+
+		$("#tblprogress").hide()
+		$("#tbloptions").show()
+	}
+
+	function getdbStatus() {
+
+		
+		$.get("/services/fetchdbstatus/rand?inte="+Math.random(), function(data) {
+
+			$xml = $(data)
+			$status = $xml.find("updatestatus")
+
+			
+
+			if ($status.attr("inprogress") == "true") {
+
+				showprogress()
+				
+				setTimeout(getdbStatus, 60000);
+
+			} else {
+
+				showdbupdate()
+				setStatus($status.attr("summary"), $status.attr("description"),	$status.attr("lastupdated"))
+
+			}
+		});
+
+	}
+
+	$(function() {
+
+		setcustom(false)
+
+		
+
+		$("#fromdate").val(
+				$.datepicker.formatDate("yy-mm-dd", getMonday(new Date())));
+		$("#todate").val($.datepicker.formatDate("yy-mm-dd", new Date()));
+
+		$("#datetypes").selectmenu(
+				{
+					change : function(event, data) {
+
+						if (data.item.value == "curweek") {
+							setcustom(false)
+							$("#fromdate").val(
+									$.datepicker.formatDate("yy-mm-dd",
+											getMonday(new Date())));
+							$("#todate").val(
+									$.datepicker.formatDate("yy-mm-dd",
+											new Date()));
+						} else if (data.item.value == "curmonth") {
+
+							setcustom(false)
+							var date = new Date();
+							var firstDay = new Date(date.getFullYear(), date
+									.getMonth(), 1);
+
+							$("#fromdate").val(
+									$.datepicker.formatDate("yy-mm-dd",
+											firstDay));
+							$("#todate").val(
+									$.datepicker.formatDate("yy-mm-dd",
+											new Date()));
+						} else if (data.item.value == "custom") {
+							$("#fromdate").val("")
+							$("#todate").val("")
+							setcustom(true)
+						}
+
+					}
+				});
+
+		//show update in progress or provide options to update
+		//show 
+		$("#fromdate").datepicker({
+
+			dateFormat : 'yy-mm-dd'
+		});
+
+		$("#todate").datepicker({
+
+			dateFormat : 'yy-mm-dd'
+		});
+
+		$("input#updatedb").button().click(function(event) {
+
+			var formdata = $("form#frmdbupdate").serializeArray()
+
+			$('#frmdbupdate')[0].reset();
+
+			$.post("/services/updatefetchdb", formdata).done(function(data) {
+
+				$xml = $(data)
+				$status = $xml.find("status")
+				if ($status.attr("error") == "true"){
+					
+					 showerror("resultcontainer",$status.attr("description"))
+					showdbupdate()
+				
+				}else{
+					
+					showprogress()
+					setTimeout(getdbStatus, 60000);
+					
+				}
+					
+
+			});
+
+			event.preventDefault();
 		});
 		
-	  $( "#fromdate" ).val($.datepicker.formatDate("yy-mm-dd", getMonday(new Date())));
-	  	$( "#todate" ).val($.datepicker.formatDate("yy-mm-dd", new Date()));
-	  	
-	  $( "#datetypes" ).selectmenu({
-	      change: function( event, data ) {
-	    	  
-	    	  if(data.item.value == "curweek"){
-	    		  setcustom(false)
-	    		  $( "#fromdate" ).val($.datepicker.formatDate("yy-mm-dd", getMonday(new Date())));
-	    	  	$( "#todate" ).val($.datepicker.formatDate("yy-mm-dd", new Date()));
-	    	  }	    		 
-	    	  else if(data.item.value == "curmonth"){
-	    		  
-	    		  setcustom(false)
-	    		  var date = new Date();
-				var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+		getdbStatus();
 
-	    		$( "#fromdate" ).val($.datepicker.formatDate("yy-mm-dd", firstDay));
-	    		  $( "#todate" ).val($.datepicker.formatDate("yy-mm-dd", new Date()));
-	    	  }	    		  
-	    	  else if(data.item.value == "custom"){
-	    		  $( "#fromdate" ).val("")
-	    		  $( "#todate" ).val("")
-	    		  setcustom(true)
-	    	  }
-	        
-	      }
-	     });
-	  
-	  
-	  //show update in progress or provide options to update
-	  //show 
-    $( "#fromdate" ).datepicker({
-	
-	dateFormat: 'yy-mm-dd'
-	}	
-	);
-  
-    $( "#todate" ).datepicker({
-	
-	dateFormat: 'yy-mm-dd'
-	}	
-	);
-    
-
-	$( "input#updatedb" )
-      .button()
-      .click(function( event ) {
-    	  
-    	  var formdata=$("form#frmdbupdate").serializeArray()
-  		
-  		$('#frmdbupdate')[0].reset();
-    	  
-    		$.post( "/services/updatefetchdb", formdata)
-    		  .done(function( data ) {
-    			  
-    			  $xml = $( data )
-        		  $status = $xml.find( "status" )        		  
-        		  if( $status.attr("error") =="true")        			  
-        			  showdbupdate()
-        			  
-        		   else        			  
-        			  showprogress()
-        			  
-        		 
-    		  });
-    	  
-    	  
-        event.preventDefault();
-      });
-    
-	  
-
-  });
-  </script>
+	});
+</script>

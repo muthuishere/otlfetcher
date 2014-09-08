@@ -123,6 +123,17 @@ class FetchReportsTest {
 		}
 		return false
 	}
+	
+	static void browserNavigatetest(){
+		
+		WebBrowser webBrowser=new WebBrowser()
+		webBrowser.init(Configurator.globalconfig.proxy)
+		webBrowser.Navigate("http://ebiz.uk.three.com:80/OA_HTML/RF.jsp?function_id=10129&resp_id=51959&resp_appl_id=808&security_group_id=0&lang_code=US")
+		webBrowser.printAll()
+		
+		
+	}
+	
 	static void updatetimesheettest(){
 
 			/*

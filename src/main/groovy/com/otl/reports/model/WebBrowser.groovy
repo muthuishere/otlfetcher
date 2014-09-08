@@ -1,5 +1,6 @@
 package com.otl.reports.model
 
+import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider
 import com.gargoylesoftware.htmlunit.ScriptResult
 import com.gargoylesoftware.htmlunit.WebClient
 import com.gargoylesoftware.htmlunit.WebWindowEvent
@@ -28,11 +29,28 @@ class WebBrowser {
 
 
 
-	def init(){
+	def init(def proxy){
 
 		curWebWindowListener=new CurWebWindowListener()
 
+		//println(proxy)
+		
+		if(null != proxy){
+			
+			println("Setting proxy")
+			webClient = new WebClient(BrowserVersion.CHROME, proxy.host, proxy.port);
+			
+				//set proxy username and password
+			//if(null != proxy?.user && null != proxy?.pwd ){
+				final DefaultCredentialsProvider credentialsProvider = (DefaultCredentialsProvider) webClient.getCredentialsProvider();
+				credentialsProvider.addCredentials(proxy?.user, proxy?.pwd );
+				println("Setting credentials")
+		//	}
+				
+			
+		}else{
 		webClient = new WebClient(BrowserVersion.CHROME);
+		}
 
 		//webClient.getWebWindowByName(selectedBrowser).getEnclosedPage()
 

@@ -169,7 +169,7 @@ class Responder {
 				
 					}
 		
-		response.append("<status code='0' error='false' description='Successfully retrieved detail r information'/>")
+		response.append("<status code='0' error='false' description='Successfully retrieved detail  information'/>")
 		}catch(Exception e){
 		
 		response= new StringBuffer()
@@ -204,6 +204,10 @@ class Responder {
 		if(null == params.fromdate || null == params.todate ){
 			
 			response.append("<status code='1' error='true' description='Invalid user inputs'/>")
+			
+		}else if(Configurator.isUpdating ){
+			
+			response.append("<status code='1' error='true' description='Already update in progress'/>")
 			
 		}else{
 		
@@ -344,10 +348,21 @@ class Responder {
 		
 	}
 	
+	def getIP(HttpServletRequest request){
+		
+		if(request.getRemoteAddr()){
+			
+			return request.getRemoteAddr()
+		}else{
+			return request.getHeader("X-Forwarded-For")
+		}
+		
+	}
 	public String getuserStatus(HttpServletRequest request){
 		
 		
-		String ip=request.getLocalAddr()
+		
+		String ip=getIP(request)
 		
 		StringBuffer response= new StringBuffer()
 		
@@ -357,9 +372,9 @@ class Responder {
 		println(getAdmins())
 		
 		if( getAdmins().contains(ip))
-		response.append("<status code='0' admin='true' description='Admin User'/>")
+			response.append("<status code='0' admin='true' description='Admin User'/>")
 		else
-		response.append("<status code='0' admin='false' description='Regular User'/>")
+			response.append("<status code='0' admin='false' description='Regular User'/>")
 		
 		response.append("</reply>")
 		
@@ -369,7 +384,7 @@ class Responder {
 	
 	public boolean isAdmin(HttpServletRequest request){
 		
-		String ip=request.getLocalAddr()
+		String ip=getIP(request)
 		return getAdmins().contains(ip)
 		
 	}
@@ -381,7 +396,7 @@ class Responder {
 		"user":request.getParameter("user"),
 		"pwd":request.getParameter("pwd")
 		]
-		String ip=request.getLocalAddr()
+		String ip=getIP(request)
 		StringBuffer response= new StringBuffer()
 		
 		response.append("<reply>")
@@ -407,7 +422,7 @@ class Responder {
 		response.append("<reply>")
 		
 		
-		response.append("<status code='1' error='true' description='${xml_string(e.getMessage())}'/>")
+			response.append("<status code='1' error='true' description='${xml_string(e.getMessage())}'/>")
 		}
 	
 		}

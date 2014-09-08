@@ -65,9 +65,10 @@ class DbUpdater {
 	
 	def start(Date from ,Date to){
 		
+		Configurator.isUpdating=true
 		Configurator.resetupdatestatus()
 		println("Starting DB Updation")
-		Configurator.isUpdating=true
+		
 		def callbackQueue = new LinkedBlockingQueue()
 		def statusmsg="Fail"
 		def description=""
@@ -109,14 +110,18 @@ class DbUpdater {
 				
 			}
 			
-			description="Updated timesheets for $successCount users of $usercount users"
+			description="Updated timesheets for $successCount  of $usercount users"
 			
 		}catch(Exception e){
 			e.printStackTrace();
 			description="Fail while parsing ${e.toString()}"
 		}
 		
-		Configurator.setupdatestatus( statusmsg, description,new Date())
+		SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM dd yyyy hh:mm:ss a");
+		
+		  
+		   
+		Configurator.setupdatestatus( statusmsg, description,formatter.format(new Date()))
 		Configurator.isUpdating=false
 		println("Completed DB Updation")
 	}
@@ -178,7 +183,7 @@ class DbUpdater {
 				
 				
 				FetchUserReport fetchUserReport=new FetchUserReport()
-				fetchUserReport.init()
+				fetchUserReport.init(Configurator.globalconfig?.proxy )
 				
 				timeEntries.addAll(fetchUserReport.startFetch(req_msg.userInfo, curstart, curend))
 				

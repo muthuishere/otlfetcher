@@ -18,12 +18,14 @@ class FetchUserReport {
 
 	WebBrowser webBrowser=null
 
-	def init(){
+	def init(def proxy){
 
 		 webBrowser=new WebBrowser()
-		webBrowser.init()
+		webBrowser.init(proxy)
 	}
-
+	
+		
+	
 	def login(UserInfo userInfo){
 
 

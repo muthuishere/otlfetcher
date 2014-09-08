@@ -107,7 +107,7 @@ function showuser(){
   
 	showpage('reports');
   
-	  $.get( "/services/getuserStatus/", function( data ) {
+	  $.get( "/services/getuserStatus/rand?inte="+Math.random(), function( data ) {
 		  
 		  $xml = $( data )
 		  $status = $xml.find( "status" )

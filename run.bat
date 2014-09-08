@@ -1,3 +1,3 @@
 
-gradle clean run -PappArgs="['C:\\muthu\\gitworkspace\\otlfetcher\\otlfetcher.conf']" 
+gradle clean run -PappArgs="['C:\\muthu\\otl\\otlfetcher\\otlfetcher.conf']" 
 pause

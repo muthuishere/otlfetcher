@@ -22,7 +22,7 @@ class DataManager {
 		
 		
 			dataStore=new DataStore()
-			dataStore.init(Configurator.globalconfig.dbname )
+			dataStore.init(Configurator.globalconfig.userdb, Configurator.globalconfig.fetcherdb)
 			
 		
 		

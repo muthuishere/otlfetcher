@@ -6,6 +6,13 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.sql.*
 
+import java.security.SecureRandom;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.sqlite.SQLite
 
 import groovy.sql.DataSet
@@ -16,22 +23,27 @@ import com.otl.reports.beans.UserInfo
 import com.otl.reports.beans.UserTimeSummary
 import com.otl.reports.exceptions.ServiceException
 import com.otl.reports.helpers.Log
+import com.otl.reports.helpers.AppCrypt
+
 
 class DataStore {
 
 
-	Sql db =null;
+	Sql fetcherDB =null;
+	Sql userDB =null;
 
 	void close(){
-		db.close();
+		fetcherDB.close();
+		userDB.close();
 	}
 
 
-	void init(def fileName){
+	void init(def userfileName,def fetchfileName){
 
 		Class.forName("org.sqlite.JDBC")
 
-		db = Sql.newInstance("jdbc:sqlite:"+fileName, "org.sqlite.JDBC")
+		fetcherDB = Sql.newInstance("jdbc:sqlite:"+fetchfileName, "org.sqlite.JDBC")
+		userDB = Sql.newInstance("jdbc:sqlite:"+userfileName, "org.sqlite.JDBC")
 		//create table if not exists TableName (col1 typ1, ..., colN typN)
 		/*
 		 public String user
@@ -40,7 +52,7 @@ class DataStore {
 		 */
 		
 		
-		db.execute("create table if not exists userInfo (user string, password string,ip string,locked string,lastupdated date)")
+		userDB.execute("create table if not exists userInfo (user string, password string,ip string,locked string,lastupdated date)")
 
 		/*
 		 * Date entryDate
@@ -52,23 +64,24 @@ class DataStore {
 		 def details
 		 * 
 		 */
-		db.execute("create table if not exists timeentry (user string, entryDate date,projectcode string,projecttask string,tasktype string,hours integer,details string,key string)")
+		fetcherDB.execute("create table if not exists timeentry (user string, entryDate date,projectcode string,projecttask string,tasktype string,hours integer,details string,key string)")
 
 		
-		//println(db.dump())
+		//println(fetcherDB.dump())
 	}
 
 	public ArrayList<UserInfo> getUserEntries(){
 
 
 		ArrayList<UserInfo> userEntries=new ArrayList<UserInfo>()
-
-		db.rows("select * from userInfo " ).each{
+		
+		
+		userDB.rows("select * from userInfo " ).each{
 
 			userEntries.add(
 					new UserInfo(
 					user: it.user,
-					password: it.password,
+					password: AppCrypt.decrypt(it.password),
 					ip: it.ip,
 					locked: it.locked
 					
@@ -85,12 +98,12 @@ class DataStore {
 		
 				ArrayList<UserInfo> userEntries=new ArrayList<UserInfo>()
 		
-				db.rows("select * from userInfo where locked='false' " ).each{
+				userDB.rows("select * from userInfo where locked='false' " ).each{
 		
 					userEntries.add(
 							new UserInfo(
 							user: it.user,
-							password: it.password,
+							password: AppCrypt.decrypt(it.password),
 							ip: it.ip,
 							locked: it.locked
 							
@@ -113,12 +126,12 @@ class DataStore {
 
 		
 
-		db.rows("select * from userInfo " + cond ).each{
+		userDB.rows("select * from userInfo " + cond ).each{
 
 
 			userInfo=new UserInfo(
 					user: it.user,
-					password: it.password,
+					password: AppCrypt.decrypt(it.password),
 					ip: it.ip,					
 					locked: it.locked
 
@@ -135,7 +148,7 @@ class DataStore {
 				if(null != user)
 					cond=cond + " AND user like '${user}' "
 					
-					db.rows("select user,locked from userInfo " + cond ).each{
+					userDB.rows("select user,locked from userInfo " + cond ).each{
 						
 									userstatuslist.add(
 											new UserTimeSummary(											
@@ -173,12 +186,12 @@ class DataStore {
 					
 					String leavehrsQuery="Select user,total(hours) as totalhrs from timeentry ${cond} and projectcode  in($leavecodes)  group by user "
 					
-					
+					/*
 					println maxdateQuery
 					println workhrsQuery
 					println leavehrsQuery
 					
-					
+					*/
 					
 					//Select user,max(entryDate)from timeentry group by user
 		
@@ -190,7 +203,7 @@ class DataStore {
 					//Merge and Add entries
 					//user, workinghours leavehours,lastupdated entry
 		
-				db.rows(maxdateQuery).each{
+				fetcherDB.rows(maxdateQuery).each{
 		
 					timeEntries.put(it.user, new UserTimeSummary(
 						user: it.user,
@@ -199,13 +212,13 @@ class DataStore {
 					
 				}
 		
-				db.rows(workhrsQuery).each{
+				fetcherDB.rows(workhrsQuery).each{
 				
 						timeEntries.get(it.user)?.workhours=it.totalhrs
 					
 						}
 					
-				db.rows(leavehrsQuery).each{
+				fetcherDB.rows(leavehrsQuery).each{
 					
 							timeEntries.get(it.user)?.leavehours=it.totalhrs
 						
@@ -228,7 +241,7 @@ class DataStore {
 					//Merge and Add entries
 					//user, workinghours leavehours,lastupdated entry
 		
-				db.rows(maxdateQuery).each{
+				fetcherDB.rows(maxdateQuery).each{
 		
 					timeEntries.put(it.user, new TimeEntry(
 						user: it.user,
@@ -254,6 +267,7 @@ class DataStore {
 	
 	
 	
+	
 		//return dataStore.getUserEntries()
 	//return dataStore.findUser(user)
 
@@ -274,7 +288,7 @@ class DataStore {
 
 Log.info("Query select * from timeentry " + cond)
 			
-		db.rows("select * from timeentry " + cond).each{
+		fetcherDB.rows("select * from timeentry " + cond).each{
 
 			
 			
@@ -308,7 +322,7 @@ Log.info("Query select * from timeentry " + cond)
 
 		def query="select key from timeentry  where key='" +timeEntry.key +"'"
 
-		exists=(db.rows(query).size()>0)
+		exists=(fetcherDB.rows(query).size()>0)
 
 
 
@@ -317,11 +331,11 @@ Log.info("Query select * from timeentry " + cond)
 			Log.error("Key Already exists ${timeEntry.key} overWriting ");
 
 			query="delete from timeentry  where key='${timeEntry.key}'"
-			db.execute(query, []);
+			fetcherDB.execute(query, []);
 
 		}
 
-		DataSet curtimeEntry = db.dataSet("timeentry")
+		DataSet curtimeEntry = fetcherDB.dataSet("timeentry")
 		//user string, projectcode string,projecttask string,tasktype string,hours integer,details string,key string
 		//	curtimeEntry.
 		curtimeEntry.add(
@@ -342,13 +356,13 @@ Log.info("Query select * from timeentry " + cond)
 
 	void printData(){
 
-		println(db.rows("select * from userInfo").size())
-		db.rows("select * from userInfo").each{ println(it) }
+		println(userDB.rows("select * from userInfo").size())
+		userDB.rows("select * from userInfo").each{ println(it) }
 
 
-		println(db.rows("select * from timeentry").size())
+		println(fetcherDB.rows("select * from timeentry").size())
 
-		db.rows("select * from timeentry").each{ println(it) }
+		fetcherDB.rows("select * from timeentry").each{ println(it) }
 
 
 	}
@@ -364,9 +378,9 @@ Log.info("Query select * from timeentry " + cond)
 				def query="select user from userInfo  where user='" + userInfo.user + "'"
 		
 			
-				exists=(db.rows(query).size()>0)
+				exists=(userDB.rows(query).size()>0)
 		
-				// boolean exists = db.execute("select user from userInfo  where user='${userInfo.user}'", null);
+				// boolean exists = fetcherDB.execute("select user from userInfo  where user='${userInfo.user}'", null);
 		
 		
 				if( exists){
@@ -375,7 +389,7 @@ Log.info("Query select * from timeentry " + cond)
 					query="update userInfo set locked='${userInfo.locked}' where user='${userInfo.user}'"
 					println(query)
 					
-					db.executeUpdate(query, []);
+					userDB.executeUpdate(query, []);
 					
 					return
 		
@@ -400,27 +414,27 @@ Log.info("Query select * from timeentry " + cond)
 
 		def query="select user from userInfo  where user='" + userInfo.user + "'"
 
-		exists=(db.rows(query).size()>0)
+		exists=(userDB.rows(query).size()>0)
 
-		// boolean exists = db.execute("select user from userInfo  where user='${userInfo.user}'", null);
+		// boolean exists = fetcherDB.execute("select user from userInfo  where user='${userInfo.user}'", null);
 
 
 		if( exists){
 
 			Log.error("Key Already exists ${userInfo.user} overWriting ");
 			query="delete from userInfo  where user='${userInfo.user}'"
-			db.executeUpdate(query, []);
+			userDB.executeUpdate(query, []);
 			
-			return
+			
 
 		}
 
-		DataSet curUserInfo = db.dataSet("userInfo")
+		DataSet curUserInfo = userDB.dataSet("userInfo")
 		//user string, projectcode string,projecttask string,tasktype string,hours integer,details string,key string
 
 		curUserInfo.add(
 				user:userInfo.user,
-				password:userInfo.password,
+				password:AppCrypt.encrypt(userInfo.password),
 				ip:userInfo.ip,
 				locked:"false",
 				lastupdated:new Date()
@@ -429,7 +443,7 @@ Log.info("Query select * from timeentry " + cond)
 
 		//curUserInfo.commit();
 		//insert into myTable(colname1, colname2) values(?, ?)
-		//	def res=db.executeUpdate("insert into userInfo values(?,?,?)",[userInfo.user,userInfo.password,userInfo.ip]);
+		//	def res=fetcherDB.executeUpdate("insert into userInfo values(?,?,?)",[userInfo.user,userInfo.password,userInfo.ip]);
 		//println(res)
 
 
