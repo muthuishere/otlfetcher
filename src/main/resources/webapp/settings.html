@@ -92,11 +92,7 @@
 	<span id="resultcontainer"/>
 </div>
 <script>
-	function getMonday(d) {
-		d = new Date(d);
-		var day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
-		return new Date(d.setDate(diff));
-	}
+
 
 	function setStatus(stat, desc, lup) {
 
@@ -170,7 +166,7 @@
 
 		$("#fromdate").val(
 				$.datepicker.formatDate("yy-mm-dd", getMonday(new Date())));
-		$("#todate").val($.datepicker.formatDate("yy-mm-dd", new Date()));
+		$("#todate").val($.datepicker.formatDate("yy-mm-dd", getLastDayofweek(new Date())));
 
 		$("#datetypes").selectmenu(
 				{
@@ -183,7 +179,7 @@
 											getMonday(new Date())));
 							$("#todate").val(
 									$.datepicker.formatDate("yy-mm-dd",
-											new Date()));
+											getLastDayofweek(new Date())));
 						} else if (data.item.value == "curmonth") {
 
 							setcustom(false)
@@ -196,7 +192,7 @@
 											firstDay));
 							$("#todate").val(
 									$.datepicker.formatDate("yy-mm-dd",
-											new Date()));
+											getLastDayofMonth(new Date())));
 						} else if (data.item.value == "custom") {
 							$("#fromdate").val("")
 							$("#todate").val("")

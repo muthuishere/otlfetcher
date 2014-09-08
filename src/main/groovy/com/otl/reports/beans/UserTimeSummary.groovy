@@ -12,6 +12,8 @@ class UserTimeSummary {
 	def leavehours
 	def lastupdated
 	def userLocked=false
+	def defaulter=true;
+	
 	
 	def getWorkdays() throws ServiceException{
 		

@@ -161,6 +161,31 @@ class DataStore {
 		return userstatuslist
 		
 	}
+	
+	 long getWorkingDaysBetweenTwoDates(Date start, Date end) {
+		
+    Calendar c1 = GregorianCalendar.getInstance();
+    c1.setTime(start);
+    int w1 = c1.get(Calendar.DAY_OF_WEEK);
+    c1.add(Calendar.DAY_OF_WEEK, -w1 + 1);
+
+    Calendar c2 = GregorianCalendar.getInstance();
+    c2.setTime(end);
+    int w2 = c2.get(Calendar.DAY_OF_WEEK);
+    c2.add(Calendar.DAY_OF_WEEK, -w2 + 1);
+
+    //end Saturday to start Saturday 
+    long days = (c2.getTimeInMillis()-c1.getTimeInMillis())/(1000*60*60*24);
+    long daysWithoutSunday = days-(days*2/7);
+
+    if (w1 == Calendar.SUNDAY) {
+        w1 = Calendar.MONDAY;
+    }
+    if (w2 == Calendar.SUNDAY) {
+        w2 = Calendar.MONDAY;
+    }
+    return daysWithoutSunday-w1+w2;
+	}
 	public def getTimesheetEntriesSummary(String user,Date from,Date to,def leavecodes){
 		
 		def timeEntries=new HashMap<String,UserTimeSummary>()
@@ -178,15 +203,21 @@ class DataStore {
 				if(null != to)
 					cond=cond + " AND entryDate <= "+ to.getTime()
 
+					int duration=0
+					if(null != from && null != to)
+						duration=(getWorkingDaysBetweenTwoDates(from,to)) * 8
 					
-					String maxdateQuery="Select user,max(entryDate) as maxentrydate from timeentry ${cond}  group by user "
-					
+					String maxdateQuery="Select user,max(entryDate) as maxentrydate from timeentry ${cond}  group by user "					
 					
 					String workhrsQuery="Select user,total(hours) as totalhrs from timeentry ${cond} and projectcode not in($leavecodes)  group by user "
 					
 					String leavehrsQuery="Select user,total(hours) as totalhrs from timeentry ${cond} and projectcode  in($leavecodes)  group by user "
 					
+					
+					//calculate total working hours 
+					
 					/*
+					 * 
 					println maxdateQuery
 					println workhrsQuery
 					println leavehrsQuery
@@ -203,12 +234,22 @@ class DataStore {
 					//Merge and Add entries
 					//user, workinghours leavehours,lastupdated entry
 		
+					
+					getuserstatusList( user).each{
+						
+							
+								timeEntries.put(it.user, new UserTimeSummary(
+									user: it.user,
+									userLocked:it.userLocked
+									))
+								
+								}
+					
+					
 				fetcherDB.rows(maxdateQuery).each{
 		
-					timeEntries.put(it.user, new UserTimeSummary(
-						user: it.user,
-						lastupdated:new Date(it.maxentrydate)
-						))
+					
+					timeEntries.get(it.user)?.lastupdated=it.new Date(it.maxentrydate)
 					
 				}
 		
@@ -224,44 +265,19 @@ class DataStore {
 						
 							}
 				
-				getuserstatusList( user).each{
+				timeEntries.each{timeEntry->
 					
-							timeEntries.get(it.user)?.userLocked=it.userLocked
-							
-						
-							}
-				return timeEntries
-					//Select user,max(entryDate)from timeentry group by user 
-		
-					// group by user where projectcode not in[leavecodes]
-					
-					//Select user,total(hours) as totalhrs from timeentry group by user where projectcode in[ leavecodes]
-					
-					
-					//Merge and Add entries
-					//user, workinghours leavehours,lastupdated entry
-		
-				fetcherDB.rows(maxdateQuery).each{
-		
-					timeEntries.put(it.user, new TimeEntry(
-						user: it.user,
-						lastupdated:new Date(it.maxentrydate)
-						))
-					
-				}
-		
-				
-				
-				getuserstatusList( user).each{
-					
-					
-							timeEntries.get(it.user)?.userLocked=it.userLocked
-							
+					int totalhrs=timeEntry.leavehours + timeEntry.workhours
+							if(totalhrs < duration  )
+								timeEntry.defaulter=true
+							else
+								timeEntry.defaulter=false
 						
 							}
 				
 				
 				return timeEntries
+				
 			}
 	
 	

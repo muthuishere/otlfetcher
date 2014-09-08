@@ -83,7 +83,30 @@ function showwarning(divid,content){
 	
 	
 }
+function getMonday(d) {
+	  d = new Date(d);
+	  var day = d.getDay(),
+	      diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+	  return new Date(d.setDate(diff));
+	}
 
+function getLastDayofweek(curr) {
+	 
+	      
+	 // var curr = new Date;
+	  var firstday = new Date(curr.setDate(curr.getDate() - curr.getDay()));
+	  var lastday = new Date(curr.setDate(curr.getDate() - curr.getDay()+6));
+	  return lastday
+	}
+function getLastDayofMonth(date) {
+	 
+   
+	 var y = date.getFullYear(), m = date.getMonth();
+	 
+	 var lastDay = new Date(y, m + 1, 0);
+	 return lastDay
+	
+	}
 
 function showpage(pageName){
 	

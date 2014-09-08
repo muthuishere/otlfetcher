@@ -284,6 +284,8 @@ class Responder {
 						response.append("\n<leavehours>${val.leavehours}</leavehours>")
 						response.append("\n<workdays>${val.workdays}</workdays>")
 						response.append("\n<leavedays>${val.leavedays}</leavedays>")
+						response.append("\n<defaulter>${val.defaulter}</defaulter>")
+						
 						
 						def lastupdated=""
 						if(val.lastupdated){
