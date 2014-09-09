@@ -91,7 +91,12 @@ class DataManager {
 		return dataStore.findUser(user)
 		
 	}
+	public boolean deleteUser(String user){
 		
+			
+			return dataStore.deleteUser(user)
+			
+		}
 	
 	private String getProjectLeaveCodes(){
 		String leavecode=""

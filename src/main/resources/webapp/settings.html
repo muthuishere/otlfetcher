@@ -28,6 +28,15 @@
 					<table id="tbloptions" cellpadding="10" cellspacing="10" border="0">
 
 						<tr>
+							<td>Users
+							<input type="hidden" name="users" id="users" value=""/></td>
+							<td id="selectplaceholder">
+							&nbsp;
+							
+							
+							</td>
+						</tr>
+						<tr>
 							<td>Date</td>
 							<td><select style="width: 230px" id="datetypes">
 									<option value="curweek">Current Week</option>
@@ -132,6 +141,80 @@
 		$("#tbloptions").show()
 	}
 
+function getValidUsers() {
+
+		
+		$.get("/services/getvalidusers/rand?inte="+Math.random(), function(data) {
+
+			
+			//parse xml
+	 		  $xml = $( data )
+	 		  $status = $xml.find( "status" )
+	 		  
+	 		  
+	 		  
+	 		  if( $status.attr("error") =="true"){
+	 			  
+	 			  showerror("selectplaceholder",$status.attr("description"))
+	 			  
+	 		  } else{
+
+					var dataCount=0
+						
+					
+					var tbl=""
+					tbl=tbl + ' <select style="width: 230px" id="lstusers">'
+					
+					
+					
+					
+					
+						
+		 				 
+		 			 $xml.find('user').each(function(index){
+		 				dataCount++
+		 	            var userName = $(this).find('name').text();
+		 	      
+		 				
+		 				 tbl=tbl + "        <option value='"+userName+"'>"+userName+"</option>" 
+		 			
+		 			 
+		 				 
+		 	        });
+			
+			tbl=tbl + '</select>'
+			
+						$("#selectplaceholder").html(tbl)
+						
+					//	$("select#lstusers").multiselectfilter("destroy");
+						
+						$("select#lstusers").multiselect().multiselectfilter({
+						    filter: function(event, matches){
+						    	
+						    	var res=""
+						        if( matches.length ){
+						            // do something
+						            
+						            for(i=0;i<matches.length;i++){
+						            	if(i>0)
+						            		res=res +","
+						            		
+						            	res=res+matches[i]
+						            	
+						            	
+						            }
+						            
+						            
+						        }
+						    	$("#users").val(res)
+						    }
+						});
+
+	 		  }
+		});
+
+	}
+	
 	function getdbStatus() {
 
 		
@@ -151,6 +234,7 @@
 			} else {
 
 				showdbupdate()
+				getValidUsers();
 				setStatus($status.attr("summary"), $status.attr("description"),	$status.attr("lastupdated"))
 
 			}
@@ -243,6 +327,7 @@
 		});
 		
 		getdbStatus();
+		
 
 	});
 </script>

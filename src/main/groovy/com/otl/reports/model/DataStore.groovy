@@ -141,7 +141,25 @@ class DataStore {
 		return userInfo
 	}
 
-
+	public boolean deleteUser(String user){
+		
+		
+		
+		if(null == user)	
+	
+			return false
+		
+		
+			
+						Log.error("Deleting  ${user} overWriting ");
+						def query="delete from userInfo  where user=:user"
+						userDB.executeUpdate(query, ["user":user]);
+						
+						
+			
+		
+				return true
+			}
 	public ArrayList<UserTimeSummary> getuserstatusList(String user){
 		ArrayList<UserTimeSummary> userstatuslist=new ArrayList<UserTimeSummary>()
 			String cond=" where 1=1 "

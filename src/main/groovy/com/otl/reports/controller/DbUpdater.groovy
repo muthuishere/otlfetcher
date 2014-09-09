@@ -63,7 +63,7 @@ class DbUpdater {
 	}
 	
 	
-	def start(Date from ,Date to){
+	def start(String lstusers,Date from ,Date to){
 		
 		Configurator.isUpdating=true
 		Configurator.resetupdatestatus()
@@ -83,10 +83,11 @@ class DbUpdater {
 			def users=datamanager.getValidUserEntries()
 			def usercount=0
 			for (UserInfo userInfo:users){
-				
-				Configurator.worker_lbq.put([ "callbackQueue": callbackQueue, "userInfo": userInfo,"from":from,"to":to])
+				if(null==lstusers || lstusers.trim() =="" || lstusers.contains(userInfo.user)){
+					Configurator.worker_lbq.put([ "callbackQueue": callbackQueue, "userInfo": userInfo,"from":from,"to":to])
 				
 				usercount++
+				}
 			}
 			def successCount=0
 			(1..usercount).each()

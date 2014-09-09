@@ -72,8 +72,18 @@ switch ( actionname ) {
 		result = responder.getAllusers()
 		
 		break;
+		case "getvalidusers":
+		result = responder.getvalidusers()
+		
+		break;
+		
+		
 		case "fetchreportsummary":
 		result = responder.fetchreportSummary(request)
+		
+		break;
+		case "deleteuser":
+		result = responder.deleteuser(request)
 		
 		break;
 		case "fetchdbstatus":

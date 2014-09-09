@@ -29,6 +29,59 @@ class Responder {
 	
 	
 	
+	public String getvalidusers(){
+		
+		StringBuffer response= new StringBuffer()
+		
+		response.append("<reply>")
+		
+		
+		boolean valid=false
+		
+		try{
+		def userTimeSummaries=dataManager.getAllUserStatus( )
+		// Add information as xml
+		
+		
+		userTimeSummaries.each{val->
+			
+							if(val.userLocked =="false"){
+										response.append("<user>")
+										valid=true
+										response.append("\n<name>${xml_string(val.user)}</name>")
+										
+										
+										
+										
+										
+										response.append("\n</user>")
+							}
+				
+					}
+		if(!valid){
+			
+			throw new Exception("No Vaid users identified")
+		}
+		
+		response.append("<status code='0' error='false' description='Successfully retrieved detail  information'/>")
+		}catch(Exception e){
+		
+		response= new StringBuffer()
+		
+		response.append("<reply>")
+		
+		response.append("<status code='1' error='true' description='${xml_string(e.getMessage())}'/>")
+		}
+	
+	
+		response.append("</reply>")
+		
+		return response;
+		
+		
+	}
+	
+	
 	public String getAllusers(){
 		
 		StringBuffer response= new StringBuffer()
@@ -107,6 +160,7 @@ class Responder {
 		
 		
 	}
+	
 	
 	public String fetchreportDetails(HttpServletRequest request){
 		
@@ -193,7 +247,7 @@ class Responder {
 		
 		
 		def params=[
-			"user":request.getParameter("user"),
+			"users":request.getParameter("users"),
 			"fromdate":request.getParameter("fromdate"),
 			"todate":request.getParameter("todate")
 			]
@@ -222,7 +276,7 @@ class Responder {
 		
 		Thread.start {
 			
-			new DbUpdater().start(from ,to)
+			new DbUpdater().start(params.users,from ,to)
 			
 			
 		}
@@ -389,6 +443,45 @@ class Responder {
 		String ip=getIP(request)
 		return getAdmins().contains(ip)
 		
+	}
+	
+	
+	public String deleteuser(HttpServletRequest request){
+		
+		
+	def params=[
+		"user":request.getParameter("user")
+		]
+		
+		StringBuffer response= new StringBuffer()
+		
+		response.append("<reply>")
+		
+		if(null == params.user  ){
+			
+			response.append("<status code='1' error='true' description='Invalid user inputs'/>")
+			
+		}else{
+		
+		try{
+		if(dataManager.deleteUser(params.user.toString()))		
+			response.append("<status code='0' error='false' description='Successfully updated user information'/>")
+		else
+			response.append("<status code='0' error='true' description='Invalid Username ,Could not delete'/>")
+		
+		}catch(Exception e){
+		response= new StringBuffer()
+		
+		response.append("<reply>")
+		
+		
+			response.append("<status code='1' error='true' description='${xml_string(e.getMessage())}'/>")
+		}
+	
+		}
+		response.append("</reply>")
+		
+		return response;
 	}
 	
 	public String updateuser(HttpServletRequest request){
