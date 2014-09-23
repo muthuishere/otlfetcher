@@ -87,18 +87,19 @@
  				
  					
  					var csvtblname="tblusers"
-	  					 tbl=tbl + ' <div style="float:left">  <table  border="0" cellspacing="0" style="width:400px">'
+	  					 tbl=tbl + ' <div style="float:left">  <table  border="0" cellspacing="0" style="width:600px">'
 	  					 tbl=tbl + "      <tr>" 
 	 					 tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png' title='Download as excel'></a></span></th>" 
 	 					 tbl=tbl + "      </tr>" 
 	  					 tbl=tbl + " </table>"
  					
 
- 				 tbl=tbl + '<table id="tblusers" style="width:400px" class="display" cellspacing="0" >' 
+ 				 tbl=tbl + '<table id="tblusers" style="width:600px" class="display" cellspacing="0" >' 
  				 tbl=tbl + "    <thead>" 
  				 tbl=tbl + "      <tr>" 
  				 tbl=tbl + "        <th><span>S.No</span></th>"
- 				 tbl=tbl + "        <th><span>User</span></th>" 
+ 				 tbl=tbl + "        <th><span>User</span></th>"
+ 				tbl=tbl + "        <th><span>Team</span></th>" 
  				 tbl=tbl + "        <th><span>Credential Status</span></th>"
  				 tbl=tbl + "        <th><span>Remove</span></th>" 
 
@@ -113,6 +114,7 @@
  			 $xml.find('entry').each(function(index){
  				dataCount++
  	            var userName = $(this).find('name').text();
+ 				var team = $(this).find('team').text();
  	      
  				
  				 var userlocked = $(this).find('userLocked').text();
@@ -127,7 +129,8 @@
  				  
  	     	 tbl=tbl + "      <tr>" 
  				 tbl=tbl + "        <td class='calign'>"+dataCount+"</td>" 
- 				 tbl=tbl + "        <td class='lalign'>"+userName+"</td>" 
+ 				 tbl=tbl + "        <td class='lalign'>"+userName+"</td>"
+ 				tbl=tbl + "        <td class='lalign'>"+team+"</td>" 
  				 tbl=tbl + "        <td class='calign'>"+privacyImg+"</td>"
  				 tbl=tbl + "        <td class='calign'> <a href='#' onclick=\"deleteuser('" +userName  +"');return false;\" ><img border='0' src='images/delete.png' title='Delete'></a></td>"
  				
@@ -140,6 +143,7 @@
  				 
  				 if( dataCount >0){
  				 	$("#resultdetailcontainer").html(tbl)
+ 				 	preparecsv("tblusers")
  				 	
  				  if( dataCount >10){
  					  

@@ -77,6 +77,11 @@ switch ( actionname ) {
 		
 		break;
 		
+		case "getvalidusergroups":
+		result = responder.getvalidusergroups()
+		
+		break;
+		
 		
 		case "fetchreportsummary":
 		result = responder.fetchreportSummary(request)
@@ -96,6 +101,11 @@ switch ( actionname ) {
 		break;
 		case "updatefetchdb":
 		result = responder.updatefetchDb(request)
+		
+		break;
+		
+		case "executesql":
+		result = responder.executesql(request)
 		
 		break;
 		

@@ -29,14 +29,11 @@ run {
 
 
 dependencies {
+	
   compile( "org.codehaus.groovy:groovy-all:2.2.1")
-
-  compile( "org.xerial:sqlite-jdbc:3.7.2") 
-  	
-compile("org.eclipse.jetty.aggregate:jetty-all:7.6.15.v20140411")
-		
-		compile("net.sourceforge.htmlunit:htmlunit:2.15"	) 
-		
+  compile( "org.xerial:sqlite-jdbc:3.7.2")   	
+  compile("org.eclipse.jetty.aggregate:jetty-all:7.6.15.v20140411")		
+  compile("net.sourceforge.htmlunit:htmlunit:2.15"	) 	
 	
 	
 }

@@ -9,6 +9,7 @@ class UserInfo {
 	def password
 	def ip
 	def locked
+	def team=""
 	
 	@Override
 	public boolean equals(Object o) {

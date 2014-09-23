@@ -17,13 +17,6 @@ class OTLReportApplication {
 	
 	static parseconfig(def configFileName){
 		
-		
-		
-		
-		
-		
-		
-		
 		// Read the configuration file into a map called "global".
 		// This map is shared with all other threads in order to provide
 		// a centralised configuration store.

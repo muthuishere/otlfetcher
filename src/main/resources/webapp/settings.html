@@ -27,6 +27,8 @@
 					</table> 
 					<table id="tbloptions" cellpadding="10" cellspacing="10" border="0">
 
+   
+	   
 						<tr>
 							<td>Users
 							<input type="hidden" name="users" id="users" value=""/></td>
@@ -144,7 +146,7 @@
 function getValidUsers() {
 
 		
-		$.get("/services/getvalidusers/rand?inte="+Math.random(), function(data) {
+		$.get("/services/getvalidusergroups/rand?inte="+Math.random(), function(data) {
 
 			
 			//parse xml
@@ -163,16 +165,44 @@ function getValidUsers() {
 						
 					
 					var tbl=""
-					tbl=tbl + ' <select style="width: 230px" id="lstusers">'
+					tbl=tbl + ' <select style="width: 530px"  multiple="multiple" id="lstusers">'
 					
 					
 					
+				//	tbl=tbl + "        <option value=''>Select</option>" 
 					
-					
-						
+						//select multiple="multiple">
+  
+      
+				
+						 
+			 			 $xml.find('team').each(function(index){
+			 				
+			 				var groupname = $(this).attr('name');
+			 				
+			 				 tbl=tbl + "<optgroup label='"+groupname+"' >" 
+			 				 
+			 				$(this).find('user').each(function(index){
+			 					 
+			 					 dataCount++
+					 	            var userName = $(this).find('name').text();
+					 	      
+					 				
+					 				 tbl=tbl + "        <option value='"+userName+"'>&nbsp;&nbsp;&nbsp;&nbsp;"+userName+"</option>" 
+					 			
+			 				 });
+			 				 
+			 				 tbl=tbl + "</optgroup>" 
+			 			 
+			 				 
+			 	        });
+			 			 
 		 				 
+			 				/*
 		 			 $xml.find('user').each(function(index){
-		 				dataCount++
+		 				
+		 				 
+		 				 dataCount++
 		 	            var userName = $(this).find('name').text();
 		 	      
 		 				
@@ -180,14 +210,16 @@ function getValidUsers() {
 		 			
 		 			 
 		 				 
-		 	        });
+		 	        }); */
 			
 			tbl=tbl + '</select>'
 			
 						$("#selectplaceholder").html(tbl)
 						
 					//	$("select#lstusers").multiselectfilter("destroy");
+						$("select#lstusers").multipleSelect();
 						
+						/*
 						$("select#lstusers").multiselect().multiselectfilter({
 						    filter: function(event, matches){
 						    	
@@ -206,9 +238,10 @@ function getValidUsers() {
 						            
 						            
 						        }
+						    	
 						    	$("#users").val(res)
 						    }
-						});
+						}); */
 
 	 		  }
 		});
@@ -300,6 +333,14 @@ function getValidUsers() {
 
 		$("input#updatedb").button().click(function(event) {
 
+			if($("select#lstusers").multipleSelect('getSelects').length >0){
+				
+				$("#users").val($("select#lstusers").multipleSelect('getSelects').join(","))	
+			}
+			
+			
+			
+			
 			var formdata = $("form#frmdbupdate").serializeArray()
 
 			$('#frmdbupdate')[0].reset();

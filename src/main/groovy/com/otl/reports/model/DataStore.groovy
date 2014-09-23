@@ -52,7 +52,7 @@ class DataStore {
 		 */
 		
 		
-		userDB.execute("create table if not exists userInfo (user string, password string,ip string,locked string,lastupdated date)")
+		userDB.execute("create table if not exists userInfo (user string, password string,ip string,locked string,lastupdated date,team string,comment string)")
 
 		/*
 		 * Date entryDate
@@ -70,24 +70,48 @@ class DataStore {
 		//println(fetcherDB.dump())
 	}
 
-	public ArrayList<UserInfo> getUserEntries(){
+	
+	public def executeSQL( def db, def sqlString){
+		
+		def result=false
+		if(db.equals("USER")){
+			
+			result= userDB.execute(sqlString)
+		}
+		
+		if(db.equals("FETCHER")){
+			result=fetcherDB.execute(sqlString)
+		
+		}
+		return result
+		
+	}
+	public ArrayList<UserInfo> getUserEntries(String team){
 
 
 		ArrayList<UserInfo> userEntries=new ArrayList<UserInfo>()
 		
 		
-		userDB.rows("select * from userInfo " ).each{
+		userDB.rows("select * from userInfo order by team " ).each{
 
+			boolean canadd=true
+			
+			if(null != team &&  team.equals(it?.team) == false){
+				
+				canadd=false
+			}
+			if(canadd){
 			userEntries.add(
 					new UserInfo(
 					user: it.user,
 					password: AppCrypt.decrypt(it.password),
 					ip: it.ip,
-					locked: it.locked
-					
+					locked: it.locked,
+					team:it?.team
 
 					)
 					);
+			}
 		}
 
 		return userEntries
@@ -98,14 +122,15 @@ class DataStore {
 		
 				ArrayList<UserInfo> userEntries=new ArrayList<UserInfo>()
 		
-				userDB.rows("select * from userInfo where locked='false' " ).each{
+				userDB.rows("select * from userInfo where locked='false' order by team " ).each{
 		
 					userEntries.add(
 							new UserInfo(
 							user: it.user,
 							password: AppCrypt.decrypt(it.password),
 							ip: it.ip,
-							locked: it.locked
+							locked: it.locked,
+							team:it?.team
 							
 		
 							)
@@ -133,7 +158,8 @@ class DataStore {
 					user: it.user,
 					password: AppCrypt.decrypt(it.password),
 					ip: it.ip,					
-					locked: it.locked
+					locked: it.locked,
+					team:it?.team
 
 					)
 		}
@@ -166,16 +192,20 @@ class DataStore {
 				if(null != user)
 					cond=cond + " AND user like '${user}' "
 					
-					userDB.rows("select user,locked from userInfo " + cond ).each{
+					
+					userDB.rows("select user,locked,team from userInfo " + cond +" order by team" ).each{
 						
 									userstatuslist.add(
 											new UserTimeSummary(											
 											user: it.user,
-											userLocked: Boolean.parseBoolean(it.locked)										
+											userLocked: Boolean.parseBoolean(it.locked),
+											team:it?.team
 											)
 											);
 								}
 					
+					println ("select user,locked,team from userInfo " + cond)
+					println (userstatuslist.size())
 		return userstatuslist
 		
 	}
@@ -478,7 +508,8 @@ Log.info("Query select * from timeentry " + cond)
 				password:AppCrypt.encrypt(userInfo.password),
 				ip:userInfo.ip,
 				locked:"false",
-				lastupdated:new Date()
+				lastupdated:new Date(),
+				team:userInfo.team
 
 				)
 

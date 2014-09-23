@@ -76,14 +76,34 @@ class DataManager {
 	
 	public ArrayList<UserInfo> getUserEntries(){
 		
-		return dataStore.getUserEntries()
+		return dataStore.getUserEntries(null)
 		
 		}
+	
+	public ArrayList<UserInfo> getTeamUserEntriesasCSV(String team){
+		
+		return dataStore.getUserEntries(getvalidString(team))
+		
+		}
+	
+	public ArrayList<UserInfo> getUserEntries(String team){
+		
+		return dataStore.getUserEntries(getvalidString(team))
+		
+		}
+	
 	public ArrayList<UserTimeSummary> getAllUserStatus(){
 		
 		return dataStore.getuserstatusList(null)
 		
 		}
+	
+	public def executeSQL(def db,def sql){
+		
+		return dataStore.executeSQL( db, sql)
+		
+		}
+	
 	
 	public UserInfo findUser(String user){
 	

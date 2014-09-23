@@ -13,7 +13,7 @@ class UserTimeSummary {
 	def lastupdated
 	def userLocked=false
 	def defaulter=true;
-	
+	def team
 	
 	def getWorkdays() throws ServiceException{
 		
