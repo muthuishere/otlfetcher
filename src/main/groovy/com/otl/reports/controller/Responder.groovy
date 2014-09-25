@@ -96,32 +96,42 @@ class Responder {
 			def userTimeSummaries=dataManager.getAllUserStatus( )
 			// Add information as xml
 
+			println(userTimeSummaries.dump())
 			def teamname=""
+			def lastteamname=""
+			StringBuffer userresponse= new StringBuffer()
+			def teamlist=[:]
+			
+			
 			userTimeSummaries.each{val->
 
 				if(val.userLocked == false){
 
-					StringBuffer userresponse= new StringBuffer()
-					userresponse.append("<user>")
 					valid=true
-
+					userresponse= new StringBuffer()
+					userresponse.append("<user>")
 					userresponse.append("\n<name>${xml_string(val.user)}</name>")
-
-
-
-
-
 					userresponse.append("\n</user>")
+					
+					def curuser=userresponse.toString();
+					if(teamlist.containsKey(val.team))						
+						teamlist.put(val.team, teamlist.get(val.team) + curuser);						
+					else
+						teamlist.put(val.team, curuser)
+						
 
-					if(teamname.equals(val.team) == false){
-						response.append("<team name='${xml_string(val.team)}'>")
-						response.append(userresponse.toString());
-						response.append("</team>")
-						teamname=val.team;
-					}
+						
+					
 				}
 
 			}
+			teamlist.each{key,val->
+				
+				response.append("<team name='${xml_string(key)}'>")
+				response.append(val);
+				response.append("</team>")
+			}
+			
 			if(!valid){
 
 				throw new Exception("No Vaid users identified")

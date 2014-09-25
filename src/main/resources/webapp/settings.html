@@ -31,7 +31,7 @@
 	   
 						<tr>
 							<td>Users
-							<input type="hidden" name="users" id="users" value=""/></td>
+							<input type="hidden" name="users" id="curusers" value=""/></td>
 							<td id="selectplaceholder">
 							&nbsp;
 							
@@ -335,7 +335,7 @@ function getValidUsers() {
 
 			if($("select#lstusers").multipleSelect('getSelects').length >0){
 				
-				$("#users").val($("select#lstusers").multipleSelect('getSelects').join(","))	
+				$("#curusers").val($("select#lstusers").multipleSelect('getSelects').join(","))	
 			}
 			
 			

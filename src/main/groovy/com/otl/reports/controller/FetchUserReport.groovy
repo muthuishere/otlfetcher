@@ -98,7 +98,7 @@ class FetchUserReport {
 		if(cells.size() == 0){
 						 
 			Log.error("No response details");
-			return
+			return null
 			
 		}
 		
@@ -225,11 +225,11 @@ class FetchUserReport {
 			if(resultContainer.asXml().contains("No results found")){
 				
 				Log.info("No response for particular period ${userInfo.user} from ${from} to ${to}")
-				return;
+				return timeEntries;
 			}
 			 
 			Log.error("No response details");
-			return
+			return timeEntries
 			
 		}
 		
@@ -260,7 +260,9 @@ class FetchUserReport {
 			webBrowser.waitForPageLoad();
 			//webBrowser.printAll()
 			
-			timeEntries.addAll(getTimesheetData(userInfo.user))
+			def resplist=getTimesheetData(userInfo.user)
+			if(null !=resplist )
+				timeEntries.addAll(resplist)
 			
 			//document.querySelectorAll("#Hxctimecard")[0].querySelectorAll("td.x1r")[0].parentNode.parentNode
 			

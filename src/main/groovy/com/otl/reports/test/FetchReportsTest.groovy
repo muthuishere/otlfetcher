@@ -6,6 +6,7 @@ import com.otl.reports.controller.DataManager
 import com.otl.reports.controller.DbUpdater
 import com.otl.reports.controller.FetchUserReport;
 import com.otl.reports.controller.OTLServer
+import com.otl.reports.controller.Responder
 import com.otl.reports.model.WebBrowser
 
 import groovy.json.JsonSlurper
@@ -17,7 +18,11 @@ import com.otl.reports.controller.Configurator;
 
 class FetchReportsTest {
 
-	
+	static void respondTest(){
+		
+		Responder res=new Responder();
+		println(res.getvalidusergroups());
+	}
 	
 	static void  integrate(){
 	
@@ -375,6 +380,7 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		
 			Configurator.globalconfig.configuration_file = configFileName
 		
+			
 			println "Configuration: ${Configurator.globalconfig}"
 		}
 		catch(Exception e)
@@ -418,6 +424,8 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 	//	servertest()
 		
 		def configFileName
+		/*
+		
 		
 		
 		if(args.size() != 1)
@@ -428,13 +436,15 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		
 		
 		configFileName=args[0]
-		
+		*/
+		configFileName="C:\\muthu\\otl\\otlfetcher\\origotlfetcher.conf"
 		parseconfig(configFileName)
 		
 		//leavecodetest()
 		//integrate()
 		
-		servertest()
+		//servertest()
+		respondTest();
 		
 	}
 

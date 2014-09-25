@@ -44,19 +44,30 @@ class DbUpdater {
 				datamanager.disableUser(dbreport_response?.userInfo?.user)
 				
 			}
-			
+		
 			
 		}else{
 		
-		println("Adding entries for" +dbreport_response?.userInfo?.user)
+		if(  dbreport_response?.timeEntries?.size() > 0){
+			
+			println("Adding entries for" +dbreport_response?.userInfo?.user)
+			
+			datamanager.addTimeEntries(dbreport_response.timeEntries);
+			
+			if( null != dbreport_response?.error  || dbreport_response?.error !="" ){
+				flgSuccess=false
+				
+			}else
+				flgSuccess=true
+			
+		}
 		
-		datamanager.addTimeEntries(dbreport_response.timeEntries);
-		flgSuccess=true
 		
 		}
 		}catch(Exception e){
 		
 			e.printStackTrace();
+			
 		}
 		
 		return flgSuccess
@@ -150,7 +161,7 @@ class DbUpdater {
 		def req_msg = curConfigurator.worker_lbq.take()
 		def reply_msg = req_msg
 		def start_ms = System.currentTimeMillis()
-	
+			ArrayList<TimeEntry> timeEntries=new ArrayList<TimeEntry>()
 		try
 		{
 		 
@@ -158,7 +169,7 @@ class DbUpdater {
 			
 			
 			
-			ArrayList<TimeEntry> timeEntries=new ArrayList<TimeEntry>()
+			
 			Date origstart=req_msg.from
 			Date origend=req_msg.to
 			Date curstart=req_msg.from
@@ -185,8 +196,9 @@ class DbUpdater {
 				
 				FetchUserReport fetchUserReport=new FetchUserReport()
 				fetchUserReport.init(Configurator.globalconfig?.proxy )
-				
-				timeEntries.addAll(fetchUserReport.startFetch(req_msg.userInfo, curstart, curend))
+				def res=fetchUserReport.startFetch(req_msg.userInfo, curstart, curend)
+				if(null != res)
+					timeEntries.addAll(res)
 				
 				use(groovy.time.TimeCategory) {
 					durationdiff = origend - curend
@@ -219,6 +231,10 @@ class DbUpdater {
 		  e.printStackTrace()
 	
 		  reply_msg.error = "${e.getCause().toString()} (${e.getMessage()})"
+		  if(timeEntries.size() > 0){
+			  
+			  reply_msg.timeEntries=timeEntries
+		  }
 	
 		
 		}
