@@ -25,11 +25,69 @@ class Responder {
 
 	def xml_string = { s ->
 
-		s.replaceAll("[\\x00-\\x1f]", "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("'", "&apos;").replaceAll("\"", "&quot;").replaceAll("\\\\", "\\\\\\\\").replaceAll("\\\$", "\\\\\\\$")
+		
+			s?.replaceAll("[\\x00-\\x1f]", "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("'", "&apos;").replaceAll("\"", "&quot;").replaceAll("\\\\", "\\\\\\\\").replaceAll("\\\$", "\\\\\\\$")
 	}
 
 
 
+	
+	
+	
+	
+	public String getAllProjects(){
+
+		StringBuffer response= new StringBuffer()
+
+		response.append("<reply>")
+
+
+		boolean valid=false
+
+		try{
+			def userTimeSummaries=dataManager.getAllProjects();
+			// Add information as xml
+
+		//	ArrayList<TimeEntry> 
+			userTimeSummaries.each{val->
+
+				
+					response.append("<project>")
+					valid=true
+					response.append("\n<code>${val.projectcode}</code>")
+
+
+
+
+
+					response.append("\n</project>")
+			
+
+			}
+			if(!valid){
+
+				throw new Exception("No Vaid Projects identified")
+			}
+
+			response.append("<status code='0' error='false' description='Successfully retrieved detail  information'/>")
+		}catch(Exception e){
+
+			response= new StringBuffer()
+
+			response.append("<reply>")
+
+			response.append("<status code='1' error='true' description='${xml_string(e.getMessage())}'/>")
+		}
+
+
+		response.append("</reply>")
+
+		return response;
+
+
+	}
+
+	
 	public String getvalidusers(){
 
 		StringBuffer response= new StringBuffer()
@@ -255,11 +313,11 @@ class Responder {
 
 			Date from =null
 			if(null != params.fromdate)
-				from = new SimpleDateFormat("yyyy-MM-dd").parse(params.fromdate);
+				from =getParsedDate(params.fromdate);
 
 			Date to =null
 			if(null != params.todate)
-				to = new SimpleDateFormat("yyyy-MM-dd").parse(params.todate);
+				to = getParsedDate(params.todate);
 
 
 			def users=[]
@@ -397,8 +455,8 @@ class Responder {
 			try{
 
 
-				Date from = new SimpleDateFormat("yyyy-MM-dd").parse(params.fromdate);
-				Date to = new SimpleDateFormat("yyyy-MM-dd").parse(params.todate);
+				Date from =getParsedDate(params.fromdate);
+				Date to = getParsedDate(params.todate);
 
 				String userlist=""
 				if(null != params.users && params.users != "") {
@@ -446,6 +504,446 @@ class Responder {
 
 
 	}
+
+	
+	
+	public String generateReport(HttpServletRequest request,String reportname){
+		
+		StringBuffer response= new StringBuffer()
+		
+						response.append("<reply>")		
+						response.append("<status code='1' error='true' description='Invalid request'/>")
+						response.append("</reply>")
+						
+		def result=response.toString();
+		
+		switch ( reportname ) {
+			
+				
+				
+				case "projectemployeereport":
+				result = generateProjectEmployeeReport(request)
+				
+				break;
+				case "projecthoursreport":
+				result = generateProjectHoursReport(request)
+				
+				break;
+				
+				
+				
+				case "employeeprojectreport":
+				result = generateEmployeeProjectReport(request)
+				
+				break;
+				
+		}
+		
+		return result;
+	}
+	
+	
+	public Date getParsedDate(def str){
+		
+		Date d=null
+		try{
+			d = new SimpleDateFormat("yyyy-MM-dd").parse(str);
+		}catch(Exception e){
+		println(e.toString())
+		}
+		return d;
+		
+	}
+	public String generateEmployeeProjectReport(HttpServletRequest request){
+
+
+		def params=[
+			"users":request.getParameter("users"),
+			"fromdate":request.getParameter("fromdate"),
+			"todate":request.getParameter("todate")
+		]
+		StringBuffer response= new StringBuffer()
+
+		response.append("<reply>")
+
+
+
+		try{
+
+			Date from =null
+			if(null != params.fromdate)
+				from =getParsedDate(params.fromdate);
+
+			Date to =null
+			if(null != params.todate)
+				to = getParsedDate(params.todate);
+
+
+			def users=[]
+
+
+			if(null != params.users && params.users != ""){
+				
+				for(String user:params.users.split(",")){
+					users.push(user)
+				}
+				
+		}else{
+				users.push("")
+			}
+			ArrayList hashmaplist=new ArrayList();
+
+
+			users.each{curuser->
+				println("Fetching generateEmployeeProjectReport  for $curuser for $from to $to")
+				//ArrayList<TimeEntry> getTimesheetEntries
+				def res=dataManager.getTimesheetEntries( curuser, from,to)
+				if(null != res)
+					hashmaplist.add(res)
+			}
+
+
+
+
+			// Add information as xml
+
+			//println(summarylist.dump())
+			if(hashmaplist.size() >0 ){
+				hashmaplist.each {summarylist ->
+					
+					summarylist.each{val->
+
+						/*
+						 * 
+						 *  $xml.find('user').each(function(index){
+  					dataCount++
+  		            var username = $(this).find('name').text();
+  					var userdate = $(this).find('date').text();
+  		          var projcode = $(this).find('code').text();
+  		        var projtask = $(this).find('task').text();
+  		      var projtype = $(this).find('type').text();
+  		    var hours = $(this).find('hours').text();
+  		    Date entryDate
+	def user
+	def projectcode
+	def projecttask
+	def tasktype
+	def hours
+	def details
+	def isLeave
+	Date fetchedDate
+						 */
+						
+						
+						response.append("<user>")
+		
+						response.append("\n<name>${xml_string(val.user)}</name>")
+						response.append("\n<code>${val.projectcode}</code>")
+						response.append("\n<task>${xml_string(val.projecttask)}</task>")
+						response.append("\n<type>${xml_string(val.tasktype)}</type>")
+						response.append("\n<hours>${val.hours}</hours>")
+						response.append("\n<details>${val.details}</details>")
+						response.append("\n<isLeave>${val.isLeave}</isLeave>")
+		
+						def entrydate=""
+						if(val.entryDate){
+		
+							SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM dd yyyy");
+		
+							// (3) create a new String using the date format we want
+							entrydate= formatter.format(val.entryDate);
+						}
+						response.append("\n<date>${entrydate}</date>")
+						//response.append("\n<fetchedDate>${val.fetchedDate}</fetchedDate>")
+		
+		
+		
+						response.append("\n</user>")
+						/*
+						response.append("<user>")
+
+						response.append("\n<name>${xml_string(val.)}</name>")
+						response.append("\n<user>${xml_string(val.user)}</user>")
+						response.append("\n<total>${val.totalhrs}</total>")
+					
+
+						response.append("\n</project>")
+						*/
+
+					}
+
+				}
+				response.append("<status code='0' error='false' description='Successfully updated user information'/>")
+			}else{
+				throw new Exception("No Timesheet Entries found")
+			}
+
+
+
+		}catch(Exception e){
+
+			e.printStackTrace();
+			response= new StringBuffer()
+
+			response.append("<reply>")
+
+
+			response.append("<status code='1' error='true' description='${xml_string(e?.getMessage())}'/>")
+
+
+		}
+
+
+		response.append("</reply>")
+
+		return response;
+
+
+	}
+
+	
+	
+	public String generateProjectHoursReport(HttpServletRequest request){
+
+
+		def params=[
+			"projects":request.getParameter("projects"),
+			"fromdate":request.getParameter("fromdate"),
+			"todate":request.getParameter("todate")
+		]
+		StringBuffer response= new StringBuffer()
+
+		response.append("<reply>")
+
+
+
+		try{
+
+			Date from =null
+			if(null != params.fromdate)
+				from =getParsedDate(params.fromdate);
+
+			Date to =null
+			if(null != params.todate)
+				to = getParsedDate(params.todate);
+
+
+			def projects=[]
+
+
+			if(null != params.projects && params.projects != ""){
+				
+				for(String project:params.projects.split(",")){
+					projects.push(project)
+				}
+				
+		}else{
+				projects.push("")
+			}
+			ArrayList hashmaplist=new ArrayList();
+
+
+			projects.each{curuser->
+				println("Fetching generateProjectHoursReport  for $curuser for $from to $to")
+
+				def res=dataManager.getProjectHoursReport( curuser, from,to)
+				if(null != res)
+					hashmaplist.add(res)
+			}
+
+
+
+
+			// Add information as xml
+
+			//println(summarylist.dump())
+			if(hashmaplist.size() >0 ){
+				hashmaplist.each {summarylist ->
+					
+					summarylist.each{val->
+
+						
+						response.append("<project>")
+
+						response.append("\n<name>${val.projectcode}</name>")
+						response.append("\n<user>${xml_string(val.user)}</user>")
+						
+						def str="0"
+						
+						if(val.totalhrs >0)
+						str= val.totalhrs.intValue() +""
+						
+						response.append("\n<total>${str}</total>")
+					
+
+						response.append("\n</project>")
+
+					}
+
+				}
+				response.append("<status code='0' error='false' description='Successfully updated user information'/>")
+			}else{
+				throw new Exception("No Timesheet Entries found")
+			}
+
+
+
+		}catch(Exception e){
+
+			e.printStackTrace();
+			response= new StringBuffer()
+
+			response.append("<reply>")
+
+
+			response.append("<status code='1' error='true' description='${xml_string(e?.getMessage())}'/>")
+
+
+		}
+
+
+		response.append("</reply>")
+
+		return response;
+
+
+	}
+
+	
+	public String generateProjectEmployeeReport(HttpServletRequest request){
+
+
+		def params=[
+			"projects":request.getParameter("projects"),
+			"fromdate":request.getParameter("fromdate"),
+			"todate":request.getParameter("todate")
+		]
+		StringBuffer response= new StringBuffer()
+
+		response.append("<reply>")
+
+
+
+		try{
+
+			Date from =null
+			if(null != params.fromdate)
+				from =getParsedDate(params.fromdate);
+
+			Date to =null
+			if(null != params.todate)
+				to = getParsedDate(params.todate);
+
+
+			def projects=[]
+
+
+			if(null != params.projects && params.projects != ""){
+				
+				for(String project:params.projects.split(",")){
+					projects.push(project)
+				}
+				
+		}else{
+				projects.push("")
+			}
+			ArrayList hashmaplist=new ArrayList();
+
+
+			projects.each{curuser->
+				println("Fetching generateProjectEmployeeReport  for $curuser for $from to $to")
+
+				def res=dataManager.getProjectEmployeeReport( curuser, from,to)
+				if(null != res)
+					hashmaplist.add(res)
+			}
+
+
+
+
+			// Add information as xml
+
+			//println(summarylist.dump())
+			if(hashmaplist.size() >0 ){
+				hashmaplist.each {summarylist ->
+					def curtoken=""
+					summarylist.each{val->
+
+						//user,projectcode,entryDate,hours,projecttask,tasktype
+							/*
+							 * 	var dataCount=0
+  					 
+  				 $xml.find('project').each(function(index){
+  					dataCount++
+  		            var project = $(this).find('name').text();
+  					var username = $(this).find('user').text();
+  		          var projdate = $(this).find('date').text();
+  		        var totalhrs = $(this).find('total').text();  		      
+  		    var hours = $(this).find('hours').text();
+							 * 
+							 * 
+							 */
+						response.append("<project>")
+
+						response.append("\n<name>${val.projectcode}</name>")
+						response.append("\n<user>${xml_string(val.user)}</user>")
+						
+						response.append("\n<hours>${val.hours}</hours>")
+						response.append("\n<total></total>")
+					
+
+
+						def projdate=""
+						if(val.entryDate){
+
+							SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM dd yyyy");
+
+							// (3) create a new String using the date format we want
+							projdate= formatter.format(val.entryDate);
+						}
+
+
+
+						response.append("\n<projdate>${projdate}</projdate>")
+						
+
+
+
+
+						response.append("\n</project>")
+
+					}
+
+				}
+				response.append("<status code='0' error='false' description='Successfully updated user information'/>")
+			}else{
+				throw new Exception("No Timesheet Entries found")
+			}
+
+
+
+		}catch(Exception e){
+
+			e.printStackTrace();
+			response= new StringBuffer()
+
+			response.append("<reply>")
+
+
+			response.append("<status code='1' error='true' description='${xml_string(e?.getMessage())}'/>")
+
+
+		}
+
+
+		response.append("</reply>")
+
+		return response;
+
+
+	}
+
+	
 	public String fetchreportSummary(HttpServletRequest request){
 
 
@@ -465,11 +963,11 @@ class Responder {
 
 			Date from =null
 			if(null != params.fromdate)
-				from = new SimpleDateFormat("yyyy-MM-dd").parse(params.fromdate);
+				from =getParsedDate(params.fromdate);
 
 			Date to =null
 			if(null != params.todate)
-				to = new SimpleDateFormat("yyyy-MM-dd").parse(params.todate);
+				to = getParsedDate(params.todate);
 
 
 			def users=[]
@@ -591,6 +1089,25 @@ class Responder {
 
 	}
 
+	public String getTeams(){
+		String admins=""
+		int i=0
+		for(def bfr:Configurator.globalconfig.teams){
+
+
+
+			if(i > 0)
+				admins=admins +","
+
+
+
+			admins=admins +"$bfr"
+
+			i++
+		}
+		return admins
+
+	}
 	def getIP(HttpServletRequest request){
 
 		if(request.getRemoteAddr()){
@@ -601,6 +1118,30 @@ class Responder {
 		}
 
 	}
+	
+	
+	public String getappConfig(HttpServletRequest request){
+		
+		
+		
+				String ip=getIP(request)
+		
+				StringBuffer response= new StringBuffer()
+		
+				response.append("<reply>")
+				def teams=getTeams();
+				
+				if( getAdmins().contains(ip))
+					response.append("<status code='0' admin='true' description='Admin User' teams='$teams' />")
+				else
+					response.append("<status code='0' admin='false' description='Regular User' teams='$teams' />")
+		
+				response.append("</reply>")
+		
+				return response.toString();
+			}
+		
+	
 	public String getuserStatus(HttpServletRequest request){
 
 
@@ -611,9 +1152,7 @@ class Responder {
 
 		response.append("<reply>")
 
-		println(ip)
-		println(getAdmins())
-
+		
 		if( getAdmins().contains(ip))
 			response.append("<status code='0' admin='true' description='Admin User'/>")
 		else

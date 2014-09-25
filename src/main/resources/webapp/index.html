@@ -68,6 +68,8 @@
                 <ul class="footer_menu">
 				 <li title="home" ><a  href="#" onclick="showpage('home');return false">Home</a></li>
 			<li title="reports" class="admin"><a  href="#" onclick="showpage('reports');return false">Reports</a></li>
+			<li title="adminreports" class="admin"><a  href="#" onclick="showpage('adminreports');return false">Admin Reports</a></li>
+			
            <li title="settings" class="admin"><a  href="#" onclick="showpage('settings');return false">Settings</a></li>
            <li title="users" class="admin"><a  href="#" onclick="showpage('users');return false">Users</a></li>
 		   
@@ -111,7 +113,7 @@ function showuser(){
   
 	showpage('reports');
   
-	  $.get( "/services/getuserStatus/rand?inte="+Math.random(), function( data ) {
+	  $.get( "/services/getappConfig/rand?inte="+Math.random(), function( data ) {
 		  
 		  $xml = $( data )
 		  $status = $xml.find( "status" )
@@ -127,6 +129,8 @@ function showuser(){
 			  showuser()
 			  
 		  }
+		  
+		  $("#teams").val($status.attr("teams"))
 		});
 	  
 	
@@ -135,6 +139,8 @@ function showuser(){
   
   
 </script>
+<input type="hidden" name="teams" id="teams"/>
+
 <form id="frmcsv" name="frmcsv" action="/services/downloadexcel" method="POST" target="_blank">
 
 <input type="hidden" name="repname" id="repname"/>

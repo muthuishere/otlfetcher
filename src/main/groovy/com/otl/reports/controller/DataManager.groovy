@@ -98,6 +98,12 @@ class DataManager {
 		
 		}
 	
+	public ArrayList<TimeEntry> getAllProjects(){
+		
+		return dataStore.getProjectsList(null)
+		
+		}
+	
 	public def executeSQL(def db,def sql){
 		
 		return dataStore.executeSQL( db, sql)
@@ -157,6 +163,27 @@ class DataManager {
 		}
 	
 	
+	
+	public def getProjectHoursReport(String project,Date from,Date to){
+		
+	
+	
+		
+			return dataStore.getProjectHoursReport(getvalidString(project),from,to)
+			
+			
+		}
+	
+	
+	public def getProjectEmployeeReport(String project,Date from,Date to){
+		
+	
+	
+		
+			return dataStore.getProjectEmployeeReport(getvalidString(project),from,to)
+			
+			
+		}
 	public ArrayList<TimeEntry> getTimesheetEntries(String user,Date from,Date to){
 	
 		

@@ -17,6 +17,9 @@
 	   <td colspan="3">
 	   
 	   
+	   <span id="teamcontainer" />
+	   
+	   <!-- 
 	   <select id="team" name="team">
 	   <option value="">All</option>
 	   <option value="CSS">CSS</option>
@@ -27,7 +30,7 @@
 	   <option value="Peoplesoft">Peoplesoft</option>
 	   <option value="Testing">Testing</option>
 	   
-	   </select>
+	   </select> -->
 	   </td>
 	   </tr>	   
 	   <tr>
@@ -214,6 +217,8 @@ function showdetailreport( username){
 	  
 	 
 	  setcustom(false)
+	    
+	   generateTeamMenu("teamcontainer","team","All")
 	    
 	    $( "#fromdate" ).val($.datepicker.formatDate("yy-mm-dd", getMonday(new Date())));
 	    	  	$( "#todate" ).val($.datepicker.formatDate("yy-mm-dd", getLastDayofweek(new Date())));

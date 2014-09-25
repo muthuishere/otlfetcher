@@ -32,7 +32,7 @@ response.setContentType("text/xml");
 String path=request.getPathInfo()
 String[] servicedata=path.split("/")
 
-println servicedata.length
+//println servicedata.length
 
 for ( e in servicedata ) {
 	println e
@@ -40,6 +40,13 @@ for ( e in servicedata ) {
 
 
 String actionname=servicedata.getAt(1)
+
+String reportname=""
+
+if(actionname.equals("reports") && servicedata.length > 1 ){
+	
+	reportname=servicedata.getAt(2)
+}
 
 
 def result = ""
@@ -51,6 +58,10 @@ switch ( actionname ) {
 	
 	break;
 	
+	case "getappConfig":
+	result = responder.getappConfig(request)
+
+		break;
 	case "updateuser":
 		result = responder.updateuser(request)
 		
@@ -77,11 +88,25 @@ switch ( actionname ) {
 		
 		break;
 		
+		
+		
+		case "getallprojects":
+		result = responder.getAllProjects()
+		
+		break;
+		
 		case "getvalidusergroups":
 		result = responder.getvalidusergroups()
 		
 		break;
 		
+		
+		
+		
+		case "reports":
+		result = responder.generateReport(request,reportname)
+		
+		break;
 		
 		case "fetchreportsummary":
 		result = responder.fetchreportSummary(request)

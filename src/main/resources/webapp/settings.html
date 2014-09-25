@@ -143,110 +143,6 @@
 		$("#tbloptions").show()
 	}
 
-function getValidUsers() {
-
-		
-		$.get("/services/getvalidusergroups/rand?inte="+Math.random(), function(data) {
-
-			
-			//parse xml
-	 		  $xml = $( data )
-	 		  $status = $xml.find( "status" )
-	 		  
-	 		  
-	 		  
-	 		  if( $status.attr("error") =="true"){
-	 			  
-	 			  showerror("selectplaceholder",$status.attr("description"))
-	 			  
-	 		  } else{
-
-					var dataCount=0
-						
-					
-					var tbl=""
-					tbl=tbl + ' <select style="width: 530px"  multiple="multiple" id="lstusers">'
-					
-					
-					
-				//	tbl=tbl + "        <option value=''>Select</option>" 
-					
-						//select multiple="multiple">
-  
-      
-				
-						 
-			 			 $xml.find('team').each(function(index){
-			 				
-			 				var groupname = $(this).attr('name');
-			 				
-			 				 tbl=tbl + "<optgroup label='"+groupname+"' >" 
-			 				 
-			 				$(this).find('user').each(function(index){
-			 					 
-			 					 dataCount++
-					 	            var userName = $(this).find('name').text();
-					 	      
-					 				
-					 				 tbl=tbl + "        <option value='"+userName+"'>&nbsp;&nbsp;&nbsp;&nbsp;"+userName+"</option>" 
-					 			
-			 				 });
-			 				 
-			 				 tbl=tbl + "</optgroup>" 
-			 			 
-			 				 
-			 	        });
-			 			 
-		 				 
-			 				/*
-		 			 $xml.find('user').each(function(index){
-		 				
-		 				 
-		 				 dataCount++
-		 	            var userName = $(this).find('name').text();
-		 	      
-		 				
-		 				 tbl=tbl + "        <option value='"+userName+"'>"+userName+"</option>" 
-		 			
-		 			 
-		 				 
-		 	        }); */
-			
-			tbl=tbl + '</select>'
-			
-						$("#selectplaceholder").html(tbl)
-						
-					//	$("select#lstusers").multiselectfilter("destroy");
-						$("select#lstusers").multipleSelect();
-						
-						/*
-						$("select#lstusers").multiselect().multiselectfilter({
-						    filter: function(event, matches){
-						    	
-						    	var res=""
-						        if( matches.length ){
-						            // do something
-						            
-						            for(i=0;i<matches.length;i++){
-						            	if(i>0)
-						            		res=res +","
-						            		
-						            	res=res+matches[i]
-						            	
-						            	
-						            }
-						            
-						            
-						        }
-						    	
-						    	$("#users").val(res)
-						    }
-						}); */
-
-	 		  }
-		});
-
-	}
 	
 	function getdbStatus() {
 
@@ -267,7 +163,8 @@ function getValidUsers() {
 			} else {
 
 				showdbupdate()
-				getValidUsers();
+				
+				showUserMenu("selectplaceholder")
 				setStatus($status.attr("summary"), $status.attr("description"),	$status.attr("lastupdated"))
 
 			}

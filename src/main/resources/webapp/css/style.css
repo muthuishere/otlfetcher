@@ -150,3 +150,5 @@ ul.footer_menu li a{ background:url(../images/bullet.png) no-repeat left; paddin
 .footer_left{ float:left; padding:0 0 0 10px;}
 .footer_right{ float:right; padding:0 10px 0 0;}
 }
+
+.top_custom_slogan{ text-align:left;font-family: 'Source Sans Pro', sans-serif; color:#CCCCCC; font-size:30px;float:left; font-style:italic; line-height:40px;}

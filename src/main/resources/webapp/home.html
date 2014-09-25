@@ -23,19 +23,7 @@
 	      <tr>
 	   <td>Team </td>
 	   <td colspan="3">
-	   <select id="team" name="team">
-	   <option value="">Select</option>
-	   <option value="CSS">CSS</option>
-	      <option value="SprintAndPayments">Sprint&Payments</option>
-	      <option value="ITSL">ITSL</option>
-
-	   <option value="Resolve">Resolve</option>
-	   <option value="Selfcare">Selfcare</option>
-	   <option value="Peoplesoft">Peoplesoft</option>
-	   <option value="Testing">Testing</option>
-
-
-	   </select>
+	  <span id="teamcontainer"/>
 	   </td>
 	   </tr>
 
@@ -57,6 +45,7 @@
         <script>
   $(function() {
 
+	  generateTeamMenu("teamcontainer","team","Select")
 	  $('#errdiv').hide();
 	$( "input#updateuser" )
       .button()

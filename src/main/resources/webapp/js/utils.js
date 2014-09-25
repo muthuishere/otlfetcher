@@ -2,8 +2,32 @@
  * 
  */
 
-
-
+function updateConfig(callback){
+	
+	
+}
+function generateTeamMenu(divID,name,defaulttxt){
+	
+	
+	if($("#teams").val() ==""){
+		
+		setTimeout(function(){generateTeamMenu(divID,name,defaulttxt)}, 1000);
+		return 
+	}
+	
+	var teamArray=$("#teams").val().split(",")
+	
+	var resp='  <select id="'+name+'" name="'+name+'">'
+	   resp = resp + '<option value="">'+defaulttxt+'</option>'
+	for(i=0;i<teamArray.length;i++){
+		
+		resp = resp + '<option value="'+teamArray[i]+'">'+teamArray[i]+'</option>'
+		
+	}
+	resp = resp + '</select>'
+	$("#"+divID).html(resp);
+	 $( "#"+name ).selectmenu()
+}
 function preparecsv(tblid){
 	
 	$('#'+ tblid).after('<input id="csv_'+tblid +'" type="hidden"/>');
@@ -108,6 +132,175 @@ function getLastDayofMonth(date) {
 	
 	}
 
+
+
+function showProjectMenu(divid) {
+
+	var containerid= "#" +divid
+		
+		$.get("/services/getallprojects/rand?inte="+Math.random(), function(data) {
+
+			
+			//parse xml
+	 		  $xml = $( data )
+	 		  $status = $xml.find( "status" )
+	 		  
+	 		  
+	 		  
+	 		  if( $status.attr("error") =="true"){
+	 			  
+	 			  showerror(divid,$status.attr("description"))
+	 			  
+	 		  } else{
+
+					var dataCount=0
+						
+					
+					var tbl=""
+					tbl=tbl + ' <select style="width: 280px"  multiple="multiple" id="lstprojects">'
+					
+					
+					
+				//	tbl=tbl + "        <option value=''>Select</option>" 
+					
+						//select multiple="multiple">
+  
+      
+				
+						 
+			 			 $xml.find('project').each(function(index){
+			 				
+			 				//var groupname = $(this).attr('name');
+			 				
+			 				// tbl=tbl + "<optgroup label='"+groupname+"' >" 
+			 				 
+			 				//$(this).find('user').each(function(index){
+			 					 
+			 					// dataCount++
+					 	            var projectName = $(this).find('code').text();
+					 	      
+					 				
+					 				 tbl=tbl + "        <option value='"+projectName+"'>&nbsp;&nbsp;&nbsp;&nbsp;"+projectName+"</option>" 
+					 			
+			 				 //});
+			 				 
+			 				 //tbl=tbl + "</optgroup>" 
+			 			 
+			 				 
+			 	        });
+			 			 
+		 				 
+			 			
+			
+			tbl=tbl + '</select>'
+			
+						$(containerid).html(tbl)
+						
+					//	$("select#lstusers").multiselectfilter("destroy");
+						$("select#lstprojects").multipleSelect();
+						
+					
+
+	 		  }
+		});
+
+	}
+
+
+
+function showUserMenu(divid) {
+
+	var containerid= "#" +divid
+		
+		$.get("/services/getvalidusergroups/rand?inte="+Math.random(), function(data) {
+
+			
+			//parse xml
+	 		  $xml = $( data )
+	 		  $status = $xml.find( "status" )
+	 		  
+	 		  
+	 		  
+	 		  if( $status.attr("error") =="true"){
+	 			  
+	 			  showerror(divid,$status.attr("description"))
+	 			  
+	 		  } else{
+
+					var dataCount=0
+						
+					
+					var tbl=""
+					tbl=tbl + ' <select style="width: 280px"  multiple="multiple" id="lstusers">'
+					
+					
+					
+				//	tbl=tbl + "        <option value=''>Select</option>" 
+					
+						//select multiple="multiple">
+  
+      
+				
+						 
+			 			 $xml.find('team').each(function(index){
+			 				
+			 				var groupname = $(this).attr('name');
+			 				
+			 				 tbl=tbl + "<optgroup label='"+groupname+"' >" 
+			 				 
+			 				$(this).find('user').each(function(index){
+			 					 
+			 					 dataCount++
+					 	            var userName = $(this).find('name').text();
+					 	      
+					 				
+					 				 tbl=tbl + "        <option value='"+userName+"'>&nbsp;&nbsp;&nbsp;&nbsp;"+userName+"</option>" 
+					 			
+			 				 });
+			 				 
+			 				 tbl=tbl + "</optgroup>" 
+			 			 
+			 				 
+			 	        });
+			 			 
+		 				 
+			 			
+			
+			tbl=tbl + '</select>'
+			
+						$(containerid).html(tbl)
+						
+					//	$("select#lstusers").multiselectfilter("destroy");
+						$("select#lstusers").multipleSelect();
+						
+						/*
+						$("select#lstusers").multiselect().multiselectfilter({
+						    filter: function(event, matches){
+						    	
+						    	var res=""
+						        if( matches.length ){
+						            // do something
+						            
+						            for(i=0;i<matches.length;i++){
+						            	if(i>0)
+						            		res=res +","
+						            		
+						            	res=res+matches[i]
+						            	
+						            	
+						            }
+						            
+						            
+						        }
+						    	
+						    	$("#users").val(res)
+						    }
+						}); */
+
+	 		  }
+		});
+
+	}
 function showpage(pageName){
 	
 	

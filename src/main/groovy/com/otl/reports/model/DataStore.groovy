@@ -18,6 +18,7 @@ import org.sqlite.SQLite
 import groovy.sql.DataSet
 import groovy.sql.Sql
 
+import com.otl.reports.beans.ProjectEmployeeReport
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.beans.UserTimeSummary
@@ -186,6 +187,9 @@ class DataStore {
 		
 				return true
 			}
+	
+	
+	
 	public ArrayList<UserTimeSummary> getuserstatusList(String user){
 		ArrayList<UserTimeSummary> userstatuslist=new ArrayList<UserTimeSummary>()
 			String cond=" where 1=1 "
@@ -234,6 +238,101 @@ class DataStore {
     }
     return daysWithoutSunday-w1+w2;
 	}
+	 
+	 
+	 
+	 
+	 
+	 
+	 public def getProjectHoursReport(String projectcode,Date from,Date to){
+		 
+		 //def timeEntries=new HashMap<String,ProjectEmployeeReport>()
+		 
+			 ArrayList<ProjectEmployeeReport> lstProjectEmployeeReport=new ArrayList<ProjectEmployeeReport>()
+		 
+				 String cond=" where 1=1 "
+				 if(null != projectcode)
+					 cond=cond + " AND projectcode like '${projectcode}' "
+		 
+		 
+				 if(null != from )
+					 cond=cond + " AND entryDate >= "+ from.getTime()
+		 
+				 if(null != to)
+					 cond=cond + " AND entryDate <= "+ to.getTime()
+ 
+					
+					 
+					
+					 
+					 String totalqry="Select user,projectcode,total(hours) as totalhrs from timeentry ${cond}  group by user,projectcode "
+					
+				
+				 fetcherDB.rows(totalqry).each{
+		 
+					 lstProjectEmployeeReport.add( new ProjectEmployeeReport(
+						 user: it.user,
+						 projectcode:it.projectcode,
+						 totalhrs: it.totalhrs,
+					
+						 ))
+					 
+					 
+					
+					 
+				 }
+		 
+			
+				 
+				 return lstProjectEmployeeReport
+				 
+	 }
+	 
+	 public def getProjectEmployeeReport(String projectcode,Date from,Date to){
+		 
+		 //def timeEntries=new HashMap<String,ProjectEmployeeReport>()
+		 
+		 	ArrayList<ProjectEmployeeReport> lstProjectEmployeeReport=new ArrayList<ProjectEmployeeReport>()
+		 
+				 String cond=" where 1=1 "
+				 if(null != projectcode)
+					 cond=cond + " AND projectcode like '${projectcode}' "
+		 
+		 
+				 if(null != from )
+					 cond=cond + " AND entryDate >= "+ from.getTime()
+		 
+				 if(null != to)
+					 cond=cond + " AND entryDate <= "+ to.getTime()
+ 
+					
+					 
+					 String reportqry="Select user,projectcode,entryDate,hours,projecttask,tasktype from timeentry ${cond}   "
+					 
+					 String totalqry="Select user,projectcode,total(hours) from timeentry ${cond}  group by user,projectcode "
+					
+					
+				 fetcherDB.rows(reportqry).each{
+		 
+					 lstProjectEmployeeReport.add( new ProjectEmployeeReport(
+						 user: it.user,
+						 projectcode:it.projectcode,
+						 entryDate: new Date(it.entryDate),
+						 hours: it.hours,
+						 projecttask:it.projecttask,
+						 tasktype:it.tasktype
+						 ))
+					 
+					 
+					
+					 
+				 }
+		 
+				
+				 
+				 return lstProjectEmployeeReport
+				 
+	 }
 	public def getTimesheetEntriesSummary(String user,Date from,Date to,def leavecodes){
 		
 		def timeEntries=new HashMap<String,UserTimeSummary>()
@@ -342,6 +441,40 @@ class DataStore {
 		//return dataStore.getUserEntries()
 	//return dataStore.findUser(user)
 
+	
+	
+	
+	public ArrayList<TimeEntry> getProjectsList(String projectcode){
+
+		ArrayList<TimeEntry> timeEntries=new ArrayList<TimeEntry>()
+
+		String cond=" where 1=1 "
+		if(null != projectcode)
+			cond=cond + " AND projectcode like '${projectcode}' "
+
+
+			
+		fetcherDB.rows("select projectcode from timeentry " + cond + " group by projectcode").each{
+
+			
+			
+			
+			
+			
+			timeEntries.add(
+					new TimeEntry(
+					
+					projectcode: it.projectcode
+					
+					)
+					);
+		}
+		Log.info("Query returned" + timeEntries.size())
+		return timeEntries
+	}
+	
+	
+	
 	public ArrayList<TimeEntry> getTimesheetEntries(String user,Date from,Date to,String leavecodes){
 
 		ArrayList<TimeEntry> timeEntries=new ArrayList<TimeEntry>()
