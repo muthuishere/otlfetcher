@@ -66,8 +66,11 @@ switch ( actionname ) {
 		result = responder.updateuser(request)
 		
 		break;
+		case "getAdminAccess":
+		result = responder.getAdminAccess(request)
 		
-
+		break;
+		
 	
 }
 

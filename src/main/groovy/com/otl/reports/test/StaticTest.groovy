@@ -1,15 +1,14 @@
 package com.otl.reports.test
 
-import com.gargoylesoftware.htmlunit.html.DomNodeList
-import com.gargoylesoftware.htmlunit.html.HtmlElement
+
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.controller.DataManager
 import com.otl.reports.controller.DbUpdater
-import com.otl.reports.controller.FetchUserReport;
+
 import com.otl.reports.controller.OTLServer
 import com.otl.reports.controller.Responder
-import com.otl.reports.model.WebBrowser
+
 
 import groovy.json.JsonSlurper
 import java.text.SimpleDateFormat
@@ -18,7 +17,7 @@ import java.util.Date;
 
 import com.otl.reports.controller.Configurator;
 
-class FetchReportsTest {
+class StaticTest {
 
 	static void respondTest(){
 		
@@ -26,6 +25,94 @@ class FetchReportsTest {
 		println(res.getvalidusergroups());
 	}
 	
+	static void equaltest(){
+		
+		
+		
+		ArrayList<TimeEntry> timeEntries = new ArrayList<TimeEntry>();
+		
+		
+		TimeEntry te=new TimeEntry(
+			user:"mnk@testorac.net",
+			projecttask:"task2 08",
+			projectcode:"101185",
+			entryDate: new Date()+5,
+			tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
+			hours:8
+			
+			)
+		boolean exists=false
+		for(TimeEntry existingTimeEntry:timeEntries){
+			
+			if(existingTimeEntry.objectequals(te)){
+				//Add hours
+				// add detail
+				existingTimeEntry.hours += te.hours
+				existingTimeEntry.details = existingTimeEntry.details + "  " + te.details
+				exists=true
+			}
+		}
+		if(!exists)
+			timeEntries.add(te)
+			
+		
+		timeEntries.add(new TimeEntry(
+			user:"mnk@testorac.net",
+			projecttask:"task2 08",
+			projectcode:"101185",
+			entryDate: new Date()+1,
+			tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
+			hours:8
+			
+			))
+		
+		timeEntries.add(new TimeEntry(
+			user:"mnk@testorac.net",
+			projecttask:"task2 08",
+			projectcode:"101185",
+			entryDate: new Date()+2,
+			tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
+			hours:8
+			
+			))
+		
+		
+		timeEntries.add(new TimeEntry(
+			user:"mnk@testorac.net",
+			projecttask:"task2 08",
+			projectcode:"101185",
+			entryDate: new Date(),
+			tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
+			hours:8
+			
+			))
+		
+		timeEntries.add(new TimeEntry(
+			user:"mnk@testorac.net",
+			projecttask:"task2 08",
+			projectcode:"101185",
+			entryDate: new Date()+5,
+			tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
+			hours:8
+			
+			))
+		
+		
+		timeEntries.add(new TimeEntry(
+			user:"mnkcheck@testorac.net",
+			projecttask:"task2 08",
+			projectcode:"101185",
+			entryDate: new Date()+5,
+			tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
+			hours:8
+			
+			))
+		 
+		
+			
+			println(timeEntries.dump())
+			println(timeEntries.size())
+	}
 	static void timesheetupdatetest(){
 		
 		
@@ -101,7 +188,7 @@ class FetchReportsTest {
 		for(TimeEntry timeEntry:timeEntries){
 			
 			def curtimeentries=[]
-			if(usertimemap.contains(timeEntry.user) == false){
+			if(usertimemap.containsKey(timeEntry.user) == false){
 				
 				curtimeentries.push(timeEntry)
 				
@@ -117,7 +204,7 @@ class FetchReportsTest {
 		}
 		usertimemap.each {curuser,lstentries->
 			
-			lstentries.sort(it.entryDate)
+			lstentries.sort{it.entryDate}
 			
 			println("$curuser  ${lstentries[0].entryDate} ${lstentries[lstentries.size()-1].entryDate} ");
 			
@@ -230,16 +317,6 @@ class FetchReportsTest {
 			return true
 		}
 		return false
-	}
-	
-	static void browserNavigatetest(){
-		
-		WebBrowser webBrowser=new WebBrowser()
-		webBrowser.init(Configurator.globalconfig.proxy)
-		webBrowser.Navigate("http://ebiz.uk.three.com:80/OA_HTML/RF.jsp?function_id=10129&resp_id=51959&resp_appl_id=808&security_group_id=0&lang_code=US")
-		webBrowser.printAll()
-		
-		
 	}
 	
 	static void updatetimesheettest(){
@@ -364,118 +441,7 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 	*/
 	}
 	
-	static void apptest(){
-		
-		FetchUserReport fetchUserReport=new FetchUserReport()
-		fetchUserReport.init()
-		
-		
-		Date date = new Date();
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		int dayOfWeek = c.get(Calendar.DAY_OF_WEEK) - c.getFirstDayOfWeek();
-		c.add(Calendar.DAY_OF_MONTH, -dayOfWeek);
-		
-		Date weekStart = c.getTime();
-		// we do not need the same day a week after, that's why use 6, not 7
-		c.add(Calendar.DAY_OF_MONTH, 6);
-		Date weekEnd = c.getTime();
-		
-		
-		
-		Date startdate = new SimpleDateFormat("yyyy.MM.dd").parse("2014.08.12");
-		
-		
-		Date from=startdate;// weekStart;
-		
-		Date to= weekEnd;
-		
-		//println(fetchUserReport.parseDate("		 Mon, Aug 18"))
-			
-			//
-		ArrayList<TimeEntry> timeEntries= new ArrayList<TimeEntry>()
-		
-	timeEntries=fetchUserReport.startFetch(new UserInfo(
-			user: "mnk@testorac.net",
-			password:"wa1"
-			), from, to)
-		
-		
-	}
-	static void timesheetstatustest(){
-		
-		WebBrowser webBrowser=new WebBrowser()
-		webBrowser.init(null)
-		webBrowser.Navigate("http://localhost:7080/test.html")
-		def resultContainer= webBrowser.findElemById("Hxcmytcsearchresults")
-		//println(resultContainer.dump())
-		
-		DomNodeList<HtmlElement> links=resultContainer.getElementsByTagName("a")
-		
-		List<HtmlElement> validlinks= new ArrayList<HtmlElement>();
-		
-		for(HtmlElement link:links){
-			
-			if(link.asXml().contains("DetailEnable")){
-				
-				def currow=link.getParentNode().getParentNode();
-				println("===" + currow.childNodes.get(0).asText()+ "==")
-				def cursheet=[:];
-				cursheet["link"]=link
-				cursheet["status"]=currow?.childNodes?.get(0)?.asText()
-				
-				validlinks.add(cursheet)
-				
-				
-			}
-			
-		}
-		
-		
-		//
-	}
-	static void browsertest(){
-		
-		WebBrowser webBrowser=new WebBrowser()
-		webBrowser.init("firefox")
-		webBrowser.Navigate("http://ebiz.uk.three.com:80/OA_HTML/RF.jsp?function_id=10129&resp_id=51959&resp_appl_id=808&security_group_id=0&lang_code=US")
-		//webBrowser.printAll()
-		
-		//webBrowser.typeOnName("ssousername", "mnk@testorac.net")
-		//webBrowser.typeOnName("password", "wa1")
-		
-		webBrowser.typeOnName("ssousername", "mnavaneesdsdthakrishnan@testorac.net")
-		webBrowser.typeOnName("password", "wa1")
-		//webBrowser.clickOnInputName(webBrowser)
-		
-		
-		
-		webBrowser.executeScriptforNewPage("buttonSubmit('OK');")
-		
-		webBrowser.waitForPageLoad();
-		
-		//webBrowser.printAll()
-		
-		if(webBrowser.findElemByName("ssousername") ==null){
-		
-			//Verify Page is valid page, check element name exists
-			
-			webBrowser.NavigateInner("http://ebiz.uk.three.com:80/OA_HTML/RF.jsp?function_id=10129&resp_id=51959&resp_appl_id=808&security_group_id=0&lang_code=US")
-			
-			webBrowser.waitForPageLoad();
-			webBrowser.printAll()
-			println("Valid User identified")
-		
-		}else{
-			println("Invalid User identified")
-		}
-		
-		
-		println "Completed Closing"
-		webBrowser.close()
-		println "Completed Closed"
-	}
-	
+
 	static void displayClassPath() {
 		
 			ClassLoader classloader = Thread.currentThread().getContextClassLoader();
@@ -583,7 +549,10 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		//respondTest();
 		//timesheetstatustest();
 		
-		timesheetupdatetest();
+	//	timesheetupdatetest();
+		
+		equaltest();
+		
 		
 	}
 

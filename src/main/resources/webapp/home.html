@@ -52,6 +52,21 @@
       .click(function( event ) {
 
     	  $('#errdiv').hide();
+    	  if( $("#user").val() ==""){
+    		  
+    		  $('#errdiv').show();
+    		  $('#errdiv').html("<span>error: </span> Username cannot be empty")
+    		  return
+    	  
+    	  }
+    	  
+if( $("#pwd").val() ==""){
+    		  
+    		  $('#errdiv').show();
+    		  $('#errdiv').html("<span>error: </span> Password cannot be empty")
+    		  return
+    	  }
+    	  
     	  if( $("#conpwd").val() != $("#pwd").val()){
     		  $('#errdiv').show();
     		  $('#errdiv').html("<span>error: </span> Both Passwords should be same")

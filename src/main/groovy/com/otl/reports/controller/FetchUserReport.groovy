@@ -78,7 +78,7 @@ class FetchUserReport {
 		Date startdate = new SimpleDateFormat("EEE, MMM d yyyy").parse( dstr.trim());
 		return startdate
 	}
-	def getTimesheetData(def user){
+	def getTimesheetData(def user,def tsstatus){
 		
 		//document.querySelectorAll("#Hxctimecard")[0].querySelectorAll("td.x1r")[0].parentNode.parentNode
 		
@@ -149,10 +149,28 @@ class FetchUserReport {
 							projectcode:projectcode, 
 							tasktype: tasktype, 
 							projecttask: projecttask, 
-							hours: curhours 
+							hours: curhours ,
+							status:tsstatus,
+							details:""
 							)
 						
-						timeEntries.add(te)
+						boolean exists=false
+						for(TimeEntry existingTimeEntry:timeEntries){
+							
+							if(existingTimeEntry.objectequals(te)){
+								//Add hours
+								// add detail
+								existingTimeEntry.hours += te.hours
+								existingTimeEntry.details = existingTimeEntry.details + "  " + te.details
+								exists=true
+							}
+						}
+						if(!exists)
+							timeEntries.add(te)
+							
+							
+							
+						//addorupdate(timeEntries,te)
 					//	println("=======${te.dump()}=========")
 						Log.info("Adding for ${user} from ${te.dump()}")
 					}
@@ -166,7 +184,24 @@ class FetchUserReport {
 		
 		return timeEntries
 	}
-	
+	def addorupdate(ArrayList<TimeEntry>  timeEntries,TimeEntry timeEntry){
+		boolean exists=false
+		for(TimeEntry existingTimeEntry:timeEntries){
+			
+			if(existingTimeEntry.equals(timeEntry)){
+				//Add hours
+				// add detail
+				existingTimeEntry.hours += timeEntry.hours
+				existingTimeEntry.details = existingTimeEntry.details + "  " + timeEntry.details
+				exists=true
+			}
+		}
+		if(!exists)
+			timeEntries.add(timeEntry)
+			
+			
+		return timeEntries
+	}
 	def getNum(String res){
 		
 		def curhours=0
@@ -233,13 +268,21 @@ class FetchUserReport {
 			
 		}
 		
-		List<HtmlElement> validlinks= new ArrayList<HtmlElement>();
+		def tsresults= new ArrayList();
 		
 		for(HtmlElement link:links){
 			
 			if(link.asXml().contains("DetailEnable")){
-				validlinks.add(link)
-				Log.info(link.asXml())
+				def cursheet=[:];
+				cursheet.link=link
+				def currow=link.getParentNode().getParentNode();
+				
+				cursheet.status=currow?.childNodes?.get(0)?.asText()
+				
+				tsresults.add(cursheet)
+				
+				Log.info(link.asXml() + " Status ${cursheet.status}")
+			//	Log.info(link.asXml())
 				
 			}
 			
@@ -251,16 +294,16 @@ class FetchUserReport {
 		
 		
 		
-		for(HtmlElement validlink:validlinks){
+		for(def tsresult:tsresults){
 			
 			
 			
 			
-			webBrowser.clickLink(validlink)
+			webBrowser.clickLink(tsresult.link)
 			webBrowser.waitForPageLoad();
 			//webBrowser.printAll()
 			
-			def resplist=getTimesheetData(userInfo.user)
+			def resplist=getTimesheetData(userInfo.user,tsresult.status)
 			if(null !=resplist )
 				timeEntries.addAll(resplist)
 			

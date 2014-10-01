@@ -55,6 +55,8 @@ class DbUpdater {
 			datamanager.addTimeEntries(dbreport_response.timeEntries);
 			
 			if( null != dbreport_response?.error  || dbreport_response?.error !="" ){
+				Log.error("Error Message While adding entries " +dbreport_response?.error)
+				
 				flgSuccess=false
 				
 			}else
@@ -112,6 +114,8 @@ class DbUpdater {
 				
 				}
 				
+			
+			println("usercount $usercount successCount $successCount")
 			if(successCount == usercount){
 				
 				statusmsg="Success"
@@ -185,7 +189,7 @@ class DbUpdater {
 					duration = curend-curstart  
 				  
 			   }
-				println("=====================================duration.days " +duration.days )
+				//println("=====================================duration.days " +duration.days )
 				if(duration.days > 30){
 				use(groovy.time.TimeCategory) {
 					curend=curstart + 30.days
@@ -198,14 +202,19 @@ class DbUpdater {
 				fetchUserReport.init(Configurator.globalconfig?.proxy )
 				def res=fetchUserReport.startFetch(req_msg.userInfo, curstart, curend)
 				if(null != res)
-					timeEntries.addAll(res)
+					{
+						timeEntries.addAll(res)
+						println("Succes for fetching  ${req_msg.userInfo} from  ${curstart} to ${curend} for total records ${res.size()}"  )
+					}else{
+						println("Failure for fetching  ${req_msg.userInfo} from  ${curstart} to ${curend} returned null"  )
+					}
 				
 				use(groovy.time.TimeCategory) {
 					durationdiff = origend - curend
 					
 				  
 				}
-				println("============================durationdiff.days " +durationdiff.days )
+			//	println("============================durationdiff.days " +durationdiff.days )
 				if(durationdiff.days <=0 ){
 					break;
 				}else{

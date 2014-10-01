@@ -103,7 +103,8 @@
   					 tbl=tbl + "    <thead>" 
   					 tbl=tbl + "      <tr>"
   					tbl=tbl + "        <th><span>Project</span></th>" 
-  					tbl=tbl + "        <th><span>User</span></th>" 
+  					tbl=tbl + "        <th><span>User</span></th>"
+  					tbl=tbl + "        <th><span>Team</span></th>" 
   					tbl=tbl + "        <th><span>Date</span></th>" 
   					 tbl=tbl + "        <th ><span>Hours</span></th>" 
   					// tbl=tbl + "        <th><span>Total</span></th>" 
@@ -120,6 +121,7 @@
   					dataCount++
   		            var project = $(this).find('name').text();
   					var username = $(this).find('user').text();
+  					var team = $(this).find('team').text();
   		          var projdate = $(this).find('projdate').text();
   		        var totalhrs = $(this).find('total').text();  		      
   		    var hours = $(this).find('hours').text();
@@ -127,7 +129,8 @@
   		     	 tbl=tbl + "      <tr>" 
   		     	
   		     	tbl=tbl + "        <td class='lalign'>"+project+"</td>"
-					 tbl=tbl + "        <td class='lalign'>"+username+"</td>" 
+					 tbl=tbl + "        <td class='lalign'>"+username+"</td>"
+					 tbl=tbl + "        <td class='lalign'>"+team+"</td>" 
 					 tbl=tbl + "        <td class='calign'>"+projdate+"</td>"					 
 					 tbl=tbl + "        <td class='calign'>"+hours+"</td>" 
 				//	 tbl=tbl + "        <td class='calign'>"+totalhrs+"</td>" 

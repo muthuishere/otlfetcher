@@ -1,6 +1,7 @@
 package com.otl.reports.controller
 
 import com.otl.reports.beans.TimeEntry;
+import com.otl.reports.beans.TimesheetStatusReport;
 import com.otl.reports.beans.UserInfo
 
 import java.text.SimpleDateFormat
@@ -26,7 +27,11 @@ class Responder {
 	def xml_string = { s ->
 
 		
+		if(s instanceof String)
 			s?.replaceAll("[\\x00-\\x1f]", "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("'", "&apos;").replaceAll("\"", "&quot;").replaceAll("\\\\", "\\\\\\\\").replaceAll("\\\$", "\\\\\\\$")
+		else
+			return s
+		
 	}
 
 
@@ -537,6 +542,10 @@ class Responder {
 				
 				break;
 				
+				case "weeklystatusreport":
+				result = generateWeeklyStatusReport(request)
+				
+				break;
 		}
 		
 		return result;
@@ -602,8 +611,13 @@ class Responder {
 					hashmaplist.add(res)
 			}
 
-
-
+			
+			ArrayList<UserInfo>  userEntryList=dataManager.getUserEntries( )
+			def userteams=[:]
+			userEntryList.each{userInfo ->
+				
+				userteams.put(userInfo.user, userInfo.team)
+			}
 
 			// Add information as xml
 
@@ -633,7 +647,10 @@ class Responder {
 	def isLeave
 	Date fetchedDate
 						 */
+						def team="unknown"
 						
+						if(userteams.containsKey(val.user))
+							team=userteams.get(val.user)
 						
 						response.append("<user>")
 		
@@ -643,7 +660,7 @@ class Responder {
 						response.append("\n<type>${xml_string(val.tasktype)}</type>")
 						response.append("\n<hours>${val.hours}</hours>")
 						response.append("\n<details>${val.details}</details>")
-						response.append("\n<isLeave>${val.isLeave}</isLeave>")
+						response.append("\n<team>${team}</team>")
 		
 						def entrydate=""
 						if(val.entryDate){
@@ -654,7 +671,7 @@ class Responder {
 							entrydate= formatter.format(val.entryDate);
 						}
 						response.append("\n<date>${entrydate}</date>")
-						//response.append("\n<fetchedDate>${val.fetchedDate}</fetchedDate>")
+						response.append("\n<fetchedDate>${val.fetchedDate}</fetchedDate>")
 		
 		
 		
@@ -767,6 +784,7 @@ class Responder {
 
 						response.append("\n<name>${val.projectcode}</name>")
 						response.append("\n<user>${xml_string(val.user)}</user>")
+						response.append("\n<team>${val.team}</team>")
 						
 						def str="0"
 						
@@ -809,6 +827,133 @@ class Responder {
 
 	}
 
+	
+	
+	
+	
+	public String generateWeeklyStatusReport(HttpServletRequest request){
+
+
+		def params=[
+			"users":request.getParameter("users"),
+			"fromdate":request.getParameter("fromdate"),
+			"todate":request.getParameter("todate")
+		]
+		StringBuffer response= new StringBuffer()
+
+		response.append("<reply>")
+
+
+
+		try{
+
+			Date from =null
+			if(null != params.fromdate)
+				from =getParsedDate(params.fromdate);
+
+			Date to =null
+			if(null != params.todate)
+				to = getParsedDate(params.todate);
+
+
+			def users=[]
+			
+
+
+			if(null != params.users && params.users != ""){
+				
+				for(String curuser:params.users.split(",")){
+					users.push(curuser)
+				}
+				
+		}else{
+				users.push("")
+			}
+			ArrayList hashmaplist=new ArrayList();
+
+			ArrayList<TimesheetStatusReport>  summarylist=dataManager.getWeeklystatus( users, from,to)
+			
+
+
+
+			// Add information as xml
+
+			//println(summarylist.dump())
+			if(null != summarylist && summarylist.size() > 0 ){
+			
+					summarylist.each{val->
+
+						
+						
+						response.append("<timesheetstatus>")
+
+						
+						response.append("\n<user>${xml_string(val.user)}</user>")
+						response.append("\n<team>${val.team}</team>")
+						
+						
+						response.append("\n<total>${val.totalhrs}</total>")
+						response.append("\n<status>${val.status}</status>")
+					
+
+
+						def projdate=""
+						if(val.startdate){
+
+							SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM dd yyyy");
+
+							// (3) create a new String using the date format we want
+							projdate= formatter.format(val.startdate);
+						}
+
+
+
+						response.append("\n<startdate>${projdate}</startdate>")
+						
+
+						projdate=""
+						if(val.enddate){
+
+							SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM dd yyyy");
+
+							// (3) create a new String using the date format we want
+							projdate= formatter.format(val.enddate);
+						}
+
+						response.append("\n<enddate>${projdate}</enddate>")
+
+						response.append("\n</timesheetstatus>")
+
+				
+
+				}
+				response.append("<status code='0' error='false' description='retrived weekly status'/>")
+			}else{
+				throw new Exception("No Timesheet Entries found")
+			}
+
+
+
+		}catch(Exception e){
+
+			e.printStackTrace();
+			response= new StringBuffer()
+
+			response.append("<reply>")
+
+
+			response.append("<status code='1' error='true' description='${xml_string(e?.getMessage())}'/>")
+
+
+		}
+
+
+		response.append("</reply>")
+
+		return response;
+
+
+	}
 	
 	public String generateProjectEmployeeReport(HttpServletRequest request){
 
@@ -869,24 +1014,13 @@ class Responder {
 					def curtoken=""
 					summarylist.each{val->
 
-						//user,projectcode,entryDate,hours,projecttask,tasktype
-							/*
-							 * 	var dataCount=0
-  					 
-  				 $xml.find('project').each(function(index){
-  					dataCount++
-  		            var project = $(this).find('name').text();
-  					var username = $(this).find('user').text();
-  		          var projdate = $(this).find('date').text();
-  		        var totalhrs = $(this).find('total').text();  		      
-  		    var hours = $(this).find('hours').text();
-							 * 
-							 * 
-							 */
+						
+						
 						response.append("<project>")
 
 						response.append("\n<name>${val.projectcode}</name>")
 						response.append("\n<user>${xml_string(val.user)}</user>")
+						response.append("\n<team>${val.team}</team>")
 						
 						response.append("\n<hours>${val.hours}</hours>")
 						response.append("\n<total></total>")
@@ -1068,7 +1202,48 @@ class Responder {
 
 
 	}
-
+	public String getAdminAccess(HttpServletRequest request){
+		
+		
+		def params=[
+			"token":request.getParameter("token")
+		]
+				String ip=getIP(request)
+		
+				
+				
+				def msg=""
+				
+				if(params.token == Configurator.globalconfig?.adminaccesstoken ){
+				
+				
+					
+					if(getAdmins().contains(ip)){
+						
+						msg="Already an admin"
+					}else{
+						Configurator.customadmins.push(ip)
+						msg="$ip added as admin"
+					}
+				
+				}else{
+					msg="Invalid token"
+				}
+				
+				StringBuffer response= new StringBuffer()
+		
+				response.append("<reply>")
+				
+				
+				
+					response.append("<status code='0'  description='$msg'  />")
+				
+		
+				response.append("</reply>")
+		
+				return response.toString();
+			}
+	
 	public String getAdmins(){
 		String admins=""
 		int i=0
@@ -1085,6 +1260,20 @@ class Responder {
 
 			i++
 		}
+		for(def bfr:Configurator.customadmins){
+			
+			
+			
+						if(i > 0)
+							admins=admins +","
+			
+			
+			
+						admins=admins +"$bfr"
+			
+						i++
+					}
+		
 		return admins
 
 	}

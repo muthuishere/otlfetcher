@@ -20,6 +20,7 @@ import groovy.sql.Sql
 
 import com.otl.reports.beans.ProjectEmployeeReport
 import com.otl.reports.beans.TimeEntry
+import com.otl.reports.beans.TimesheetStatusReport
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.beans.UserTimeSummary
 import com.otl.reports.exceptions.ServiceException
@@ -65,7 +66,7 @@ class DataStore {
 		 def details
 		 * 
 		 */
-		fetcherDB.execute("create table if not exists timeentry (user string, entryDate date,projectcode string,projecttask string,tasktype string,hours integer,details string,key string)")
+		fetcherDB.execute("create table if not exists timeentry (user string, entryDate date,projectcode string,projecttask string,tasktype string,hours integer,details string,key string,status string)")
 
 		
 		//println(fetcherDB.dump())
@@ -269,11 +270,13 @@ class DataStore {
 					
 				
 				 fetcherDB.rows(totalqry).each{
-		 
+					 def userteam=findUser(it.user)?.team
+					 
 					 lstProjectEmployeeReport.add( new ProjectEmployeeReport(
 						 user: it.user,
 						 projectcode:it.projectcode,
 						 totalhrs: it.totalhrs,
+						 team: userteam
 					
 						 ))
 					 
@@ -313,14 +316,18 @@ class DataStore {
 					
 					
 				 fetcherDB.rows(reportqry).each{
-		 
+	
+					 
+					 def userteam=findUser(it.user)?.team
+					 
 					 lstProjectEmployeeReport.add( new ProjectEmployeeReport(
 						 user: it.user,
 						 projectcode:it.projectcode,
 						 entryDate: new Date(it.entryDate),
 						 hours: it.hours,
 						 projecttask:it.projecttask,
-						 tasktype:it.tasktype
+						 tasktype:it.tasktype,
+						 team:userteam
 						 ))
 					 
 					 
@@ -333,6 +340,7 @@ class DataStore {
 				 return lstProjectEmployeeReport
 				 
 	 }
+	 
 	public def getTimesheetEntriesSummary(String user,Date from,Date to,def leavecodes){
 		
 		def timeEntries=new HashMap<String,UserTimeSummary>()
@@ -438,6 +446,77 @@ class DataStore {
 	
 	
 	
+	public ArrayList<TimesheetStatusReport>  getWeeklystatus(def users,Date from,Date to){
+		
+		def timeEntries=new ArrayList<TimesheetStatusReport>()
+		
+		//		ArrayList<UserTimeSummary> timeEntries=new ArrayList<UserTimeSummary>()
+		
+				
+				
+		
+				
+				users.each{ user ->
+				
+					String cond=" where 1=1 "
+					
+					if(null != user)
+					cond=cond + " AND user like  '$user'"
+			
+					
+				
+				if(null != from )
+					cond=cond + " AND entryDate >= "+ from.getTime()
+		
+				if(null != to)
+					cond=cond + " AND entryDate <= "+ to.getTime()
+
+						
+						
+						def statuslist=[]
+						def totalhrs=0
+						fetcherDB.rows("select user,status,total(hours) as totalhrs from timeentry " + cond +" group by user,status").each{
+				
+							if(statuslist.contains(it.status) == false){
+								statuslist.push(it.status)
+						
+								}
+							totalhrs +=it.totalhrs
+							
+						}
+						println("select user,status,total(hours) as totalhrs from timeentry " + cond +" group by user,status")
+						
+						if(statuslist.size() > 0){
+						def curstatus=statuslist.join(",")
+						def userteam=findUser(user)?.team
+					//	println(curstatus)
+						timeEntries.push(
+							
+							
+							
+							new TimesheetStatusReport(
+								user: user, 
+								status: curstatus, 
+								startdate: from, 
+								enddate: to ,
+								team: userteam,
+								totalhrs:totalhrs
+								)
+							
+							)
+						
+						
+						Log.info("Query returned" + timeEntries.size())
+						
+						}
+				}
+					
+				
+				return timeEntries
+				
+			}
+	
+	
 		//return dataStore.getUserEntries()
 	//return dataStore.findUser(user)
 
@@ -519,6 +598,23 @@ Log.info("Query select * from timeentry " + cond)
 		Log.info("Query returned" + timeEntries.size())
 		return timeEntries
 	}
+	
+	void deleteTimesheet(def user,Date startdate,Date enddate){
+		
+		
+		if(null == user || null == startdate || null == enddate)
+			throw new ServiceException("Incorrect arguements");
+		
+			
+
+					Log.error("Deleting timesheet for $user from $startdate to $enddate");
+		
+					def query="delete from timeentry  where user='${user}'  AND entryDate >= "+ startdate.getTime() + " AND entryDate <= "+ enddate.getTime()
+					fetcherDB.execute(query, []);
+
+		
+		
+			}
 	void insertTimesheet(TimeEntry timeEntry){
 
 
@@ -550,7 +646,8 @@ Log.info("Query select * from timeentry " + cond)
 				hours:timeEntry.hours,
 				details:timeEntry.details,
 				key:timeEntry.key,
-				entryDate:timeEntry.entryDate.getTime()
+				entryDate:timeEntry.entryDate.getTime(),
+				status:timeEntry.status
 				)
 
 
