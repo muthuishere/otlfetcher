@@ -1,10 +1,15 @@
 package com.otl.reports.test
 
+<<<<<<< HEAD
 import com.gargoylesoftware.htmlunit.Page
 import com.gargoylesoftware.htmlunit.html.DomNodeList
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlFrame
 import com.gargoylesoftware.htmlunit.html.HtmlPage
+=======
+import com.gargoylesoftware.htmlunit.html.DomNodeList
+import com.gargoylesoftware.htmlunit.html.HtmlElement
+>>>>>>> 6841ff90a14a06f4bf9edf420513fac5c925e6f2
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.controller.DataManager
@@ -28,6 +33,107 @@ class FetchReportsTest {
 		
 		Responder res=new Responder();
 		println(res.getvalidusergroups());
+	}
+	
+	static void timesheetupdatetest(){
+		
+		
+		
+		
+		ArrayList<TimeEntry> timeEntries = new ArrayList<TimeEntry>();
+		
+		
+		
+		timeEntries.add(new TimeEntry(
+			user:"mnk@testorac.net",
+			projecttask:"task2 08",
+			projectcode:"101185",
+			entryDate: new Date()+1,
+			tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
+			hours:8
+			
+			))
+		
+		timeEntries.add(new TimeEntry(
+			user:"mnk@testorac.net",
+			projecttask:"task2 08",
+			projectcode:"101185",
+			entryDate: new Date()+2,
+			tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
+			hours:8
+			
+			))
+		
+		
+		timeEntries.add(new TimeEntry(
+			user:"mnk@testorac.net",
+			projecttask:"task2 08",
+			projectcode:"101185",
+			entryDate: new Date(),
+			tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
+			hours:8
+			
+			))
+		
+		timeEntries.add(new TimeEntry(
+			user:"mnk@testorac.net",
+			projecttask:"task2 08",
+			projectcode:"101185",
+			entryDate: new Date()+5,
+			tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
+			hours:8
+			
+			))
+		
+		
+		timeEntries.add(new TimeEntry(
+			user:"mnkcheck@testorac.net",
+			projecttask:"task2 08",
+			projectcode:"101185",
+			entryDate: new Date()+5,
+			tasktype:"Normal Hours - E&D Vendor - (Straight Time)",
+			hours:8
+			
+			))
+		 
+		def user
+		def startdate
+		def enddate
+		
+		println(timeEntries.dump())
+		timeEntries.sort{it.entryDate}
+		//timeEntries.sort { a, b -> b.value.entryDate <=> a.value.entryDate }
+	
+		println(timeEntries.dump())
+		
+		def usertimemap=[:]
+		for(TimeEntry timeEntry:timeEntries){
+			
+			def curtimeentries=[]
+			if(usertimemap.contains(timeEntry.user) == false){
+				
+				curtimeentries.push(timeEntry)
+				
+				
+			}else{
+				curtimeentries=usertimemap[timeEntry.user]
+				curtimeentries.push(timeEntry)
+				
+			}
+			usertimemap[timeEntry.user]=curtimeentries
+			
+			
+		}
+		usertimemap.each {curuser,lstentries->
+			
+			lstentries.sort(it.entryDate)
+			
+			println("$curuser  ${lstentries[0].entryDate} ${lstentries[lstentries.size()-1].entryDate} ");
+			
+		}
+		
+		
+		
 	}
 	
 	static void  integrate(){
@@ -305,7 +411,38 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		
 		
 	}
-	
+	static void timesheetstatustest(){
+		
+		WebBrowser webBrowser=new WebBrowser()
+		webBrowser.init(null)
+		webBrowser.Navigate("http://localhost:7080/test.html")
+		def resultContainer= webBrowser.findElemById("Hxcmytcsearchresults")
+		//println(resultContainer.dump())
+		
+		DomNodeList<HtmlElement> links=resultContainer.getElementsByTagName("a")
+		
+		List<HtmlElement> validlinks= new ArrayList<HtmlElement>();
+		
+		for(HtmlElement link:links){
+			
+			if(link.asXml().contains("DetailEnable")){
+				
+				def currow=link.getParentNode().getParentNode();
+				println("===" + currow.childNodes.get(0).asText()+ "==")
+				def cursheet=[:];
+				cursheet["link"]=link
+				cursheet["status"]=currow?.childNodes?.get(0)?.asText()
+				
+				validlinks.add(cursheet)
+				
+				
+			}
+			
+		}
+		
+		
+		//
+	}
 	static void browsertest(){
 		
 		WebBrowser webBrowser=new WebBrowser()
@@ -541,6 +678,7 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		println("$projectname $projectid $selectedprojnumber")
 		
 	}
+
 	static main(args) {
 	//	displayClassPath();
 		
@@ -565,16 +703,7 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		
 		configFileName=args[0]
 		*/
-		configFileName="C:\\muthu\\otl\\otlfetcher\\origotlfetcher.conf"
-		//parseconfig(configFileName)
-		
-		//leavecodetest()
-		//integrate()
-		
-		//servertest()
-		//respondTest();
-		
-		browserprojectcodetest();
+
 		
 	}
 
