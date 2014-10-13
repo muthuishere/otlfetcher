@@ -1,5 +1,10 @@
 package com.otl.reports.test
 
+import com.gargoylesoftware.htmlunit.Page
+import com.gargoylesoftware.htmlunit.html.DomNodeList
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlFrame
+import com.gargoylesoftware.htmlunit.html.HtmlPage
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.controller.DataManager
@@ -10,6 +15,7 @@ import com.otl.reports.controller.Responder
 import com.otl.reports.model.WebBrowser
 
 import groovy.json.JsonSlurper
+
 import java.text.SimpleDateFormat
 import java.util.ArrayList;
 import java.util.Date;
@@ -413,6 +419,128 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		
 		println leavecode
 	}
+	
+	static void browserprojectcodetest(){
+		
+		def baseurl="http://ebiz.uk.three.com:80"
+		baseurl="http://localhost:8080/otlcheck"
+		
+		def searchsuffix="&categoryChoice=HxcCuiProjectNumber&N1%3Alength=0&_FORM=_LOVResFrm&tableNameFormValue=N1&stateCheckForTable=FFFF&event=lovFilter&source=&searchAreaMode=&value=&state=&partialTargets=&partial=&searchText="
+		def timeurl=baseurl + "/createtime.htm"
+		
+		def projcode="100202"
+		
+		
+		WebBrowser webBrowser=new WebBrowser()
+		webBrowser.init(null)
+		webBrowser.Navigate(timeurl)
+		//webBrowser.printAll()
+		
+		//webBrowser.typeOnName("ssousername", "mnk@testorac.net")
+		//webBrowser.typeOnName("password", "wa1")
+		
+		//document.querySelector("input.x4").parentNode.querySelector("a")
+		
+		ArrayList<HtmlElement> cells=webBrowser.getElemsByTagClass("input","x4")
+		
+		if(null ==cells || cells.size() == 0){
+			
+			println("No response details");
+			return null
+			
+			}
+		
+		HtmlElement validparent=cells.get(0).parentNode;
+		
+		
+		DomNodeList<HtmlElement> links= validparent.getElementsByTagName("a"); //get a list of all table rows
+		
+		 
+		if(null ==links || links.size() == 0){
+			
+			println("No Link response details");
+			return null
+			
+			}
+		
+		def linkxml=links.get(0).asXml();
+		
+		linkxml=linkxml.replace("{", "#")
+		linkxml=linkxml.replace("}", "#")
+		println(linkxml)
+		
+		
+		
+	//	println(linkxml.split("#").length)
+	//	println(linkxml.split("#")[1].split(",").length)
+		
+		def chunks=linkxml.split("#")[1].split(",")
+		def projcodechunk=""
+		for(def chunk:chunks){
+			
+			if(chunk.contains("'D'"))
+				projcodechunk=chunk.split(":")[1].replace("'","")
+			
+		}
+		
+		def pcurl="${baseurl}${projcodechunk}${searchsuffix}${projcode}"
+		
+		println(pcurl)
+		
+		webBrowser.Navigate(pcurl)
+		
+		HtmlFrame frame=webBrowser.getFirstElementByTag("frame")
+		
+		if(null ==frame) {
+			
+			println("No response details");
+			return null
+			
+			}
+		
+
+		HtmlPage framepage=frame.getEnclosedPage();
+		
+		def tblelem=framepage.getHtmlElementById("HXC_CUI_PROJECT_LOV_lovTable")
+		
+		
+		DomNodeList<HtmlElement> spanelems= tblelem.getElementsByTagName("span"); //get a list of all table rows
+		
+		 
+		if(null ==links || links.size() == 0){
+			
+			println("No tblelem response details");
+			return null
+			
+			}
+		def projectname=""
+		def projectid=""
+		def selectedprojnumber=""
+		for(HtmlElement spanelem:spanelems){
+			
+			if(null != spanelem.getAttribute("title") && spanelem.getAttribute("title").contains("Project Number")){
+				
+				selectedprojnumber=spanelem.asText()
+				
+			}
+			if(null != spanelem.getAttribute("title") && spanelem.getAttribute("title").contains("Project Name")){
+				
+				projectname=spanelem.asText()
+				
+			}
+			if(null != spanelem.getAttribute("title") && spanelem.getAttribute("title").contains("Project ID")){
+				
+				projectid=spanelem.asText()
+				
+			}
+			
+			
+		}
+		
+		//HXC_CUI_PROJECT_LOV_lovTable
+		println("$projectname $projectid $selectedprojnumber")
+		
+	}
 	static main(args) {
 	//	displayClassPath();
 		
@@ -438,13 +566,15 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		configFileName=args[0]
 		*/
 		configFileName="C:\\muthu\\otl\\otlfetcher\\origotlfetcher.conf"
-		parseconfig(configFileName)
+		//parseconfig(configFileName)
 		
 		//leavecodetest()
 		//integrate()
 		
 		//servertest()
-		respondTest();
+		//respondTest();
+		
+		browserprojectcodetest();
 		
 	}
 
