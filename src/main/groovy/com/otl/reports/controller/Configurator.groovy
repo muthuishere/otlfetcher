@@ -8,6 +8,9 @@ public class Configurator {
 //	public static String leavecodes="'101','102'"
 	public static def globalconfig=null
 	public static boolean isUpdating=false
+	public static customadmins=[]
+	
+	
 	public static def fetchDbInfo=[
 		"status":"",
 		"description":"",

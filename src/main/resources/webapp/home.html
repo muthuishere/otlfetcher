@@ -52,10 +52,25 @@
       .click(function( event ) {
 
     	  $('#errdiv').hide();
+    	  if( $("#user").val() ==""){
+    		  
+    		  $('#errdiv').show();
+    		  $('#errdiv').html("<span>error: </span> Username cannot be empty")
+    		  return false
+    	  
+    	  }
+    	  
+if( $("#pwd").val() ==""){
+    		  
+    		  $('#errdiv').show();
+    		  $('#errdiv').html("<span>error: </span> Password cannot be empty")
+    		  return false
+    	  }
+    	  
     	  if( $("#conpwd").val() != $("#pwd").val()){
     		  $('#errdiv').show();
     		  $('#errdiv').html("<span>error: </span> Both Passwords should be same")
-    		  return
+    		  return false
 
     	  }
 		var formdata=$("form#frmuser").serializeArray()

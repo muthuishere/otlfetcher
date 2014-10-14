@@ -1,5 +1,11 @@
 package com.otl.reports.controller
 
+import java.util.Date;
+
+import com.otl.reports.beans.TimesheetStatusReport;
+
+
+
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.beans.UserTimeSummary;
@@ -10,10 +16,8 @@ import java.util.TreeMap.Entry
 
 class DataManager {
 
-	DataStore dataStore=null
-	String TIMESHEET_TABLE="timesheet"
-	String USER_TABLE="users"
-	private boolean initialized=false
+	DataStore dataStore=null	
+	
 	
 	
 	
@@ -34,6 +38,36 @@ class DataManager {
 	}
 	public void addTimeEntries(ArrayList<TimeEntry> timeEntries){
 	
+		
+		def usertimemap=[:]
+		for(TimeEntry timeEntry:timeEntries){
+			
+			def curtimeentries=[]
+			if(usertimemap.containsKey(timeEntry.user) == false){
+				
+				curtimeentries.push(timeEntry)
+				
+				
+			}else{
+				curtimeentries=usertimemap[timeEntry.user]
+				curtimeentries.push(timeEntry)
+				
+			}
+			usertimemap[timeEntry.user]=curtimeentries
+			
+			
+		}
+		usertimemap.each {curuser,lstentries->
+			
+			lstentries.sort{it.entryDate}
+			
+			
+			dataStore.deleteTimesheet(curuser,lstentries[0].entryDate,lstentries[lstentries.size()-1].entryDate)
+			
+		}
+		
+		
+		
 		for(TimeEntry timeEntry:timeEntries){
 			dataStore.insertTimesheet(timeEntry)
 			
@@ -73,7 +107,10 @@ class DataManager {
 		
 		}
 	
-	
+	public ArrayList<TimesheetStatusReport>  getWeeklystatus(def users,Date from,Date to){
+		
+		return dataStore.getWeeklystatus(users,from,to)
+	}
 	public ArrayList<UserInfo> getUserEntries(){
 		
 		return dataStore.getUserEntries(null)

@@ -16,12 +16,26 @@ class TimeEntry {
 	def details
 	def isLeave
 	Date fetchedDate
+	def status
+	def team
 	
-	
+	public boolean objectequals(TimeEntry timeEntry) {
+		
+		if(null == timeEntry)
+			return false
+		if(!entryDate || !user || !projectcode || !projecttask ||  !tasktype)
+			return false
+		
+			if(!timeEntry.entryDate || !timeEntry.user || !timeEntry.projectcode || !timeEntry.projecttask ||  !timeEntry.tasktype)
+			return false
+			
+			return (timeEntry.entryDate.getTime() == entryDate.getTime() &&  timeEntry.user == user && timeEntry.projectcode == projectcode && timeEntry.projecttask == projecttask && timeEntry.tasktype == tasktype )
+			
+	}
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+//		if (this == o) return true;
+	//	if (o == null || getClass() != o.getClass()) return false;
 
 		TimeEntry timeEntry = (TimeEntry) o;
 
@@ -34,11 +48,12 @@ class TimeEntry {
 		
 		if (tasktype != null ? !tasktype.equals(timeEntry.tasktype) : timeEntry.tasktype != null) return false;
 		
-		if (hours != timeEntry.hours) return false;
+		//if (hours != timeEntry.hours) return false;
 		
 		
 		return true;
 	}
+	
 	
 	
 	String getKey() throws ServiceException{

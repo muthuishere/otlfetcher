@@ -5,17 +5,15 @@ import com.otl.reports.exceptions.ServiceException
 import groovy.transform.ToString
 
 @ToString
-class ProjectEmployeeReport {
+class TimesheetStatusReport {
 
-	Date entryDate
+	
 	def user
+	def startdate
+	def enddate
 	def team
-	def projectcode
-	def projecttask
-	def tasktype
-	def hours
-
-	def totalhrs
+	
+	long totalhrs
 	def status
 
 	

@@ -1,5 +1,5 @@
 <div>
-	   <form id="frmemployeeprojectreport">
+	   <form id="frmweeklystatusreport">
 	   <table cellpadding="10" cellspacing="10" border="0">
 	   
 	   
@@ -16,15 +16,19 @@
 	 
 	   <tr>
 	    <tr id="dtcustomrow">		   
-	   <td>From </td>
-	   <td ><input name="fromdate" id="fromdate" > </td>
-	   <td>To </td>
-	   <td ><input name="todate" id="todate" > </td>
+	   <td>Week 
+	   <input name="fromdate" id="fromdate" type="hidden" >
+	   <input name="todate" id="todate" type="hidden" /> 
+	   </td>
+	   <td >
+	    <input name="weekdate" id="weekdate" type="text" /> 
+	   </td>
 	   </tr>
 	   <tr>
 	  <td colspan="4" style="text-align:right"><input type="button" id="search" value="Search" style="width:120px"> </td>
 	   </tr>
 	   </table>
+	    <div id="errdiv" class="alert-box error" ></div>
 	   </form>
 	  </div>
 	   <div  >
@@ -36,42 +40,59 @@
  <script>
 
 		  
+var startDate
+var endDate
+ 
+ 
   $(function() {
-	  
-	 
+	  $('#errdiv').hide();
 	  showUserMenu("selectplaceholder")
 	  
-	    $( "#fromdate" ).datepicker({
-	
-	dateFormat: 'yy-mm-dd'
-	}	
-	);
-  
-    $( "#todate" ).datepicker({
-	
-	dateFormat: 'yy-mm-dd'
-	}	
-	);
-
-    
-    $("#fromdate[value='']").datepicker("setDate", "-90d"); 
-
+	 // setcalendar("#weekdate","#fromdate","#todate")
+	 $('#weekdate').weekpicker({
+		 showOtherMonths: true,
+         selectOtherMonths: true,
+         dateFormat: 'yy-mm-dd',
+         startField: $( "#fromdate"),
+         endField: $( "#todate")
+    // options ...
+});
+	  $('#errdiv').hide();
 	  
 	$( "input#search" )
       .button()
       .click(function( event ) {
     	  
+    	  $('#errdiv').hide();
+    	  
+ if( $("#weekdate").val() ==""){
+    		  
+    		  $('#errdiv').show();
+    		  $('#errdiv').html("<span>error: </span> Select a week")
+    		  return
+    	  
+    	  }
+ 
+    	 
+    	  
     	  if($("select#lstusers").multipleSelect('getSelects').length >0){
 				
 				$("#curusers").val($("select#lstusers").multipleSelect('getSelects').join(","))	
 			}
-			
+ if( $("#curusers").val() ==""){
+    		  
+    		  $('#errdiv').show();
+    		  $('#errdiv').html("<span>error: </span> Select Users")
+    		  return
     	  
-    	  var formdata=$("form#frmemployeeprojectreport").serializeArray()
+    	  }
+    	  
+    	  
+    	  var formdata=$("form#frmweeklystatusreport").serializeArray()
   		
-  		//$('#frmemployeeprojectreport')[0].reset();
+  		//$('#frmweeklystatusreport')[0].reset();
     	  $("#resultcontainer").html("<img src='images/loadingajax.gif'/>")
-  		$.post( "/services/reports/employeeprojectreport", formdata)
+  		$.post( "/services/reports/weeklystatusreport", formdata)
   		  .done(function( data ) {
   		    
   			
@@ -90,7 +111,7 @@
   				  var tbl=""
   					  
   					
-  						var csvtblname="tblemployeeprojectreports"
+  						var csvtblname="tblweeklysstatusreports"
   		  					 tbl=tbl + ' <table  border="0" cellspacing="0" width="100%">'
   		  					 tbl=tbl + "      <tr>" 
   		 					 tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png' title='Download as excel'></a></span></th>" 
@@ -98,16 +119,15 @@
   		  					 tbl=tbl + " </table>"
  					
   		  					
-  					 tbl=tbl + ' <table id="tblemployeeprojectreports" class="display" cellspacing="0" width="100%">' 
+  					 tbl=tbl + ' <table id="tblweeklysstatusreports" class="display" cellspacing="0" width="100%">' 
   					 tbl=tbl + "    <thead>" 
   					 tbl=tbl + "      <tr>"
-  					tbl=tbl + "        <th><span>User</span></th>"
+  					tbl=tbl + "        <th><span>User</span></th>" 
   					tbl=tbl + "        <th><span>Team</span></th>" 
-  					tbl=tbl + "        <th><span>Date</span></th>" 
-  					 tbl=tbl + "        <th><span>Project Code</span></th>" 
-  					 tbl=tbl + "        <th><span>Task</span></th>" 
-  					 tbl=tbl + "        <th><span>Type</span></th>" 
-  					 tbl=tbl + "        <th ><span>Hours</span></th>" 
+  					 tbl=tbl + "        <th><span>Start Date</span></th>" 
+  					 tbl=tbl + "        <th><span>End Date</span></th>"
+  					 tbl=tbl + "        <th ><span>Hours</span></th>"
+  					tbl=tbl + "        <th ><span>Approval Status</span></th>" 
   					 
   					 tbl=tbl + "      </tr>" 
   					 tbl=tbl + "    </thead>" 
@@ -115,26 +135,30 @@
   				
   					var dataCount=0
   					 
-  				 $xml.find('user').each(function(index){
+  				 $xml.find('timesheetstatus').each(function(index){
   					dataCount++
-  		            var username = $(this).find('name').text();
+  		            var username = $(this).find('user').text();
   					var team = $(this).find('team').text();
-  					var userdate = $(this).find('date').text();
-  		          var projcode = $(this).find('code').text();
-  		        var projtask = $(this).find('task').text();
-  		      var projtype = $(this).find('type').text();
-  		    var hours = $(this).find('hours').text();
+  		          var status = $(this).find('status').text();
+  		        var startdate = $(this).find('startdate').text();
+  		      var enddate = $(this).find('enddate').text();
+  		    var hours = $(this).find('total').text();
   		    
   		     	 tbl=tbl + "      <tr>" 
   		     	
-					 tbl=tbl + "        <td class='lalign'>"+username+"</td>"
-					 tbl=tbl + "        <td class='lalign'>"+team+"</td>" 
-					 tbl=tbl + "        <td class='calign'>"+userdate+"</td>"
-					 tbl=tbl + "        <td class='calign'>"+projcode+"</td>" 
-					 tbl=tbl + "        <td class='calign'>"+projtask+"</td>" 
-					 tbl=tbl + "        <td class='calign'>"+projtype+"</td>" 
-					 
+					 tbl=tbl + "        <td class='lalign'>"+username+"</td>" 
+					 tbl=tbl + "        <td class='calign'>"+team+"</td>"
+					 tbl=tbl + "        <td class='calign'>"+startdate+"</td>" 
+					 tbl=tbl + "        <td class='calign'>"+enddate+"</td>" 
 					 tbl=tbl + "        <td class='calign'>"+hours+"</td>" 
+					 
+					 var formattedstatus=""
+						 formattedstatus="<span style='font-weight:bold'> "+status+"</span>"
+					     if(status == "Approved")
+					    	 formattedstatus="<span style='color:green;font-weight:bold'> "+status+"</span>"  
+					    
+					    	 	
+					 tbl=tbl + "        <td class='calign'>"+formattedstatus+"</td>" 
 					
 					 tbl=tbl + "      </tr>" 
 					 
@@ -145,7 +169,7 @@
   					 
   					 if( dataCount >0){
   					 	$("#resultcontainer").html(tbl)
-  					 	preparecsv("tblemployeeprojectreports")
+  					 	preparecsv("tblweeklysstatusreports")
   					  if( dataCount >10){
   						  
   						  
@@ -155,7 +179,7 @@
   						  "paging":   true,  				        
 	  				        "info":     true
   						} );
-  						$('#tblemployeeprojectreports').dataTable();
+  						$('#tblweeklysstatusreports').dataTable();
   					  }
   	  					  
   					  else{
@@ -168,7 +192,7 @@
   						} );
   						
   						
-  						$('#tblemployeeprojectreports').dataTable();
+  						$('#tblweeklysstatusreports').dataTable();
   					  }	
   					 }
   					 else
