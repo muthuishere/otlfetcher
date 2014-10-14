@@ -16,13 +16,21 @@
 	 
 	   <tr>
 	    <tr id="dtcustomrow">		   
-	   <td>Week 
-	   <input name="fromdate" id="fromdate" type="hidden" >
-	   <input name="todate" id="todate" type="hidden" /> 
+	   <td> From </td>
+	   <td>
+	   <input name="fromdate" id="fromdate"  >
 	   </td>
+	   <td>To</td>
+	   <td>
+	   <input name="todate" id="todate"  /> 
+	   </td>
+	   <!--
+	   <td>Week 
+	   	   </td>
 	   <td >
 	    <input name="weekdate" id="weekdate" type="text" /> 
 	   </td>
+	   -->
 	   </tr>
 	   <tr>
 	  <td colspan="4" style="text-align:right"><input type="button" id="search" value="Search" style="width:120px"> </td>
@@ -48,6 +56,18 @@ var endDate
 	  $('#errdiv').hide();
 	  showUserMenu("selectplaceholder")
 	  
+	  $('#fromdate').datepicker({
+	  dateFormat: 'yy-mm-dd',
+	  firstDay: 1 
+	  });
+	  $('#todate').datepicker({
+	  dateFormat: 'yy-mm-dd',
+	  firstDay: 1 
+	  
+	  });
+	   $("#fromdate[value='']").datepicker("setDate", "-90d"); 
+	   
+	 /* 
 	 // setcalendar("#weekdate","#fromdate","#todate")
 	 $('#weekdate').weekpicker({
 		 showOtherMonths: true,
@@ -57,6 +77,8 @@ var endDate
          endField: $( "#todate")
     // options ...
 });
+
+*/
 	  $('#errdiv').hide();
 	  
 	$( "input#search" )

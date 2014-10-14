@@ -457,57 +457,84 @@ class DataStore {
 		
 				
 				users.each{ user ->
-				
-					String cond=" where 1=1 "
+					def startDate = from
+					def endDate = to
+					Calendar c1 = GregorianCalendar.getInstance();
+					c1.setTime(startDate);
+					int w1 = c1.get(Calendar.DAY_OF_WEEK);
+					def nextFromDate = c1.getTime()
+					def currStartDate
+					def currEndDate
+					println "NexFromDate :" + nextFromDate
+					println "endDate :" + endDate
 					
-					if(null != user)
-					cond=cond + " AND user like  '$user'"
-			
+					nextFromDate = startDate
 					
+									
+					while ( nextFromDate <= endDate)
+					{
+						println "Inside While Loop"
+						c1.setTime(nextFromDate)
+						w1 = c1.get(Calendar.DAY_OF_WEEK)
+						int daysInCurrentWeek=Calendar.SATURDAY - w1 + 1
+						//println "Number of days left in the week :" + daysInCurrentWeek
+						currStartDate = c1.getTime()
+						currEndDate = c1.getTime() + daysInCurrentWeek
+						//println "Current Start Date in the week :" + currStartDate
+						//println "Current End Date in the week :" + currEndDate
+						nextFromDate = currEndDate + 1
+						//println "nextFromDate computed is: " + nextFromDate
+						if(currEndDate > endDate) { currEndDate = endDate}
+						//println "Updated End Date in the week for last cycle :" + currEndDate
+									
+					
+							String cond=" where 1=1 "
+									
+							if(null != user)
+								cond=cond + " AND user like  '$user'"
+									
+							if(null != from )
+								cond=cond + " AND entryDate >= "+ currStartDate.getTime()
 				
-				if(null != from )
-					cond=cond + " AND entryDate >= "+ from.getTime()
-		
-				if(null != to)
-					cond=cond + " AND entryDate <= "+ to.getTime()
-
-						
-						
-						def statuslist=[]
-						def totalhrs=0
-						fetcherDB.rows("select user,status,total(hours) as totalhrs from timeentry " + cond +" group by user,status").each{
+							if(null != to)
+								cond=cond + " AND entryDate <= "+ currEndDate.getTime()
 				
-							if(statuslist.contains(it.status) == false){
-								statuslist.push(it.status)
+							
+								def statuslist=[]
+								def totalhrs=0
+								fetcherDB.rows("select user,status,total(hours) as totalhrs from timeentry " + cond +" group by user,status").each{
 						
+									if(statuslist.contains(it.status) == false){
+										statuslist.push(it.status)
+								
+										}
+									totalhrs +=it.totalhrs
+									
 								}
-							totalhrs +=it.totalhrs
+								
+								println("select user,status,total(hours) as totalhrs from timeentry " + cond +" group by user,status")
+								
+								if(statuslist.size() > 0){
+								def curstatus=statuslist.join(",")
+								def userteam=findUser(user)?.team
+							//	println(curstatus)
+								timeEntries.push(
 							
-						}
-						println("select user,status,total(hours) as totalhrs from timeentry " + cond +" group by user,status")
-						
-						if(statuslist.size() > 0){
-						def curstatus=statuslist.join(",")
-						def userteam=findUser(user)?.team
-					//	println(curstatus)
-						timeEntries.push(
-							
-							
-							
-							new TimesheetStatusReport(
-								user: user, 
-								status: curstatus, 
-								startdate: from, 
-								enddate: to ,
-								team: userteam,
-								totalhrs:totalhrs
-								)
-							
-							)
-						
-						
-						Log.info("Query returned" + timeEntries.size())
-						
+									new TimesheetStatusReport(
+										user: user, 
+										status: curstatus, 
+										startdate: currStartDate, 
+										enddate: currEndDate ,
+										team: userteam,
+										totalhrs:totalhrs
+										)
+									
+									)
+								
+								
+								Log.info("Query returned" + timeEntries.size())
+								
+								}
 						}
 				}
 					
