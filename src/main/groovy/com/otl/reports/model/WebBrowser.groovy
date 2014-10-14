@@ -68,6 +68,18 @@ class WebBrowser {
 
 	}
 
+	HtmlElement getFirstElementByTag(String tag ){
+		
+		 DomNodeList<HtmlElement> domNodeList= currentPage.getElementsByTagName(tag); //get a list of all table rows
+		if(null == domNodeList || domNodeList.size() ==0)
+		
+			return null
+		
+
+		return  domNodeList[0]
+
+	}
+	
 	def close(){
 
 		webClient.closeAllWindows();
