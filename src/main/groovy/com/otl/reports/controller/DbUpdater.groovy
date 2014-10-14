@@ -8,6 +8,7 @@ import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlTableBody
+import com.otl.reports.beans.ProjectInfo
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.exceptions.ServiceException
@@ -27,7 +28,8 @@ class DbUpdater {
 		{
 			Thread.start { worker_thread( Configurator ) }
 		}
-		
+		datamanager=new DataManager();
+		datamanager.init();
 	}
 	def parseCallback(def dbreport_response){
 		
@@ -88,8 +90,7 @@ class DbUpdater {
 		try{
 			
 			def k=null
-			datamanager=new DataManager();
-			datamanager.init();
+			
 			
 			
 			
@@ -126,6 +127,7 @@ class DbUpdater {
 				
 			}
 			
+			
 			description="Updated timesheets for $successCount  of $usercount users"
 			
 		}catch(Exception e){
@@ -138,10 +140,36 @@ class DbUpdater {
 		  
 		   
 		Configurator.setupdatestatus( statusmsg, description,formatter.format(new Date()))
+		
+		//updateprojectcodes();
+		
 		Configurator.isUpdating=false
 		println("Completed DB Updation")
 	}
 	
+	def updateprojectcodes(){
+		try{
+			
+			
+			UserInfo userInfo=datamanager.getValidUserEntries().get(0)
+			def projectcodes=datamanager.getOrphanProjectCodes()
+			
+			FetchUserReport fetchUserReport=new FetchUserReport()
+			fetchUserReport.init(Configurator.globalconfig?.proxy )
+			
+			def projectdetails=fetchUserReport.getProjectDetails(userInfo,projectcodes)
+
+			if(null ==projectdetails ||  projectdetails.size() ==0)
+				throw new Exception("Empty response for project details");
+			
+				datamanager.insertProjects(projectdetails)
+			
+				println("Successfully Updated Project details")
+		
+		}catch(Exception e){
+				e.printStackTrace();
+		}
+	}
 	
 
 	

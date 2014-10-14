@@ -18,6 +18,7 @@ class TimeEntry {
 	Date fetchedDate
 	def status
 	def team
+	ProjectInfo projectInfo;
 	
 	public boolean objectequals(TimeEntry timeEntry) {
 		

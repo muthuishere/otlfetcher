@@ -6,6 +6,7 @@ import com.otl.reports.beans.TimesheetStatusReport;
 
 
 
+import com.otl.reports.beans.ProjectInfo
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.beans.UserTimeSummary;
@@ -99,6 +100,15 @@ class DataManager {
 	}
 	
 
+	public void insertProjects(def projectdetails){
+		
+		for (ProjectInfo projectInfo:projectdetails){
+		
+			dataStore.insertProject(projectInfo)
+		}
+		
+		
+	}
 	
 	
 	public ArrayList<UserInfo> getValidUserEntries(){
@@ -107,6 +117,11 @@ class DataManager {
 		
 		}
 	
+	public def getOrphanProjectCodes(){
+		
+		return dataStore.getOrphanProjectCodes()
+		
+		}
 	public ArrayList<TimesheetStatusReport>  getWeeklystatus(def users,Date from,Date to){
 		
 		return dataStore.getWeeklystatus(users,from,to)

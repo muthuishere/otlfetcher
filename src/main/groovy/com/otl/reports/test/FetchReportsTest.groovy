@@ -500,7 +500,6 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 			} 
 		}
 	
-	
 	static parseconfig(def configFileName){
 		
 		
@@ -535,6 +534,17 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		
 	}
 	
+	static void updateprojectcodetest(){
+		
+		Thread.start {
+			
+								new DbUpdater().updateprojectcodes()
+			
+			
+							}
+		
+		
+	}
 	static void leavecodetest(){
 		
 		
@@ -704,6 +714,12 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		configFileName=args[0]
 		*/
 
+		configFileName="C:\\muthu\\otl\\otlfetcher\\origotlfetcher.conf"
+		parseconfig(configFileName)
+		
+		updateprojectcodetest();
+		
+		
 		
 	}
 

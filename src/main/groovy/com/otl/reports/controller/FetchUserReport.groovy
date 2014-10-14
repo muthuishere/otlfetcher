@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import com.gargoylesoftware.htmlunit.html.DomElement
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlFrame
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlTableBody
+import com.otl.reports.beans.ProjectInfo
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.exceptions.ServiceException
@@ -28,8 +30,8 @@ class FetchUserReport {
 	
 	def login(UserInfo userInfo){
 
-
-		webBrowser.Navigate(Configurator.globalconfig.timesheet_url)
+		
+		webBrowser.Navigate(Configurator.globalconfig.otl_host + Configurator.globalconfig.timesheet_url)
 
 		
 
@@ -52,7 +54,13 @@ class FetchUserReport {
 	}
 
 	def gotoTimesheetPage(){
-		webBrowser.NavigateInner(Configurator.globalconfig.timesheet_url)
+		webBrowser.NavigateInner(Configurator.globalconfig.otl_host + Configurator.globalconfig.timesheet_url)
+		
+		webBrowser.waitForPageLoad();
+	}
+	
+	def gotoCreateTimecardPage(){
+		webBrowser.NavigateInner(Configurator.globalconfig.otl_host + Configurator.globalconfig.timesheet_entry_url)
 
 		webBrowser.waitForPageLoad();
 	}
@@ -216,6 +224,209 @@ class FetchUserReport {
 		
 		return curhours
 	}
+	
+	def crawlProjectInfo(url){
+		
+		ProjectInfo projectinfo=new ProjectInfo();
+		
+		webBrowser.NavigateInner(url)
+		
+		
+		
+		HtmlFrame frame=webBrowser.getFirstElementByTag("frame")
+		
+		println(url);
+		
+		if(null ==frame) {
+			
+			println("No response details");
+			return null
+			
+			}
+		
+
+		HtmlPage framepage=frame.getEnclosedPage();
+		
+		println(framepage.asXml())
+		def tblelem=framepage.getHtmlElementById("HXC_CUI_PROJECT_LOV_lovTable")
+		
+		
+		DomNodeList<HtmlElement> spanelems= tblelem.getElementsByTagName("span"); //get a list of all table rows
+		
+		 
+		if(null ==links || links.size() == 0){
+			
+			println("No  response details");
+			return null
+			
+			}
+		def projectname=""
+		def projectid=""
+		def selectedprojnumber=""
+		for(HtmlElement spanelem:spanelems){
+			
+			if(null != spanelem.getAttribute("title") && spanelem.getAttribute("title").contains("Project Number")){
+				
+				
+				projectinfo.code=spanelem.asText()
+				
+			}
+			if(null != spanelem.getAttribute("title") && spanelem.getAttribute("title").contains("Project Name")){
+				
+				projectinfo.name=spanelem.asText()
+				
+				
+			}
+			if(null != spanelem.getAttribute("title") && spanelem.getAttribute("title").contains("Project ID")){
+				
+				
+				projectinfo.projectid=spanelem.asText()
+			}
+			
+			
+		}
+		
+		return projectinfo;
+		
+	}
+	def getProjectcodeSearchurl(){
+		
+		
+		ArrayList<HtmlElement> cells=webBrowser.getElemsByTagClass("input","x4")
+		
+		if(null ==cells || cells.size() == 0){
+			
+			println("No response details");
+			return null
+			
+			}
+		
+		HtmlElement validparent=cells.get(0).parentNode;
+		
+		
+		DomNodeList<HtmlElement> links= validparent.getElementsByTagName("a"); //get a list of all table rows
+		
+		 
+		if(null ==links || links.size() == 0){
+			
+			println("No Link response details");
+			return null
+			
+			}
+		
+		def linkxml=links.get(0).asXml();
+		
+		linkxml=linkxml.replace("{", "#")
+		linkxml=linkxml.replace("}", "#")
+		println(linkxml)
+		
+		
+		
+	//	println(linkxml.split("#").length)
+	//	println(linkxml.split("#")[1].split(",").length)
+		
+		def chunks=linkxml.split("#")[1].split(",")
+		def projcodechunk=""
+		for(def chunk:chunks){
+			
+			if(chunk.contains("'D'"))
+				projcodechunk=chunk.split(":")[1].replace("'","")
+			
+		}
+		
+		
+		projcodechunk=projcodechunk.replaceAll("&amp;", "&")
+		println(projcodechunk)
+		//Split with key param
+		//find  oas
+		def oasstring=""
+		/*
+		projcodechunk.split("&").each{keyvalpair ->
+			
+			if(keyvalpair.contains("=") && keyvalpair.split("=")[0] == "oas" ){
+				oasstring=keyvalpair.replace("=", "%3D")
+				return
+			}
+			
+		}
+		*/
+		projcodechunk=projcodechunk + "&event=lovFilter&source=A241N1display&searchText=#SEARCH#&enc=ISO-8859-1&contextURI=/OA_HTML/&configName=OAConfig"
+		def redirecturl=projcodechunk//URLEncoder.encode(projcodechunk)
+		println(redirecturl)
+		
+//		%2FOA_HTML%2FOA.jsp%3Fregion%3D%2Foracle%2Fapps%2Fhxc%2Fselfservice%2Fconfigui%2Fwebui%2FCuiProjectLovRN%26regionCode%3DHXC_CUI_PROJECT_LOV%26regionAppId%3D809%26lovBaseItemName%3DA241N1display%26fndOAJSPinEmbeddedMode%3Dy%26_ti%3D634763544%26label%3DProject%26formName%3DDefaultFormName%26addBreadCrumb%3DS%26baseAppMod%3Doracle.apps.hxc.selfservice.timecard.server.TimecardAM%26amUsageMode%3D1%26lovMainCriteria%3DHxcCuiProjectNumber%26Criteria%3DA241N1display.HxcCuiProjectNumber%26PassiveCriteria%3D%26retainAM%3DY%26Selector%3DN%26lovMultiSelectDelimiter%3D%253B%26baseToLovKey%3D%2Foracle%2Fapps%2Fhxc%2FregionMap%2FHXCTIMECARDACTIVITIESPAGE.A241N1display_%2Foracle%2Fapps%2Fhxc%2Fselfservice%2Fconfigui%2Fwebui%2FCuiProjectLovRN%26baseCompMode%3D11.5.10%26event%3DlovFilter%26source%3DA241N1display%26searchText%3D
+		def baseurl=Configurator.globalconfig.otl_host
+		def project_code_url=Configurator.globalconfig.project_code_url
+		
+		
+		def projectsearchurl="${baseurl}${redirecturl}"
+		
+		println("templateurl $projectsearchurl")
+		
+		return projectsearchurl;
+		
+	}
+	def getProjectDetails(UserInfo userInfo,def projectcodes) throws ServiceException{
+		
+				ArrayList<ProjectInfo> projectdetails= new ArrayList<ProjectInfo>()
+				
+				
+				if(!userInfo)
+				throw new ServiceException("User Information cannot be empty")
+			
+				
+				
+			if(!login(userInfo))
+				throw new ServiceException("INVALID CREDENTIALS:Invalid User Credentials")
+	
+				
+				
+				if(!projectcodes && projectcodes.size() == 0)
+					throw new ServiceException("Project Information cannot be empty")
+				
+		
+					
+					
+					Log.info("Opening goto CreateTimecard Page")
+					
+				gotoCreateTimecardPage()
+		
+				String url=getProjectcodeSearchurl();
+				
+				println("Url for project code $url")
+				if(null == url)
+						throw new ServiceException("unable to construct url")
+						
+				def tsresults= new ArrayList();
+				
+				int i=1;
+				for(def code:projectcodes){
+					//TODO remove
+					if(i > 1 )
+						break;
+						
+					def codeurl= url.replace("#SEARCH#", code +"");
+					
+					println("codeurl $codeurl")
+					def projectInfo=crawlProjectInfo(codeurl)
+					
+					if(null != projectInfo)
+						projectdetails.add(projectInfo)
+						
+						i++
+						
+				}
+				
+			
+				
+		
+		
+				close()
+		
+		
+				Log.info "Completed Project code crawling"
+				return projectdetails
+			}
 	def startFetch(UserInfo userInfo,Date from,Date to) throws ServiceException{
 
 		ArrayList<TimeEntry> timeEntries= new ArrayList<TimeEntry>()

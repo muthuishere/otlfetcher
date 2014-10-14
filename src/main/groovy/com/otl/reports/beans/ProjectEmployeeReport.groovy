@@ -12,6 +12,7 @@ class ProjectEmployeeReport {
 	def team
 	def projectcode
 	def projecttask
+	ProjectInfo projectInfo;
 	def tasktype
 	def hours
 

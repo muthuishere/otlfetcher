@@ -19,6 +19,7 @@ import groovy.sql.DataSet
 import groovy.sql.Sql
 
 import com.otl.reports.beans.ProjectEmployeeReport
+import com.otl.reports.beans.ProjectInfo
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.TimesheetStatusReport
 import com.otl.reports.beans.UserInfo
@@ -34,11 +35,13 @@ class DataStore {
 	Sql fetcherDB =null;
 	Sql userDB =null;
 
+	def users=[:]
+	def projects=[:]
+	
 	void close(){
 		fetcherDB.close();
 		userDB.close();
 	}
-
 
 	void init(def userfileName,def fetchfileName){
 
@@ -69,6 +72,17 @@ class DataStore {
 		fetcherDB.execute("create table if not exists timeentry (user string, entryDate date,projectcode string,projecttask string,tasktype string,hours integer,details string,key string,status string)")
 
 		
+		/*
+		 *
+		 
+		 def projectcode
+		 def projectname
+		 def projectid
+		 *
+		 */
+		fetcherDB.execute("create table if not exists projectdetails (code string,name string,projectid string)")
+
+		
 		//println(fetcherDB.dump())
 	}
 
@@ -88,6 +102,112 @@ class DataStore {
 		return result
 		
 	}
+	
+	
+	void updateUserCache(){
+		
+		def tmpusers=[:]
+		
+		userDB.rows("select * from userInfo " ).each{
+			
+			tmpusers.put(it.user, new UserInfo(
+								user: it.user,
+								ip: it.ip,
+								locked: it.locked,
+								team:it?.team
+			
+								));
+						
+						
+						
+						
+					}
+		
+		users=tmpusers;
+	}
+	
+	
+	public void insertProject(ProjectInfo projectInfo){
+
+
+
+		boolean exists =false
+
+		def query="select code from projectdetails  where code='" + projectInfo.code + "'"
+
+		exists=(fetcherDB.rows(query).size()>0)
+
+		// boolean exists = fetcherDB.execute("select user from userInfo  where user='${userInfo.user}'", null);
+
+
+		if( exists){
+
+			Log.error("Key Already exists ${projectInfo.code} overWriting ");
+			query="delete from userInfo  where user='${projectInfo.code}'"
+			fetcherDB.executeUpdate(query, []);
+			
+			
+
+		}
+
+		DataSet projectDataSet = userDB.dataSet("projectdetails")
+		
+		projectDataSet.add(
+				name:projectInfo.name,				
+				code:projectInfo.code,				
+				projectid:projectInfo.projectid
+
+				)
+
+		
+		updateProjectCache();
+
+
+	}
+	void updateProjectCache(){
+	
+		
+		def tmpprojects=[:]
+		
+		fetcherDB.rows("select * from projectdetails " ).each{
+		
+			
+			
+			tmpprojects.put(it.name, new ProjectInfo(
+								name: it.name,
+								code: it.code,
+								projectid: it.projectid
+			
+								));
+						
+						
+						
+						
+					}
+		
+		projects=tmpprojects;
+		
+	}
+	
+	//Get projectcodes which does not have entry in projectdetails
+	public def getOrphanProjectCodes(){
+		
+			
+			def projectcodes=[]
+			updateProjectCache();
+			
+			fetcherDB.rows("Select projectcode from timeentry  group by projectcode").each{
+			
+				if(null == projects.getAt(it.projectcode))			
+								projectcodes.push(it.projectcode)
+				
+							
+							
+						}
+			
+			return projectcodes
+			
+		}
 	public ArrayList<UserInfo> getUserEntries(String team){
 
 
@@ -270,13 +390,14 @@ class DataStore {
 					
 				
 				 fetcherDB.rows(totalqry).each{
-					 def userteam=findUser(it.user)?.team
+					 def userteam=getUserTeam(it.user)
 					 
 					 lstProjectEmployeeReport.add( new ProjectEmployeeReport(
 						 user: it.user,
 						 projectcode:it.projectcode,
 						 totalhrs: it.totalhrs,
-						 team: userteam
+						 team: userteam,						 
+						 projectInfo:projects.getAt(it.projectcode)
 					
 						 ))
 					 
@@ -291,6 +412,10 @@ class DataStore {
 				 
 	 }
 	 
+	 def getUserTeam(def user){
+		 
+		 return users.getAt(user)?.team;
+	 }
 	 public def getProjectEmployeeReport(String projectcode,Date from,Date to){
 		 
 		 //def timeEntries=new HashMap<String,ProjectEmployeeReport>()
@@ -318,7 +443,7 @@ class DataStore {
 				 fetcherDB.rows(reportqry).each{
 	
 					 
-					 def userteam=findUser(it.user)?.team
+					 def userteam=getUserTeam(it.user)
 					 
 					 lstProjectEmployeeReport.add( new ProjectEmployeeReport(
 						 user: it.user,
@@ -327,7 +452,8 @@ class DataStore {
 						 hours: it.hours,
 						 projecttask:it.projecttask,
 						 tasktype:it.tasktype,
-						 team:userteam
+						 team:userteam,
+						 projectInfo:projects.getAt(it.projectcode)
 						 ))
 					 
 					 
@@ -516,7 +642,7 @@ class DataStore {
 								
 								if(statuslist.size() > 0){
 								def curstatus=statuslist.join(",")
-								def userteam=findUser(user)?.team
+								def userteam=getUserTeam(user);
 							//	println(curstatus)
 								timeEntries.push(
 							
@@ -770,6 +896,7 @@ Log.info("Query select * from timeentry " + cond)
 
 				)
 
+		updateUserCache();
 		//curUserInfo.commit();
 		//insert into myTable(colname1, colname2) values(?, ?)
 		//	def res=fetcherDB.executeUpdate("insert into userInfo values(?,?,?)",[userInfo.user,userInfo.password,userInfo.ip]);
