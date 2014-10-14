@@ -1,15 +1,15 @@
 package com.otl.reports.test
 
-<<<<<<< HEAD
+
 import com.gargoylesoftware.htmlunit.Page
 import com.gargoylesoftware.htmlunit.html.DomNodeList
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlFrame
 import com.gargoylesoftware.htmlunit.html.HtmlPage
-=======
+
 import com.gargoylesoftware.htmlunit.html.DomNodeList
 import com.gargoylesoftware.htmlunit.html.HtmlElement
->>>>>>> 6841ff90a14a06f4bf9edf420513fac5c925e6f2
+
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.controller.DataManager
