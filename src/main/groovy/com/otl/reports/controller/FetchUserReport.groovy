@@ -26,7 +26,17 @@ class FetchUserReport {
 		webBrowser.init(proxy)
 	}
 	
+	static def getstringbetween(String str,String start,String end){
 		
+		def resp=null
+		try{
+			
+			resp=str.substring(str.indexOf(start)+start.length(),str.indexOf(end, str.indexOf(start)))
+		}catch(Exception){
+		
+		}
+		return resp
+	}
 	
 	def login(UserInfo userInfo){
 
@@ -41,6 +51,7 @@ class FetchUserReport {
 		//webBrowser.clickOnInputName(webBrowser)
 
 
+		
 
 		webBrowser.executeScriptforNewPage("buttonSubmit('OK');")
 
@@ -366,6 +377,62 @@ class FetchUserReport {
 		return projectsearchurl;
 		
 	}
+	
+	def getprojectcodeSearchPage(){
+		
+		
+		ArrayList<HtmlElement> cells=webBrowser.getElemsByTagClass("input","x4")
+		
+		if(null ==cells || cells.size() == 0){
+			
+			println("No response details");
+			return null
+			
+			}
+		
+		HtmlElement validparent=cells.get(0).parentNode;
+		
+		
+		DomNodeList<HtmlElement> links= validparent.getElementsByTagName("a"); //get a list of all table rows
+		
+		 
+		if(null ==links || links.size() == 0){
+			
+			println("No Link response details");
+			return null
+			
+			}
+		
+		def linkxml=links.get(0).asXml();
+		
+		def script=getstringbetween(linkxml,"return ","\"");// linkxml.substring(linkxml.indexOf("return "),linkxml.indexOf("\"", linkxml.indexOf("return")))
+		
+		//def script=linkxml.substring(linkxml.indexOf("return"),linkxml.indexOf("\"", linkxml.indexOf("return"));
+			
+		
+		webBrowser.executeScript(script)
+		
+		webBrowser.executeScriptforNewPage("gototspage();")
+		
+		
+		
+		HtmlFrame frame=webBrowser.getFirstElementByTag("frame")
+		
+	
+		if(null ==frame) {
+			
+			println("No Frame available response details");
+			return null
+			
+			}
+		
+
+		HtmlPage framepage=frame.getEnclosedPage();
+		
+		println(framepage.asXml())
+		return framepage;
+		
+	}
 	def getProjectDetails(UserInfo userInfo,def projectcodes) throws ServiceException{
 		
 				ArrayList<ProjectInfo> projectdetails= new ArrayList<ProjectInfo>()
@@ -391,8 +458,12 @@ class FetchUserReport {
 					
 				gotoCreateTimecardPage()
 		
-				String url=getProjectcodeSearchurl();
+				webBrowser.executeScript("var tspage;function gototspage(){ document.location=tspage; } ;window.open = function (open) {    return function (url, name, features) {               name = name || 'default_window_name';	tspage=url;	document.location=url;	return open(url);    };}(window.open);")
 				
+				
+				def framepage=getprojectcodeSearchPage();
+				webBrowser.currentPage=framepage
+				/*
 				println("Url for project code $url")
 				if(null == url)
 						throw new ServiceException("unable to construct url")
@@ -419,7 +490,7 @@ class FetchUserReport {
 				
 			
 				
-		
+		*/
 		
 				close()
 		

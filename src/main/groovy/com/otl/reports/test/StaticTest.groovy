@@ -514,7 +514,25 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		println leavecode
 	}
 	
-	
+	static def getstringbetween(String str,String start,String end){
+		
+		def resp=null
+		try{
+			
+			resp=str.substring(str.indexOf(start)+start.length(),str.indexOf(end, str.indexOf(start)))
+		}catch(Exception){
+		
+		}
+		return resp
+	}
+	static void scriptparsetest(){
+		
+		def linkxml="""<a onclick="return _LovInputVTF('A241N1display',0,document.forms['DefaultFormName']['A241N1display'],1,1,{'F':'DefaultFormName','N':'A241N1display','L':'A241N1display','D':'/OA_HTML/OA.jsp?region=/oracle/apps/hxc/selfservice/configui/webui/CuiProjectLovRN&amp;regionCode=HXC_CUI_PROJECT_LOV&amp;regionAppId=809&amp;lovBaseItemName=A241N1display&amp;fndOAJSPinEmbeddedMode=y&amp;_ti=309327795&amp;label=Project&amp;formName=DefaultFormName&amp;addBreadCrumb=S&amp;baseAppMod=oracle.apps.hxc.selfservice.timecard.server.TimecardAM&amp;amUsageMode=1&amp;lovMainCriteria=HxcCuiProjectNumber&amp;Criteria=A241N1display.HxcCuiProjectNumber&amp;PassiveCriteria=&amp;retainAM=Y&amp;Selector=N&amp;lovMultiSelectDelimiter=%3B&amp;baseToLovKey=/oracle/apps/hxc/regionMap/HXCTIMECARDACTIVITIESPAGE.A241N1display_/oracle/apps/hxc/selfservice/configui/webui/CuiProjectLovRN&amp;baseCompMode=11.5.10&amp;oapc=7&amp;oas=6LZjAle-P9ASzlltTtBmTw..','S':OnLovSelect,'M':1,'P':1});" href="javascript:_submitNav('DefaultFormName','http%3A//ebiz.uk.three.com/OA_HTML/RF.jsp%3Ffunction_id%3D21872%26resp_id%3D51959%26resp_appl_id%3D808%26security_group_id%3D0%26lang_code%3DUS%26params%3DoXz3uPWpQwrzL9GYxHDvbQ21U7daFAGoFLbCyjwGgPM%26oas%3DzbCVd9Hn1VkKqFuPz_4zWQ..%23')"><img src="/OA_HTML/cabo/images/cache/clovi.gif" width="24" height="24" border="0" title="Search for Project" align="absmiddle"></a>
+"""
+		def script=getstringbetween(linkxml,"return ","\"");// linkxml.substring(linkxml.indexOf("return "),linkxml.indexOf("\"", linkxml.indexOf("return")))
+			println script
+			
+	}
 	static main(args) {
 	//	displayClassPath();
 		
@@ -551,7 +569,9 @@ webWindowClosed Page : <com.gargoylesoftware.htmlunit.WebWindowEvent@8fda59 oldP
 		
 	//	timesheetupdatetest();
 		
-		equaltest();
+		//equaltest();
+		
+		scriptparsetest()
 		
 		
 	}

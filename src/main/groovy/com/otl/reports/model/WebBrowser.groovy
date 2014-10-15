@@ -217,9 +217,8 @@ class WebBrowser {
 	def executeScriptforNewPage(String content){
 
 		curWebWindowListener.pageChanged=false
-		ScriptResult result= currentPage.executeJavaScript(content);
-
-
+		ScriptResult result= currentPage.executeJavaScript(content);		
+		
 		currentPage=result.getNewPage()
 
 
@@ -236,7 +235,13 @@ class WebBrowser {
 
 	def executeScript(String content){
 
-		currentPage.executeJavaScript(content);
+		try{
+			currentPage.executeJavaScript(content);
+		}catch(Exception e){
+			e.printStackTrace();
+			
+		}
+		
 
 
 	}
