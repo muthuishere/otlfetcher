@@ -8,11 +8,13 @@ import com.gargoylesoftware.htmlunit.WebWindowListener
 import com.gargoylesoftware.htmlunit.html.DomElement
 import com.gargoylesoftware.htmlunit.html.DomNodeList
 import com.gargoylesoftware.htmlunit.html.HtmlElement
+import com.gargoylesoftware.htmlunit.html.HtmlFrame
 import com.gargoylesoftware.htmlunit.html.HtmlInput
 import com.gargoylesoftware.htmlunit.html.HtmlPage
 import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.control.CompilerConfiguration
 import com.gargoylesoftware.htmlunit.BrowserVersion
+import com.otl.reports.exceptions.ServiceException
 import com.otl.reports.helpers.BrowserHelper
 import com.otl.reports.helpers.Log
 class WebBrowser {
@@ -214,6 +216,41 @@ class WebBrowser {
 
 	}
 
+	def typeOnFrameName(HtmlPage page,def elemName,def value){
+		
+		boolean flgSuccess=false;
+		
+		try{
+		DomElement htmlInput=page.getElementByName(elemName)
+		
+
+		if(null !=htmlInput){
+			((HtmlInput)htmlInput).setValueAttribute(value)
+			flgSuccess=true
+		}
+
+		else
+			Log.error("Cannot find element ${elemName}")
+
+	}catch(Exception e){
+	
+	}
+
+		return flgSuccess
+
+
+	}
+	
+	def executeScriptforNewPageinFrame(HtmlPage page,String content){
+		
+				curWebWindowListener.pageChanged=false
+				ScriptResult result= page.executeJavaScript(content);
+				
+				currentPage=result.getNewPage()
+		
+		
+			}
+	
 	def executeScriptforNewPage(String content){
 
 		curWebWindowListener.pageChanged=false
@@ -289,6 +326,27 @@ class WebBrowser {
 
 
 
+	}
+	
+	def setfirstFrameAsPage() {
+		
+		
+		HtmlFrame frame=getFirstElementByTag("frame")
+		
+	
+		if(null ==frame) {
+			
+			println("No Frame available response details");
+			return false
+			 
+			
+			}
+		
+
+		currentPage=frame.getEnclosedPage();
+		
+		return true
+		
 	}
 
 	def printAll(){

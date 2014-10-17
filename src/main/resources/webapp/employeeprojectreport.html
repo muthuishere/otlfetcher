@@ -107,6 +107,7 @@
   					tbl=tbl + "        <th><span>Team</span></th>" 
   					tbl=tbl + "        <th><span>Date</span></th>" 
   					 tbl=tbl + "        <th><span>Project Code</span></th>" 
+  					tbl=tbl + "        <th><span>Project Name</span></th>"
   					 tbl=tbl + "        <th><span>Task</span></th>" 
   					 tbl=tbl + "        <th><span>Type</span></th>" 
   					 tbl=tbl + "        <th ><span>Hours</span></th>" 
@@ -123,6 +124,7 @@
   					var team = $(this).find('team').text();
   					var userdate = $(this).find('date').text();
   		          var projcode = $(this).find('code').text();
+  		        var projectname = $(this).find('projectname').text();
   		        var projtask = $(this).find('task').text();
   		      var projtype = $(this).find('type').text();
   		    var hours = $(this).find('hours').text();
@@ -132,7 +134,9 @@
 					 tbl=tbl + "        <td class='lalign'>"+username+"</td>"
 					 tbl=tbl + "        <td class='lalign'>"+team+"</td>" 
 					 tbl=tbl + "        <td class='calign'>"+userdate+"</td>"
-					 tbl=tbl + "        <td class='calign'>"+projcode+"</td>" 
+					 tbl=tbl + "        <td class='calign'>"+projcode+"</td>"
+					 tbl=tbl + "        <td class='calign'>"+projectname+"</td>"
+					 
 					 tbl=tbl + "        <td class='calign'>"+projtask+"</td>" 
 					 tbl=tbl + "        <td class='calign'>"+projtype+"</td>" 
 					 

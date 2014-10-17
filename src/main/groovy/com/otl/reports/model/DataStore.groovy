@@ -82,7 +82,8 @@ class DataStore {
 		 */
 		fetcherDB.execute("create table if not exists projectdetails (code string,name string,projectid string)")
 
-		
+		updateUserCache();
+		updateProjectCache();
 		//println(fetcherDB.dump())
 	}
 
@@ -143,14 +144,14 @@ class DataStore {
 		if( exists){
 
 			Log.error("Key Already exists ${projectInfo.code} overWriting ");
-			query="delete from userInfo  where user='${projectInfo.code}'"
+			query="delete from projectdetails  where code='${projectInfo.code}'"
 			fetcherDB.executeUpdate(query, []);
 			
 			
 
 		}
 
-		DataSet projectDataSet = userDB.dataSet("projectdetails")
+		DataSet projectDataSet = fetcherDB.dataSet("projectdetails")
 		
 		projectDataSet.add(
 				name:projectInfo.name,				
@@ -173,7 +174,7 @@ class DataStore {
 		
 			
 			
-			tmpprojects.put(it.name, new ProjectInfo(
+			tmpprojects.put(it.code, new ProjectInfo(
 								name: it.name,
 								code: it.code,
 								projectid: it.projectid
@@ -186,6 +187,7 @@ class DataStore {
 					}
 		
 		projects=tmpprojects;
+	//	println(projects.dump())
 		
 	}
 	
@@ -580,8 +582,6 @@ class DataStore {
 		
 				
 				
-		
-				
 				users.each{ user ->
 					def startDate = from
 					def endDate = to
@@ -696,10 +696,11 @@ class DataStore {
 			timeEntries.add(
 					new TimeEntry(
 					
-					projectcode: it.projectcode
-					
+					projectcode: it.projectcode,							 
+						 projectInfo:projects.getAt(it.projectcode)
 					)
 					);
+				
 		}
 		Log.info("Query returned" + timeEntries.size())
 		return timeEntries
@@ -739,7 +740,8 @@ Log.info("Query select * from timeentry " + cond)
 					entryDate: new Date(it.entryDate),
 					hours: it.hours,
 					user: it.user,
-					projectcode: it.projectcode,
+					projectcode: it.projectcode,					
+					projectInfo:projects.getAt(it.projectcode),
 					projecttask: it.projecttask,
 					tasktype: it.tasktype,
 					details: it.details,

@@ -107,7 +107,7 @@ class DataManager {
 			dataStore.insertProject(projectInfo)
 		}
 		
-		
+		dataStore.updateProjectCache();
 	}
 	
 	

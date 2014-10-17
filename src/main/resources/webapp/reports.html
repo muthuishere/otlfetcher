@@ -98,7 +98,7 @@ function showdetailreport( username){
 	  $("#username_detail").val(username)
 	      var formdata=$("form#frmreports").serializeArray()
 	 
-		console.log(formdata)
+		//console.log(formdata)
 		
 	$.post( "/services/fetchreportdetails", formdata)
 	  .done(function( data ) {
@@ -132,7 +132,8 @@ function showdetailreport( username){
 				 tbl=tbl + "    <thead>" 
 				 tbl=tbl + "      <tr>" 
 				 tbl=tbl + "        <th><span>Date</span></th>"
-				 tbl=tbl + "        <th><span>Project Code</span></th>" 
+				 tbl=tbl + "        <th><span>Project Code</span></th>"
+				 tbl=tbl + "        <th><span>Project Name</span></th>" 
 				 tbl=tbl + "        <th><span>Task</span></th>" 
 				 tbl=tbl + "        <th><span>Type</span></th>" 
 				 tbl=tbl + "        <th ><span>Hours</span></th>" 
@@ -147,6 +148,7 @@ function showdetailreport( username){
 				dataCount++
 	            var entryDate = $(this).find('entryDate').text();
 	          var projectcode = $(this).find('projectcode').text();
+	          var projectname = $(this).find('projectname').text();
 	        var projecttask = $(this).find('projecttask').text();
 	      var tasktype = $(this).find('tasktype').text();
 	   
@@ -157,7 +159,8 @@ function showdetailreport( username){
 				  
 	     	 tbl=tbl + "      <tr>" 
 				 tbl=tbl + "        <td class='lalign'>"+entryDate+"</td>" 
-				 tbl=tbl + "        <td class='calign'>"+projectcode+"</td>" 
+				 tbl=tbl + "        <td class='calign'>"+projectcode+"</td>"
+				 tbl=tbl + "        <td class='calign'>"+projectname+"</td>" 
 				 tbl=tbl + "        <td class='calign'>"+projecttask+"</td>" 
 				 tbl=tbl + "        <td class='calign'>"+tasktype+"</td>"
 				 

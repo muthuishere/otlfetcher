@@ -24,12 +24,14 @@ class DbUpdater {
 	
 	public DbUpdater(){
 		
+		datamanager=new DataManager();
+		datamanager.init();
+		
 		(1..Configurator.globalconfig.worker_thread_count).each
 		{
 			Thread.start { worker_thread( Configurator ) }
 		}
-		datamanager=new DataManager();
-		datamanager.init();
+		
 	}
 	def parseCallback(def dbreport_response){
 		
@@ -39,7 +41,7 @@ class DbUpdater {
 			
 			Log.error("Error getting response for " +dbreport_response?.userInfo?.user)
 			
-			if(dbreport_response?.error.contains("INVALID CREDENTIALS")){
+			if(null != dbreport_response?.error && dbreport_response.error.contains("INVALID CREDENTIALS")){
 				
 				Log.error("Error Invalid credentials disabling " +dbreport_response?.userInfo?.user)
 				
@@ -56,13 +58,16 @@ class DbUpdater {
 			
 			datamanager.addTimeEntries(dbreport_response.timeEntries);
 			
-			if( null != dbreport_response?.error  || dbreport_response?.error !="" ){
+			if( null != dbreport_response?.error   ){
 				Log.error("Error Message While adding entries " +dbreport_response?.error)
 				
 				flgSuccess=false
 				
-			}else
+			}else{
+			println("Setting success for" +dbreport_response?.userInfo?.user)
 				flgSuccess=true
+				
+			}
 			
 		}
 		
@@ -95,6 +100,7 @@ class DbUpdater {
 			
 			
 			def users=datamanager.getValidUserEntries()
+			
 			def usercount=0
 			for (UserInfo userInfo:users){
 				if(null==lstusers || lstusers.trim() =="" || lstusers.contains(userInfo.user)){
@@ -116,10 +122,15 @@ class DbUpdater {
 				}
 				
 			
-			println("usercount $usercount successCount $successCount")
+		println("usercount $usercount successCount $successCount")
 			if(successCount == usercount){
 				
 				statusmsg="Success"
+				
+			}
+			else if(successCount ==0){
+				
+				statusmsg="Failure"
 				
 			}else if(successCount < usercount){
 				
@@ -127,9 +138,8 @@ class DbUpdater {
 				
 			}
 			
-			
 			description="Updated timesheets for $successCount  of $usercount users"
-			
+			println(description)
 		}catch(Exception e){
 			e.printStackTrace();
 			description="Fail while parsing ${e.toString()}"
@@ -141,17 +151,30 @@ class DbUpdater {
 		   
 		Configurator.setupdatestatus( statusmsg, description,formatter.format(new Date()))
 		
-		//updateprojectcodes();
+		updateprojectcodes(lstusers);
 		
 		Configurator.isUpdating=false
 		println("Completed DB Updation")
 	}
 	
-	def updateprojectcodes(){
+	def updateprojectcodes(def lstusers){
 		try{
 			
+			def users=datamanager.getValidUserEntries()
+			UserInfo userInfo=null
+			if(null == lstusers)
+				userInfo=datamanager.getValidUserEntries().get(0)
+			else{
+				
+				for (UserInfo curuserInfo:users){
+					if(lstusers.contains(curuserInfo.user)){
+					userInfo=curuserInfo;
+					break;
+					}
+				
+				}	
+			}
 			
-			UserInfo userInfo=datamanager.getValidUserEntries().get(0)
 			def projectcodes=datamanager.getOrphanProjectCodes()
 			
 			FetchUserReport fetchUserReport=new FetchUserReport()
@@ -168,6 +191,7 @@ class DbUpdater {
 		
 		}catch(Exception e){
 				e.printStackTrace();
+				println("Error while Updated Project details")
 		}
 	}
 	
@@ -232,9 +256,9 @@ class DbUpdater {
 				if(null != res)
 					{
 						timeEntries.addAll(res)
-						println("Succes for fetching  ${req_msg.userInfo} from  ${curstart} to ${curend} for total records ${res.size()}"  )
+						println("Succes for fetching  ${req_msg.userInfo.user} from  ${curstart} to ${curend} for total records ${res.size()}"  )
 					}else{
-						println("Failure for fetching  ${req_msg.userInfo} from  ${curstart} to ${curend} returned null"  )
+						println("Failure for fetching  ${req_msg.userInfo.user} from  ${curstart} to ${curend} returned null"  )
 					}
 				
 				use(groovy.time.TimeCategory) {
@@ -260,7 +284,7 @@ class DbUpdater {
 		  def took = System.currentTimeMillis() - start_ms
 	
 	
-	
+		  reply_msg.error=null
 		  curConfigurator.log("Worker: Took: ${took} ms")
 		}
 		catch(Exception e)

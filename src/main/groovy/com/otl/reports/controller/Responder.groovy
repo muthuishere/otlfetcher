@@ -57,11 +57,19 @@ class Responder {
 			userTimeSummaries.each{val->
 
 				
-					response.append("<project>")
+					response.append("\n<project>")
 					valid=true
-					response.append("\n<code>${val.projectcode}</code>")
+					response.append("\n\t<code>${val.projectcode}</code>")
 
-
+					def projname=""
+					def projectid=""
+					if(null != val.projectInfo){
+						
+							projname=xml_string(val.projectInfo.name)
+							projectid=xml_string(val.projectInfo.projectid)
+					}
+					response.append("\n\t<name>${projname}</name>")
+					response.append("\n\t<projectid>${projectid}</projectid>")
 
 
 
@@ -345,7 +353,7 @@ class Responder {
 
 
 			users.each{curuser->
-				println("Fetching for $curuser for $from to $to")
+				//println("Fetching for $curuser for $from to $to")
 				def res=dataManager.getTimesheetEntries( curuser, from,to)
 				if(null != res)
 					timesheetdetails.addAll(res)
@@ -364,6 +372,16 @@ class Responder {
 
 				response.append("\n<name>${xml_string(val.user)}</name>")
 				response.append("\n<projectcode>${val.projectcode}</projectcode>")
+				
+				def projectname=""
+				def projectid=""
+				if(null != val.projectInfo){
+					projectname=val.projectInfo.name
+					projectid=val.projectInfo.projectid
+				}
+				response.append("\n<projectname>${xml_string(projectname)}</projectname>")
+				response.append("\n<projectid>${xml_string(projectid)}</projectid>")
+				
 				response.append("\n<projecttask>${xml_string(val.projecttask)}</projecttask>")
 				response.append("\n<tasktype>${xml_string(val.tasktype)}</tasktype>")
 				response.append("\n<hours>${val.hours}</hours>")
@@ -604,7 +622,7 @@ class Responder {
 
 
 			users.each{curuser->
-				println("Fetching generateEmployeeProjectReport  for $curuser for $from to $to")
+				//println("Fetching generateEmployeeProjectReport  for $curuser for $from to $to")
 				//ArrayList<TimeEntry> getTimesheetEntries
 				def res=dataManager.getTimesheetEntries( curuser, from,to)
 				if(null != res)
@@ -627,26 +645,7 @@ class Responder {
 					
 					summarylist.each{val->
 
-						/*
-						 * 
-						 *  $xml.find('user').each(function(index){
-  					dataCount++
-  		            var username = $(this).find('name').text();
-  					var userdate = $(this).find('date').text();
-  		          var projcode = $(this).find('code').text();
-  		        var projtask = $(this).find('task').text();
-  		      var projtype = $(this).find('type').text();
-  		    var hours = $(this).find('hours').text();
-  		    Date entryDate
-	def user
-	def projectcode
-	def projecttask
-	def tasktype
-	def hours
-	def details
-	def isLeave
-	Date fetchedDate
-						 */
+					
 						def team="unknown"
 						
 						if(userteams.containsKey(val.user))
@@ -656,6 +655,18 @@ class Responder {
 		
 						response.append("\n<name>${xml_string(val.user)}</name>")
 						response.append("\n<code>${val.projectcode}</code>")
+						
+						def projectname=""
+						def projectid=""
+						if(null != val.projectInfo){
+							projectname=val.projectInfo.name
+							projectid=val.projectInfo.projectid
+						}
+						response.append("\n<projectname>${xml_string(projectname)}</projectname>")
+						response.append("\n<projectid>${xml_string(projectid)}</projectid>")
+						
+						
+						
 						response.append("\n<task>${xml_string(val.projecttask)}</task>")
 						response.append("\n<type>${xml_string(val.tasktype)}</type>")
 						response.append("\n<hours>${val.hours}</hours>")
@@ -761,7 +772,7 @@ class Responder {
 
 
 			projects.each{curuser->
-				println("Fetching generateProjectHoursReport  for $curuser for $from to $to")
+			
 
 				def res=dataManager.getProjectHoursReport( curuser, from,to)
 				if(null != res)
@@ -783,6 +794,18 @@ class Responder {
 						response.append("<project>")
 
 						response.append("\n<name>${val.projectcode}</name>")
+						
+						def projectname=""
+						def projectid=""
+						if(null != val.projectInfo){
+							projectname=val.projectInfo.name
+							projectid=val.projectInfo.projectid
+						}
+						response.append("\n<projectname>${xml_string(projectname)}</projectname>")
+						response.append("\n<projectid>${xml_string(projectid)}</projectid>")
+						
+						
+						
 						response.append("\n<user>${xml_string(val.user)}</user>")
 						response.append("\n<team>${val.team}</team>")
 						
@@ -996,7 +1019,7 @@ class Responder {
 
 
 			projects.each{curuser->
-				println("Fetching generateProjectEmployeeReport  for $curuser for $from to $to")
+				//println("Fetching generateProjectEmployeeReport  for $curuser for $from to $to")
 
 				def res=dataManager.getProjectEmployeeReport( curuser, from,to)
 				if(null != res)
@@ -1019,6 +1042,17 @@ class Responder {
 						response.append("<project>")
 
 						response.append("\n<name>${val.projectcode}</name>")
+						
+						def projectname=""
+						def projectid=""
+						if(null != val.projectInfo){
+							projectname=val.projectInfo.name
+							projectid=val.projectInfo.projectid
+						}
+						response.append("\n<projectname>${xml_string(projectname)}</projectname>")
+						response.append("\n<projectid>${xml_string(projectid)}</projectid>")
+						
+						
 						response.append("\n<user>${xml_string(val.user)}</user>")
 						response.append("\n<team>${val.team}</team>")
 						
@@ -1124,7 +1158,7 @@ class Responder {
 
 
 			users.each{curuser->
-				println("Fetching summary for $curuser for $from to $to")
+				//println("Fetching summary for $curuser for $from to $to")
 
 				def res=dataManager.getTimesheetEntriesSummary( curuser, from,to)
 				if(null != res)

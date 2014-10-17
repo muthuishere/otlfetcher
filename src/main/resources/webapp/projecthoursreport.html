@@ -104,7 +104,8 @@
   					 tbl=tbl + ' <table id="tblprojecthourreports" class="display" cellspacing="0" width="100%">' 
   					 tbl=tbl + "    <thead>" 
   					 tbl=tbl + "      <tr>"
-  					tbl=tbl + "        <th><span>Project</span></th>" 
+  					tbl=tbl + "        <th><span>Project Code</span></th>"
+  					tbl=tbl + "        <th><span>Project Name</span></th>"
   					tbl=tbl + "        <th><span>User</span></th>"
   					tbl=tbl + "        <th><span>Team</span></th>"
   					
@@ -121,6 +122,7 @@
   				 $xml.find('project').each(function(index){
   					dataCount++
   		            var project = $(this).find('name').text();
+  					var projectname = $(this).find('projectname').text();
   					var username = $(this).find('user').text();
   					var team = $(this).find('team').text();
   		          
@@ -130,6 +132,7 @@
   		     	 tbl=tbl + "      <tr>" 
   		     	
   		     	tbl=tbl + "        <td class='lalign'>"+project+"</td>"
+  		     	tbl=tbl + "        <td class='lalign'>"+projectname+"</td>"
 					 tbl=tbl + "        <td class='lalign'>"+username+"</td>"
 					 tbl=tbl + "        <td class='lalign'>"+team+"</td>"
 					 

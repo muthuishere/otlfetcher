@@ -157,7 +157,7 @@ function showProjectMenu(divid) {
 						
 					
 					var tbl=""
-					tbl=tbl + ' <select style="width: 280px"  multiple="multiple" id="lstprojects">'
+					tbl=tbl + ' <select style="width: 380px"  multiple="multiple" id="lstprojects">'
 					
 					
 					
@@ -177,10 +177,15 @@ function showProjectMenu(divid) {
 			 				//$(this).find('user').each(function(index){
 			 					 
 			 					// dataCount++
-					 	            var projectName = $(this).find('code').text();
+			 				  		var code = $(this).find('code').text();
+					 	            var projectName = $(this).find('name').text();
+					 	            
+					 	            var title=code
+					 	            if(projectName != "")
+					 	            	title=projectName +"(" + code + ")"
 					 	      
 					 				
-					 				 tbl=tbl + "        <option value='"+projectName+"'>&nbsp;&nbsp;&nbsp;&nbsp;"+projectName+"</option>" 
+					 				 tbl=tbl + "        <option value='"+code+"'>&nbsp;&nbsp;&nbsp;&nbsp;"+title+"</option>" 
 					 			
 			 				 //});
 			 				 
