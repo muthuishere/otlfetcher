@@ -15,7 +15,7 @@ class ProjectEmployeeReport {
 	ProjectInfo projectInfo;
 	def tasktype
 	def hours
-
+	def month
 	def totalhrs
 	def status
 
