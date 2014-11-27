@@ -3,10 +3,17 @@ package com.otl.reports.controller
 import com.otl.reports.beans.TimeEntry;
 import com.otl.reports.beans.TimesheetStatusReport;
 import com.otl.reports.beans.UserInfo
+import com.otl.reports.helpers.Log
 
 import java.text.SimpleDateFormat
 import java.util.ArrayList;
 import java.util.Date;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.UploadContext;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import javax.servlet.http.HttpServletRequest
 
@@ -18,7 +25,7 @@ class Responder {
 		dataManager=new DataManager()
 		dataManager.init();
 
-		println("Initialized")
+		Log.info("Initialized")
 	}
 	/**
 	 * Create private constructor
@@ -26,20 +33,19 @@ class Responder {
 
 	def xml_string = { s ->
 
-		
+
 		if(s instanceof String)
 			s?.replaceAll("[\\x00-\\x1f]", "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("'", "&apos;").replaceAll("\"", "&quot;").replaceAll("\\\\", "\\\\\\\\").replaceAll("\\\$", "\\\\\\\$")
 		else
 			return s
-		
 	}
 
 
 
-	
-	
-	
-	
+
+
+
+
 	public String getAllProjects(){
 
 		StringBuffer response= new StringBuffer()
@@ -53,28 +59,28 @@ class Responder {
 			def userTimeSummaries=dataManager.getAllProjects();
 			// Add information as xml
 
-		//	ArrayList<TimeEntry> 
+			//	ArrayList<TimeEntry>
 			userTimeSummaries.each{val->
 
-				
-					response.append("\n<project>")
-					valid=true
-					response.append("\n\t<code>${val.projectcode}</code>")
 
-					def projname=""
-					def projectid=""
-					if(null != val.projectInfo){
-						
-							projname=xml_string(val.projectInfo.name)
-							projectid=xml_string(val.projectInfo.projectid)
-					}
-					response.append("\n\t<name>${projname}</name>")
-					response.append("\n\t<projectid>${projectid}</projectid>")
+				response.append("\n<project>")
+				valid=true
+				response.append("\n\t<code>${val.projectcode}</code>")
+
+				def projname=""
+				def projectid=""
+				if(null != val.projectInfo){
+
+					projname=xml_string(val.projectInfo.name)
+					projectid=xml_string(val.projectInfo.projectid)
+				}
+				response.append("\n\t<name>${projname}</name>")
+				response.append("\n\t<projectid>${projectid}</projectid>")
 
 
 
-					response.append("\n</project>")
-			
+				response.append("\n</project>")
+
 
 			}
 			if(!valid){
@@ -100,7 +106,7 @@ class Responder {
 
 	}
 
-	
+
 	public String getvalidusers(){
 
 		StringBuffer response= new StringBuffer()
@@ -167,13 +173,13 @@ class Responder {
 			def userTimeSummaries=dataManager.getAllUserStatus( )
 			// Add information as xml
 
-			println(userTimeSummaries.dump())
+			Log.debug(userTimeSummaries.dump())
 			def teamname=""
 			def lastteamname=""
 			StringBuffer userresponse= new StringBuffer()
 			def teamlist=[:]
-			
-			
+
+
 			userTimeSummaries.each{val->
 
 				if(val.userLocked == false){
@@ -183,26 +189,26 @@ class Responder {
 					userresponse.append("<user>")
 					userresponse.append("\n<name>${xml_string(val.user)}</name>")
 					userresponse.append("\n</user>")
-					
+
 					def curuser=userresponse.toString();
-					if(teamlist.containsKey(val.team))						
-						teamlist.put(val.team, teamlist.get(val.team) + curuser);						
+					if(teamlist.containsKey(val.team))
+						teamlist.put(val.team, teamlist.get(val.team) + curuser);
 					else
 						teamlist.put(val.team, curuser)
-						
 
-						
-					
+
+
+
 				}
 
 			}
 			teamlist.each{key,val->
-				
+
 				response.append("<team name='${xml_string(key)}'>")
 				response.append(val);
 				response.append("</team>")
 			}
-			
+
 			if(!valid){
 
 				throw new Exception("No Vaid users identified")
@@ -372,7 +378,7 @@ class Responder {
 
 				response.append("\n<name>${xml_string(val.user)}</name>")
 				response.append("\n<projectcode>${val.projectcode}</projectcode>")
-				
+
 				def projectname=""
 				def projectid=""
 				if(null != val.projectInfo){
@@ -381,7 +387,7 @@ class Responder {
 				}
 				response.append("\n<projectname>${xml_string(projectname)}</projectname>")
 				response.append("\n<projectid>${xml_string(projectid)}</projectid>")
-				
+
 				response.append("\n<projecttask>${xml_string(val.projecttask)}</projecttask>")
 				response.append("\n<tasktype>${xml_string(val.tasktype)}</tasktype>")
 				response.append("\n<hours>${val.hours}</hours>")
@@ -452,6 +458,101 @@ class Responder {
 
 		return response;
 	}
+
+	public def exportdb(HttpServletRequest request){
+
+
+		String dbname = request.getParameter("dbtype")
+		Log.debug( "Entering into exportdb function: " + dbname)
+		String fileName;
+		StringBuffer response= new StringBuffer()
+
+		if(dbname != null && dbname != "")
+		{
+			if(dbname == 'userdb') {fileName = Configurator.globalconfig.userdb}
+			if(dbname == 'fetchdb') {fileName = Configurator.globalconfig.fetcherdb}
+			Log.debug( "Value of the file name to be exported is " + fileName)
+
+			return (new FileInputStream(fileName)).getBytes()
+		}
+		else
+		{
+			response.append("<reply>")
+			response.append("<status code='1' error='true' description='Invalid Database Selected'/>")
+			response.append("</reply>")
+			return response
+		}
+
+
+
+	}
+
+
+	public String importdb(HttpServletRequest request){
+		/*
+		 String dbname = request.getParameter("dbtype")
+		 println (dbname)
+		 def file1 = request.getParameter("myfile")
+		 println file1
+		 println file1.getBytes()
+		 */
+		//SQL imported_db
+		StringBuffer response= new StringBuffer()
+
+		response.append("<reply>")
+		def importdb_location
+		def UPLOAD_DIRECTORY = "C:/uk"
+		UPLOAD_DIRECTORY = Configurator.globalconfig.tmpupload_path
+
+		Log.debug("Value of the upload directory : " + UPLOAD_DIRECTORY)
+		String override = null
+
+		if(ServletFileUpload.isMultipartContent(request)){
+			try {
+				List<FileItem> multiparts = new ServletFileUpload(
+						new DiskFileItemFactory()).parseRequest(request);
+				int i = 0
+
+				for(FileItem item : multiparts){
+					i++
+					if(!item.isFormField()){
+						String name = new File(item.getName()).getName();
+						Log.debug( "Name of the file being uploaded is : " + name)
+						importdb_location = new File(UPLOAD_DIRECTORY + File.separator + name)
+						item.write(importdb_location);
+					}
+					else if(item.isFormField()){
+						if(item.getFieldName().equals("override")){
+							override = item.inputStream.getText()
+							Log.debug("Value of the override parameter selected is 3:" + override)
+
+						}
+					}
+				}
+
+
+				Log.debug( "Size of the request parameters is : " + i)
+				//File uploaded successfully
+				request.setAttribute("message", "File Uploaded Successfully");
+			} catch (Exception ex) {
+				request.setAttribute("message", "File Upload Failed due to " + ex);
+				Log.error( "Exception while parsing the parameters : " + ex)
+				response.append("<status code='1' error='true' description='File Upload failed. Retry again Please'/>")
+
+			}
+		}
+
+
+		dataManager.importDB(importdb_location, override)
+
+		response.append("<status code='1' error='false' description='Successfully imported the file'/>")
+
+		response.append("</reply>")
+		return response;
+
+	}
+
+
 	public String updatefetchDb(HttpServletRequest request){
 
 
@@ -528,58 +629,63 @@ class Responder {
 
 	}
 
-	
-	
+
+
 	public String generateReport(HttpServletRequest request,String reportname){
-		
+
 		StringBuffer response= new StringBuffer()
-		
-						response.append("<reply>")		
-						response.append("<status code='1' error='true' description='Invalid request'/>")
-						response.append("</reply>")
-						
+
+		response.append("<reply>")
+		response.append("<status code='1' error='true' description='Invalid request'/>")
+		response.append("</reply>")
+
 		def result=response.toString();
-		
+
 		switch ( reportname ) {
-			
-				
-				
-				case "projectemployeereport":
+
+
+
+			case "projectemployeereport":
 				result = generateProjectEmployeeReport(request)
-				
+
 				break;
-				case "projecthoursreport":
+			case "projecthoursreport":
 				result = generateProjectHoursReport(request)
-				
+
 				break;
-				
-				
-				
-				case "employeeprojectreport":
+
+
+
+			case "employeeprojectreport":
 				result = generateEmployeeProjectReport(request)
-				
+
 				break;
-				
-				case "weeklystatusreport":
+
+			case "weeklystatusreport":
 				result = generateWeeklyStatusReport(request)
-				
+
+				break;
+
+			case "projectmonthlyreport":
+				result = generateProjectMonthlyReport(request)
+
 				break;
 		}
-		
+
 		return result;
 	}
-	
-	
+
+
 	public Date getParsedDate(def str){
-		
+
 		Date d=null
 		try{
 			d = new SimpleDateFormat("yyyy-MM-dd").parse(str);
 		}catch(Exception e){
-		println(e.toString())
+			Log.error(e.toString())
 		}
 		return d;
-		
+
 	}
 	public String generateEmployeeProjectReport(HttpServletRequest request){
 
@@ -610,12 +716,12 @@ class Responder {
 
 
 			if(null != params.users && params.users != ""){
-				
+
 				for(String user:params.users.split(",")){
 					users.push(user)
 				}
-				
-		}else{
+
+			}else{
 				users.push("")
 			}
 			ArrayList hashmaplist=new ArrayList();
@@ -629,11 +735,11 @@ class Responder {
 					hashmaplist.add(res)
 			}
 
-			
+
 			ArrayList<UserInfo>  userEntryList=dataManager.getUserEntries( )
 			def userteams=[:]
 			userEntryList.each{userInfo ->
-				
+
 				userteams.put(userInfo.user, userInfo.team)
 			}
 
@@ -642,20 +748,20 @@ class Responder {
 			//println(summarylist.dump())
 			if(hashmaplist.size() >0 ){
 				hashmaplist.each {summarylist ->
-					
+
 					summarylist.each{val->
 
-					
+
 						def team="unknown"
-						
+
 						if(userteams.containsKey(val.user))
 							team=userteams.get(val.user)
-						
+
 						response.append("<user>")
-		
+
 						response.append("\n<name>${xml_string(val.user)}</name>")
 						response.append("\n<code>${val.projectcode}</code>")
-						
+
 						def projectname=""
 						def projectid=""
 						if(null != val.projectInfo){
@@ -664,39 +770,36 @@ class Responder {
 						}
 						response.append("\n<projectname>${xml_string(projectname)}</projectname>")
 						response.append("\n<projectid>${xml_string(projectid)}</projectid>")
-						
-						
-						
+
+
+
 						response.append("\n<task>${xml_string(val.projecttask)}</task>")
 						response.append("\n<type>${xml_string(val.tasktype)}</type>")
 						response.append("\n<hours>${val.hours}</hours>")
 						response.append("\n<details>${val.details}</details>")
 						response.append("\n<team>${team}</team>")
-		
+
 						def entrydate=""
 						if(val.entryDate){
-		
+
 							SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM dd yyyy");
-		
+
 							// (3) create a new String using the date format we want
 							entrydate= formatter.format(val.entryDate);
 						}
 						response.append("\n<date>${entrydate}</date>")
 						response.append("\n<fetchedDate>${val.fetchedDate}</fetchedDate>")
-		
-		
-		
+
+
+
 						response.append("\n</user>")
 						/*
-						response.append("<user>")
-
-						response.append("\n<name>${xml_string(val.)}</name>")
-						response.append("\n<user>${xml_string(val.user)}</user>")
-						response.append("\n<total>${val.totalhrs}</total>")
-					
-
-						response.append("\n</project>")
-						*/
+						 response.append("<user>")
+						 response.append("\n<name>${xml_string(val.)}</name>")
+						 response.append("\n<user>${xml_string(val.user)}</user>")
+						 response.append("\n<total>${val.totalhrs}</total>")
+						 response.append("\n</project>")
+						 */
 
 					}
 
@@ -729,8 +832,8 @@ class Responder {
 
 	}
 
-	
-	
+
+
 	public String generateProjectHoursReport(HttpServletRequest request){
 
 
@@ -760,19 +863,19 @@ class Responder {
 
 
 			if(null != params.projects && params.projects != ""){
-				
+
 				for(String project:params.projects.split(",")){
 					projects.push(project)
 				}
-				
-		}else{
+
+			}else{
 				projects.push("")
 			}
 			ArrayList hashmaplist=new ArrayList();
 
 
 			projects.each{curuser->
-			
+
 
 				def res=dataManager.getProjectHoursReport( curuser, from,to)
 				if(null != res)
@@ -787,14 +890,14 @@ class Responder {
 			//println(summarylist.dump())
 			if(hashmaplist.size() >0 ){
 				hashmaplist.each {summarylist ->
-					
+
 					summarylist.each{val->
 
-						
+
 						response.append("<project>")
 
 						response.append("\n<name>${val.projectcode}</name>")
-						
+
 						def projectname=""
 						def projectid=""
 						if(null != val.projectInfo){
@@ -803,19 +906,19 @@ class Responder {
 						}
 						response.append("\n<projectname>${xml_string(projectname)}</projectname>")
 						response.append("\n<projectid>${xml_string(projectid)}</projectid>")
-						
-						
-						
+
+
+
 						response.append("\n<user>${xml_string(val.user)}</user>")
 						response.append("\n<team>${val.team}</team>")
-						
+
 						def str="0"
-						
+
 						if(val.totalhrs >0)
-						str= val.totalhrs.intValue() +""
-						
+							str= val.totalhrs.intValue() +""
+
 						response.append("\n<total>${str}</total>")
-					
+
 
 						response.append("\n</project>")
 
@@ -850,10 +953,10 @@ class Responder {
 
 	}
 
-	
-	
-	
-	
+
+
+
+
 	public String generateWeeklyStatusReport(HttpServletRequest request){
 
 
@@ -880,22 +983,22 @@ class Responder {
 
 
 			def users=[]
-			
+
 
 
 			if(null != params.users && params.users != ""){
-				
+
 				for(String curuser:params.users.split(",")){
 					users.push(curuser)
 				}
-				
-		}else{
+
+			}else{
 				users.push("")
 			}
 			ArrayList hashmaplist=new ArrayList();
 
 			ArrayList<TimesheetStatusReport>  summarylist=dataManager.getWeeklystatus( users, from,to)
-			
+
 
 
 
@@ -903,51 +1006,51 @@ class Responder {
 
 			//println(summarylist.dump())
 			if(null != summarylist && summarylist.size() > 0 ){
-			
-					summarylist.each{val->
 
-						
-						
-						response.append("<timesheetstatus>")
-
-						
-						response.append("\n<user>${xml_string(val.user)}</user>")
-						response.append("\n<team>${val.team}</team>")
-						
-						
-						response.append("\n<total>${val.totalhrs}</total>")
-						response.append("\n<status>${val.status}</status>")
-					
-
-
-						def projdate=""
-						if(val.startdate){
-
-							SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM dd yyyy");
-
-							// (3) create a new String using the date format we want
-							projdate= formatter.format(val.startdate);
-						}
+				summarylist.each{val->
 
 
 
-						response.append("\n<startdate>${projdate}</startdate>")
-						
+					response.append("<timesheetstatus>")
 
-						projdate=""
-						if(val.enddate){
 
-							SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM dd yyyy");
+					response.append("\n<user>${xml_string(val.user)}</user>")
+					response.append("\n<team>${val.team}</team>")
 
-							// (3) create a new String using the date format we want
-							projdate= formatter.format(val.enddate);
-						}
 
-						response.append("\n<enddate>${projdate}</enddate>")
+					response.append("\n<total>${val.totalhrs}</total>")
+					response.append("\n<status>${val.status}</status>")
 
-						response.append("\n</timesheetstatus>")
 
-				
+
+					def projdate=""
+					if(val.startdate){
+
+						SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM dd yyyy");
+
+						// (3) create a new String using the date format we want
+						projdate= formatter.format(val.startdate);
+					}
+
+
+
+					response.append("\n<startdate>${projdate}</startdate>")
+
+
+					projdate=""
+					if(val.enddate){
+
+						SimpleDateFormat formatter = new SimpleDateFormat("EEE, MMM dd yyyy");
+
+						// (3) create a new String using the date format we want
+						projdate= formatter.format(val.enddate);
+					}
+
+					response.append("\n<enddate>${projdate}</enddate>")
+
+					response.append("\n</timesheetstatus>")
+
+
 
 				}
 				response.append("<status code='0' error='false' description='retrived weekly status'/>")
@@ -977,7 +1080,206 @@ class Responder {
 
 
 	}
-	
+
+
+
+	public String generateProjectMonthlyReport(HttpServletRequest request)
+	{
+		//Defining the parameters & retriving from the http request
+		def params=[
+			"projects":request.getParameter("projects"),
+			"users":request.getParameter("users"),
+			"fromdate":request.getParameter("fromdate"),
+			"todate":request.getParameter("todate")]
+		Log.debug( "Prams retrieved from request :" + params)
+
+		StringBuffer response = new StringBuffer()
+
+		response.append("<reply>")
+
+		try{
+			Date from = null
+			if(null != params.fromdate)
+				from = getParsedDate(params.fromdate);
+
+			Date to = null
+			if(null != params.todate)
+				to = getParsedDate(params.todate);
+
+			def users = []
+			def projects = []
+
+			if(null != params.projects && params.projects != "")
+			{
+				for(String project:params.projects.split(","))
+				{
+					projects.push(project)
+				}
+
+			}
+			else
+			{
+				projects.push("")
+			}
+
+			if(null != params.users && params.users !=  "")
+			{
+				for(String user :params.users.split(","))
+				{
+					users.push(user)
+				}
+			}
+			else
+			{
+				users.push("")
+			}
+			ArrayList hashmaplist
+			def res
+			projects.each{project ->
+				hashmaplist=new ArrayList()
+				res = null
+				def nextFromDate
+				def currStartDate
+				def currEndDate
+				def startDate = from
+				def endDate = to
+				def projectname
+				Calendar c1 = GregorianCalendar.getInstance();
+				c1.setTime(startDate);
+				int w1 = c1.get(Calendar.DAY_OF_MONTH);
+				//Testing the new logic, based on number of days in a month.
+				String month
+				nextFromDate = startDate
+				def monthCounter = 0
+				response.append("<project>")
+				response.append("\n<projectcode>${project}</projectcode>")
+				println "Value of the project code : " + project
+				//println "Value of the projectname : " + projectname
+				projectname = dataManager.getProjectName(project)
+				println "Project Name in the responder : " + projectname
+				response.append("\n<month>")
+				while ( nextFromDate <= endDate)
+				{
+
+
+					monthCounter = monthCounter + 1
+					c1.setTime(nextFromDate)
+					w1 = c1.get(Calendar.DAY_OF_MONTH)
+					int daysLeftInCurrentMonth=c1.getActualMaximum(GregorianCalendar.DAY_OF_MONTH) - w1
+					//println "Number of days left in the month :" + daysLeftInCurrentMonth
+					currStartDate = c1.getTime()
+					currEndDate = c1.getTime() + daysLeftInCurrentMonth
+					//println "Current Start Date in the month :" + currStartDate
+					//println "Current End Date in the month :" + currEndDate
+					nextFromDate = currEndDate + 1
+					//println "nextFromDate computed is: " + nextFromDate
+					if(currEndDate > endDate) { currEndDate = endDate}
+					res=dataManager.getProjectMonthlyReport( project,params.users, currStartDate,currEndDate)
+					Log.debug( res )
+					if(res == null)
+					{
+						def str="0"
+						response.append("\n<m$monthCounter>${str}</m$monthCounter>")
+					}
+					else
+					{
+						if( res.size > 0)
+						{
+
+							res.each {summarylist ->
+								summarylist.each{val->
+									def str="0"
+									if(val.totalhrs >0)
+									{
+										str= val.totalhrs.intValue()/8 +""
+									}
+									response.append("\n<m$monthCounter>${str}</m$monthCounter>")
+								}
+
+							}
+						}
+						else
+						{
+							Log.debug( "No rows found for the combination ProjCode: " + project + " for the month " + c1.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()))
+							response.append("\n<m$monthCounter>0</m$monthCounter>")
+						}
+
+
+					}
+				}
+				response.append("\n</month>")
+				response.append("\n<projectname>${xml_string(projectname)}</projectname>")
+				response.append("\n</project>")
+			}
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			response= new StringBuffer()
+			response.append("<reply>")
+			response.append("<status code='1' error='true' description='${xml_string(e?.getMessage())}'/>")
+		}
+
+
+
+
+		Date from = null
+		if(null != params.fromdate)
+			from = getParsedDate(params.fromdate);
+
+		Date to = null
+		if(null != params.todate)
+			to = getParsedDate(params.todate);
+
+		//Building and Appending Header
+		StringBuffer header = new StringBuffer()
+		header.append("<header>")
+		header.append("<hmonth>")
+		def nextFromDate
+		def currStartDate
+		def currEndDate
+		def startDate = from
+		def endDate = to
+		Calendar c1 = GregorianCalendar.getInstance();
+		c1.setTime(startDate);
+		int w1 = c1.get(Calendar.DAY_OF_MONTH);
+		//Testing the new logic, based on number of days in a month.
+		String month
+		nextFromDate = startDate
+		while ( nextFromDate <= endDate)
+		{
+
+			c1.setTime(nextFromDate)
+			w1 = c1.get(Calendar.DAY_OF_MONTH)
+			int daysLeftInCurrentMonth=c1.getActualMaximum(GregorianCalendar.DAY_OF_MONTH) - w1
+			//println "Number of days left in the month :" + daysLeftInCurrentMonth
+			currStartDate = c1.getTime()
+			currEndDate = c1.getTime() + daysLeftInCurrentMonth
+			//println "Current Start Date in the month :" + currStartDate
+			//println "Current End Date in the month :" + currEndDate
+			month = "" + c1.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()) + "-" + currStartDate[Calendar.YEAR]
+			Log.debug(month)
+			nextFromDate = currEndDate + 1
+			//println "nextFromDate computed is: " + nextFromDate
+			header.append("<$month/>")
+			if(currEndDate > endDate) { currEndDate = endDate}
+		}
+		header.append("</hmonth>")
+		header.append("</header>")
+
+		Log.debug( "header Value is : " + header)
+		response = response.append(header)
+		response.append("<status code='0' error='false' description='Successfully retrieved Project information'/>")
+		response.append("</reply>")
+		Log.debug("Value of the response :" + response)
+		String formattedResponse
+		formattedResponse = response
+		//println "Formatted Response : "  + formattedResponse.replaceAll('&' , 'amp;')
+		return formattedResponse;
+
+	}
+
+
+
 	public String generateProjectEmployeeReport(HttpServletRequest request){
 
 
@@ -1007,12 +1309,12 @@ class Responder {
 
 
 			if(null != params.projects && params.projects != ""){
-				
+
 				for(String project:params.projects.split(",")){
 					projects.push(project)
 				}
-				
-		}else{
+
+			}else{
 				projects.push("")
 			}
 			ArrayList hashmaplist=new ArrayList();
@@ -1037,12 +1339,12 @@ class Responder {
 					def curtoken=""
 					summarylist.each{val->
 
-						
-						
+
+
 						response.append("<project>")
 
 						response.append("\n<name>${val.projectcode}</name>")
-						
+
 						def projectname=""
 						def projectid=""
 						if(null != val.projectInfo){
@@ -1051,14 +1353,14 @@ class Responder {
 						}
 						response.append("\n<projectname>${xml_string(projectname)}</projectname>")
 						response.append("\n<projectid>${xml_string(projectid)}</projectid>")
-						
-						
+
+
 						response.append("\n<user>${xml_string(val.user)}</user>")
 						response.append("\n<team>${val.team}</team>")
-						
+
 						response.append("\n<hours>${val.hours}</hours>")
 						response.append("\n<total></total>")
-					
+
 
 
 						def projdate=""
@@ -1073,7 +1375,7 @@ class Responder {
 
 
 						response.append("\n<projdate>${projdate}</projdate>")
-						
+
 
 
 
@@ -1111,7 +1413,7 @@ class Responder {
 
 	}
 
-	
+
 	public String fetchreportSummary(HttpServletRequest request){
 
 
@@ -1237,47 +1539,47 @@ class Responder {
 
 	}
 	public String getAdminAccess(HttpServletRequest request){
-		
-		
+
+
 		def params=[
 			"token":request.getParameter("token")
 		]
-				String ip=getIP(request)
-		
-				
-				
-				def msg=""
-				
-				if(params.token == Configurator.globalconfig?.adminaccesstoken ){
-				
-				
-					
-					if(getAdmins().contains(ip)){
-						
-						msg="Already an admin"
-					}else{
-						Configurator.customadmins.push(ip)
-						msg="$ip added as admin"
-					}
-				
-				}else{
-					msg="Invalid token"
-				}
-				
-				StringBuffer response= new StringBuffer()
-		
-				response.append("<reply>")
-				
-				
-				
-					response.append("<status code='0'  description='$msg'  />")
-				
-		
-				response.append("</reply>")
-		
-				return response.toString();
+		String ip=getIP(request)
+
+
+
+		def msg=""
+
+		if(params.token == Configurator.globalconfig?.adminaccesstoken ){
+
+
+
+			if(getAdmins().contains(ip)){
+
+				msg="Already an admin"
+			}else{
+				Configurator.customadmins.push(ip)
+				msg="$ip added as admin"
 			}
-	
+
+		}else{
+			msg="Invalid token"
+		}
+
+		StringBuffer response= new StringBuffer()
+
+		response.append("<reply>")
+
+
+
+		response.append("<status code='0'  description='$msg'  />")
+
+
+		response.append("</reply>")
+
+		return response.toString();
+	}
+
 	public String getAdmins(){
 		String admins=""
 		int i=0
@@ -1295,19 +1597,19 @@ class Responder {
 			i++
 		}
 		for(def bfr:Configurator.customadmins){
-			
-			
-			
-						if(i > 0)
-							admins=admins +","
-			
-			
-			
-						admins=admins +"$bfr"
-			
-						i++
-					}
-		
+
+
+
+			if(i > 0)
+				admins=admins +","
+
+
+
+			admins=admins +"$bfr"
+
+			i++
+		}
+
 		return admins
 
 	}
@@ -1341,30 +1643,30 @@ class Responder {
 		}
 
 	}
-	
-	
+
+
 	public String getappConfig(HttpServletRequest request){
-		
-		
-		
-				String ip=getIP(request)
-		
-				StringBuffer response= new StringBuffer()
-		
-				response.append("<reply>")
-				def teams=getTeams();
-				
-				if( getAdmins().contains(ip))
-					response.append("<status code='0' admin='true' description='Admin User' teams='$teams' />")
-				else
-					response.append("<status code='0' admin='false' description='Regular User' teams='$teams' />")
-		
-				response.append("</reply>")
-		
-				return response.toString();
-			}
-		
-	
+
+
+
+		String ip=getIP(request)
+
+		StringBuffer response= new StringBuffer()
+
+		response.append("<reply>")
+		def teams=getTeams();
+
+		if( getAdmins().contains(ip))
+			response.append("<status code='0' admin='true' description='Admin User' teams='$teams' />")
+		else
+			response.append("<status code='0' admin='false' description='Regular User' teams='$teams' />")
+
+		response.append("</reply>")
+
+		return response.toString();
+	}
+
+
 	public String getuserStatus(HttpServletRequest request){
 
 
@@ -1375,7 +1677,7 @@ class Responder {
 
 		response.append("<reply>")
 
-		
+
 		if( getAdmins().contains(ip))
 			response.append("<status code='0' admin='true' description='Admin User'/>")
 		else
@@ -1460,7 +1762,7 @@ class Responder {
 						password:params.pwd,
 						ip: ip,
 						team:params.team
-						))
+						),"enabled","enabled")
 
 				response.append("<status code='0' error='false' description='Successfully updated user information'/>")
 			}catch(Exception e){

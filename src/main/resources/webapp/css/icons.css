@@ -5,6 +5,19 @@
 	
 }
 
+input.upload-button{
+    background-image: url('../images/Upload-Folder-icon.png'); /* 16px x 16px */
+    background-color: transparent; /* make the button transparent */
+    background-repeat: no-repeat;  /* make the background image appear only once */
+    background-position: 0px 0px;  /* equivalent to 'top left' */
+    border: none;           /* assuming we don't want any borders */
+    cursor: pointer;        /* make the cursor like hovering over an <a> element */
+    height: 160px;           /* make this the size of your image */
+	width: 160px;           /* make this the size of your image */
+    padding-left: 16px;     /* make text start to the right of the image */
+    vertical-align: middle; /* align the text vertically centered */
+}
+
 .alert-box {
 	color:#555;
 	border-radius:10px;
@@ -73,3 +86,9 @@
 .lalign{
 	text-align: left;
 }
+
+#lblradioenabled.ui-state-active { background: green; }
+#lblradioenabled.ui-state-active span.ui-button-text { color: white; }
+
+#lblradiodisabled.ui-state-active { background: green; }
+#lblradiodisabled.ui-state-active span.ui-button-text { color: white; }

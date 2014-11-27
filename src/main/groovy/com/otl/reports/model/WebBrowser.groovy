@@ -36,22 +36,22 @@ class WebBrowser {
 		curWebWindowListener=new CurWebWindowListener()
 
 		//println(proxy)
-		
+
 		if(null != proxy){
-			
+
 			println("Setting proxy")
 			webClient = new WebClient(BrowserVersion.CHROME, proxy.host, proxy.port);
-			
-				//set proxy username and password
+
+			//set proxy username and password
 			//if(null != proxy?.user && null != proxy?.pwd ){
-				final DefaultCredentialsProvider credentialsProvider = (DefaultCredentialsProvider) webClient.getCredentialsProvider();
-				credentialsProvider.addCredentials(proxy?.user, proxy?.pwd );
-				println("Setting credentials")
-		//	}
-				
-			
+			final DefaultCredentialsProvider credentialsProvider = (DefaultCredentialsProvider) webClient.getCredentialsProvider();
+			credentialsProvider.addCredentials(proxy?.user, proxy?.pwd );
+			println("Setting credentials")
+			//	}
+
+
 		}else{
-		webClient = new WebClient(BrowserVersion.CHROME);
+			webClient = new WebClient(BrowserVersion.CHROME);
 		}
 
 		//webClient.getWebWindowByName(selectedBrowser).getEnclosedPage()
@@ -71,17 +71,17 @@ class WebBrowser {
 	}
 
 	HtmlElement getFirstElementByTag(String tag ){
-		
-		 DomNodeList<HtmlElement> domNodeList= currentPage.getElementsByTagName(tag); //get a list of all table rows
+
+		DomNodeList<HtmlElement> domNodeList= currentPage.getElementsByTagName(tag); //get a list of all table rows
 		if(null == domNodeList || domNodeList.size() ==0)
-		
+
 			return null
-		
+
 
 		return  domNodeList[0]
 
 	}
-	
+
 	def close(){
 
 		webClient.closeAllWindows();
@@ -94,21 +94,21 @@ class WebBrowser {
 
 		try{
 			elem=currentPage.getElementByName(name)
-		println("Element found ${elem}")
+			println("Element found ${elem}")
 		}catch(Exception e){
-		println("Exception found ${e}")
+			println("Exception found ${e}")
 		}
 
 
 		return  elem
 
 	}
-	
+
 	ArrayList<HtmlElement> getElemsByTagClass(String tag ,String name){
-		
-		 DomNodeList<HtmlElement> domNodeList= currentPage.getElementsByTagName(tag); //get a list of all table rows
+
+		DomNodeList<HtmlElement> domNodeList= currentPage.getElementsByTagName(tag); //get a list of all table rows
 		ArrayList<HtmlElement> elems= new ArrayList<HtmlElement>();
-		 
+
 		for (HtmlElement row : domNodeList)
 		{
 			String className = row.getAttribute("class");
@@ -117,12 +117,12 @@ class WebBrowser {
 				elems.add(row)
 			}
 		}
-		
+
 
 		return  elems
 
 	}
-	
+
 	def findElemById(def name){
 		return  currentPage.getElementById(name)
 
@@ -192,24 +192,24 @@ class WebBrowser {
 	}
 
 	def typeOnName(def elemName,def value){
-		
+
 		boolean flgSuccess=false;
-		
+
 		try{
-		DomElement htmlInput=currentPage.getElementByName(elemName)
-		
+			DomElement htmlInput=currentPage.getElementByName(elemName)
 
-		if(null !=htmlInput){
-			((HtmlInput)htmlInput).setValueAttribute(value)
-			flgSuccess=true
+
+			if(null !=htmlInput){
+				((HtmlInput)htmlInput).setValueAttribute(value)
+				flgSuccess=true
+			}
+
+			else
+				Log.error("Cannot find element ${elemName}")
+
+		}catch(Exception e){
+
 		}
-
-		else
-			Log.error("Cannot find element ${elemName}")
-
-	}catch(Exception e){
-	
-	}
 
 		return flgSuccess
 
@@ -217,58 +217,58 @@ class WebBrowser {
 	}
 
 	def typeOnFrameName(HtmlPage page,def elemName,def value){
-		
+
 		boolean flgSuccess=false;
-		
+
 		try{
-		DomElement htmlInput=page.getElementByName(elemName)
-		
+			DomElement htmlInput=page.getElementByName(elemName)
 
-		if(null !=htmlInput){
-			((HtmlInput)htmlInput).setValueAttribute(value)
-			flgSuccess=true
+
+			if(null !=htmlInput){
+				((HtmlInput)htmlInput).setValueAttribute(value)
+				flgSuccess=true
+			}
+
+			else
+				Log.error("Cannot find element ${elemName}")
+
+		}catch(Exception e){
+
 		}
-
-		else
-			Log.error("Cannot find element ${elemName}")
-
-	}catch(Exception e){
-	
-	}
 
 		return flgSuccess
 
 
 	}
-	
+
 	def executeScriptforNewPageinFrame(HtmlPage page,String content){
-		
-				curWebWindowListener.pageChanged=false
-				ScriptResult result= page.executeJavaScript(content);
-				
-				currentPage=result.getNewPage()
-		
-		
-			}
-	
-	def executeScriptforNewPage(String content){
 
 		curWebWindowListener.pageChanged=false
-		ScriptResult result= currentPage.executeJavaScript(content);		
-		
+		ScriptResult result= page.executeJavaScript(content);
+
 		currentPage=result.getNewPage()
 
 
 	}
-	
+
+	def executeScriptforNewPage(String content){
+
+		curWebWindowListener.pageChanged=false
+		ScriptResult result= currentPage.executeJavaScript(content);
+
+		currentPage=result.getNewPage()
+
+
+	}
+
 	def clickLink(HtmlElement link){
-		
-				curWebWindowListener.pageChanged=false	
-		
-				currentPage=link.click();
-		
-		
-			}
+
+		curWebWindowListener.pageChanged=false
+
+		currentPage=link.click();
+
+
+	}
 
 	def executeScript(String content){
 
@@ -276,9 +276,9 @@ class WebBrowser {
 			currentPage.executeJavaScript(content);
 		}catch(Exception e){
 			e.printStackTrace();
-			
+
 		}
-		
+
 
 
 	}
@@ -327,26 +327,26 @@ class WebBrowser {
 
 
 	}
-	
+
 	def setfirstFrameAsPage() {
-		
-		
+
+
 		HtmlFrame frame=getFirstElementByTag("frame")
-		
-	
+
+
 		if(null ==frame) {
-			
+
 			println("No Frame available response details");
 			return false
-			 
-			
-			}
-		
+
+
+		}
+
 
 		currentPage=frame.getEnclosedPage();
-		
+
 		return true
-		
+
 	}
 
 	def printAll(){
@@ -355,6 +355,7 @@ class WebBrowser {
 	}
 	def Navigate(String url){
 
+		println "Value of the URL to be parsed: " + url
 		currentPage = webClient.getPage(url);
 
 
