@@ -65,9 +65,25 @@
 			</td>
 		</tr>
 		</table>
-		
-	<div id="message"></div>
-
+	
+	<table>
+		<tr>
+			<td>	
+				Last Import Status: 
+			</td>
+			<td>
+				<div id="message"></div>
+			</td>
+			</tr>
+			<tr>
+			<td>
+				Last Updated Time: 
+			</td>
+			<td>
+				<div id="lastupdatedtime"></div>
+			</td>
+		</tr>
+	</table>
 
 
 
@@ -90,13 +106,14 @@
 			if (undefined == "" || null == lup || lup == "") {
 		
 				$('#tblcurstatus').hide();
-		
+
 			} else {
 				$('#tblcurstatus').show();
 		
 				//$('#curstatus').html(stat);
 				$('#message').html(desc);
-			//	$('#curlastupdated').html(lup);
+				
+				$('#lastupdatedtime').html(lup);
 			}
 		}
 		
