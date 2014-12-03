@@ -31,6 +31,18 @@ class DbImporter {
 		}
 	}
 	def parseCallback(def dbreport_response){
+		
+
+		if(dbreport_response.error == null || dbreport_response.error == ""){
+		
+			return true	
+		}
+		else
+		{
+			return false
+		}
+		
+		
 	}
 
 

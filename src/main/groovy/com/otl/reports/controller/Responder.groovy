@@ -497,7 +497,7 @@ class Responder {
 
 		response.append("<reply>")
 
-		if(Configurator.isDBImporting ){
+		if(Configurator.isUpdating ){
 
 			response.append("<status code='1' error='true' description='Already import in progress'/>")
 
