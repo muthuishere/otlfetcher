@@ -1,0 +1,208 @@
+<div>
+
+	
+	<table width="100%" border="0">
+			<tr>
+				<td>
+				
+					
+		
+		
+		<table id="tblprogress" cellpadding="10" cellspacing="10"
+			border="0" style="width: 100%; text-align: center;">
+
+			<tr>
+				<td align="center"><img align="center"
+					src="images/dbprogress.gif" /></td>
+			</tr>
+			<td><span style="color: rgb(126, 39, 39); font-size: 18px">Db
+					Update in progress </span></td>
+
+			</tr>
+
+		</table> 
+		</td>
+		</tr>
+		<tr>
+		<td>
+		<form id="UploadForm" action="/services/importdb" method="post"
+		target="my_iframe" enctype="multipart/form-data">
+		
+		<table id="tbloptions" cellpadding="10" cellspacing="10" border="0">
+			<tr>
+
+				<td>Select DB file to import:</td>
+				<td><input type="file" size="60" id="myfile" name="myfile"
+					multiple></td>
+			</tr>
+			<tr>
+				<td>Overwrite:</td>
+				<td>
+
+					<div id="radio">
+						<input type="radio" id="radioenabled" name="override"
+							value="enabled"><label id="lblradioenabled"
+							for="radioenabled">YES</label> <input type="radio"
+							id="radiodisabled" name="override" value="disabled"
+							checked="checked"><label id="lblradiodisabled"
+							for="radiodisabled">NO</label>
+
+					</div>
+
+
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" style="text-align: right"><input type="submit"
+					id="btnimportdb" value="Import DB"></td>
+
+			</tr>
+		</table>
+		
+	
+		
+			</form>
+			</td>
+		</tr>
+		</table>
+		
+	<div id="message"></div>
+
+
+
+
+
+
+	<iframe id="my_iframe" name="my_iframe" frameborder="0" width="2px"
+		height="2px" style="visibility:hidden"></iframe>
+
+</div>
+<div>
+
+	<span id="resultcontainer" />
+
+</div>
+
+<script>
+
+		function setStatus(stat, desc, lup) {
+		
+			if (undefined == "" || null == lup || lup == "") {
+		
+				$('#tblcurstatus').hide();
+		
+			} else {
+				$('#tblcurstatus').show();
+		
+				//$('#curstatus').html(stat);
+				$('#message').html(desc);
+			//	$('#curlastupdated').html(lup);
+			}
+		}
+		
+		function showprogress() {
+		
+			$("#tblprogress").show()
+			$("#tbloptions").hide()
+		
+		}
+		
+		function showdbimport() {
+		
+			$("#tblprogress").hide()
+			$("#tbloptions").show()
+		}
+
+
+		function getdbStatus() {
+
+			
+			$.get("/services/fetchdbstatus/rand?inte="+Math.random(), function(data) {
+
+				$xml = $(data)
+				$status = $xml.find("updatestatus")
+
+				console.log("Attempting to show progress")
+
+				if ($status.attr("inprogress") == "true") {
+
+					showprogress()
+					console.log("Attempting to show progress")
+					
+					setTimeout(getdbStatus, 60000);
+
+				} else {
+
+					showdbimport()
+					
+					
+					setStatus($status.attr("summary"), $status.attr("description"),	$status.attr("lastupdated"))
+
+				}
+			});
+
+		}
+		
+		
+	var show_preview = function(data) {
+
+		//alert("test")
+		$xml = $(data)
+		$status = $xml.find("status")
+		if ($status.attr("error") == "true") {
+
+			showerror("resultcontainer", $status.attr("description"))
+
+		} else if ($status.attr("error") == "false") {
+			showsuccess("resultcontainer", $status.attr("description"))
+		}
+
+	}
+
+	function processFrameContent(data) {
+
+		//console.log(data)
+		//show_preview(data)
+		getdbStatus();
+		//getdbStatus() 
+	}
+
+	
+	 $("#btnimportdb").button()
+	 .click(function( event ) {
+
+	 //$('#resultcontainer').hide();
+	 
+	
+	 });
+	
+	 
+	 
+	 
+	$(document)
+			.ready(
+					function() {
+
+						$("#myfile").button();
+						$("#btnimportdb").button();
+						$("#radio").buttonset();
+						getdbStatus() 
+						
+						$("#my_iframe")
+								.on(
+										"load",
+										function(evt) {
+
+											if (window.frames['my_iframe']
+													&& window.frames['my_iframe'].document.firstChild.nodeName == "reply"){
+												processFrameContent(window.frames['my_iframe'].document.firstChild.outerHTML)
+												console.log(window.frames['my_iframe'].document.firstChild.outerHTML)
+											}
+												
+
+										});
+						// $("#my_iframe").attr("src","ar.xml")
+						
+						
+					});
+</script>

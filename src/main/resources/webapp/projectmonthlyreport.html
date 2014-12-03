@@ -1,0 +1,216 @@
+<div>
+
+	<form id="frmprojectmonthlyreport">
+
+		<table cellpadding="10" cellspacing="10" border="0">
+			<tr>
+				<td>Users <input type="hidden" name="users" id="curusers"
+					value="" />
+				</td>
+				<td id="selectuserplaceholder">&nbsp;</td>
+			</tr>
+			<tr></tr>
+			<tr>
+				<td>Projects <input type="hidden" name="projects"
+					id="curprojects" value="" />
+				</td>
+				<td id="selectprojectplaceholder">&nbsp;</td>
+			</tr>
+			<tr id="dtcustomrow">
+				<td>From</td>
+				<td><input name="fromdate" id="fromdate"></td>
+				<td>To</td>
+				<td><input name="todate" id="todate" /></td>
+			</tr>
+			<tr>
+				<td colspan="4" style="text-align: right"><input type="button"
+					id="search" value="Search" style="width: 120px"></td>
+			</tr>
+		</table>
+		<div id="errdiv" class="alert-box error"></div>
+
+	</form>
+
+</div>
+
+<div>
+	<span id="resultcontainer" />
+</div>
+
+
+<script>
+
+		  
+  $(function() {
+	  
+	 $('#errdiv').hide();
+	 
+	showProjectMenu("selectprojectplaceholder")
+	showUserMenu("selectuserplaceholder")
+	  
+	$( "#fromdate" ).datepicker({
+		dateFormat: 'yy-mm-dd',
+		firstDay: 1 
+		});
+  
+    $( "#todate" ).datepicker({
+		dateFormat: 'yy-mm-dd',
+		firstDay: 1 
+		});
+    
+    $("#fromdate[value='']").datepicker("setDate", "-90d");
+    
+	
+	$( "input#search" )
+      .button()
+      .click(function( event ) {
+    	  
+    	  $('#errdiv').hide();
+    	  
+		if( $("#weekdate").val() ==""){
+			$('#errdiv').show();
+			$('#errdiv').html("<span>error: </span> Select a week")
+    		return
+    	}
+	
+		if($("select#lstprojects").multipleSelect('getSelects').length >0){
+			$("#curprojects").val($("select#lstprojects").multipleSelect('getSelects').join(","))	
+		}
+		if( $("#curprojects").val() ==""){		  
+			$('#errdiv').show();
+			$('#errdiv').html("<span>error: </span> Select Projects")
+			return
+		}
+		
+    	if($("select#lstusers").multipleSelect('getSelects').length >0){
+	 		$("#curusers").val($("select#lstusers").multipleSelect('getSelects').join(","))	
+		}
+		if( $("#curusers").val() ==""){		  
+			$('#errdiv').show();
+			$('#errdiv').html("<span>error: </span> Select Users")
+			return
+		}
+		
+		var formdata=$("form#frmprojectmonthlyreport").serializeArray()
+  		
+    	  $("#resultcontainer").html("<img src='images/loadingajax.gif'/>")
+  		$.post( "/services/reports/projectmonthlyreport", formdata)
+  		  .done(function( data ) {
+  		    
+  			
+  			//parse xml
+  			  $xml = $( data )
+  			  $status = $xml.find( "status" )
+  			  
+  			  if( $status.attr("error") =="true"){
+  				  
+  				  showerror("resultcontainer",$status.attr("description"))
+  				  
+  			  } else{
+  				  
+  				  var tbl=""
+  					  
+					var csvtblname="tblmonthlysstatusreports"
+					tbl=tbl + ' <table  border="0" cellspacing="0" width="100%">'
+					tbl=tbl + "      <tr>" 
+					tbl=tbl + "        <th align='right'><span><a href='#' onclick=\"downloadcsv('" +csvtblname  +"');return false;\" ><img border='0' src='images/excel.png' title='Download as excel'></a></span></th>" 
+					tbl=tbl + "      </tr>" 
+					tbl=tbl + " </table>"
+					tbl=tbl + ' <table id="tblmonthlysstatusreports" class="display" cellspacing="0" width="100%">' 
+					tbl=tbl + "    <thead>" 
+					tbl=tbl + "      <tr>"
+					tbl=tbl + "        <th><span>Project</span></th>" 
+					tbl=tbl + "        <th><span>Project Name</span></th>" 
+					//alert("Test")
+					$xml.find('header').each(function(index){	
+					//alert("Test1")
+						$(this).find('hmonth').each(function(index){
+							//alert("Test 2")
+							$(this).find('*').each(function(index){
+							
+							var monthname = $(this).get(0).nodeName;
+							//alert("Inside child loop 1" + monthname)
+							tbl=tbl + "        <th><span>" + monthname + "</span></th>" 
+						});
+						
+						});
+					});
+					tbl=tbl + "      </tr>" 
+					tbl=tbl + "    </thead>" 
+					tbl=tbl + "    <tbody>" 
+
+					var dataCount=0
+
+					$xml.find('project').each(function(index){
+					 
+					dataCount++
+					var projectcode = $(this).find('projectcode').text();
+					var projectname = $(this).find('projectname').text();
+					var username = $(this).find('user').text();
+					var team = $(this).find('team').text();
+
+					var totalhrs = $(this).find('total').text();
+					tbl=tbl + "      <tr>" 
+					tbl=tbl + "        <td class='calign'>"+projectcode+"</td>" 
+					tbl=tbl + "        <td class='calign'>"+projectname+"</td>" 
+					
+					$(this).find('month').each(function(index){
+						$(this).find('*').each(function(index){
+							//alert("Inside child loop")
+							var monthEffort=$(this).text();
+							tbl=tbl + "        <td class='calign'>"+monthEffort+"</td>" 
+						});
+						
+					});
+
+					tbl=tbl + "      </tr>" 
+					 
+  		        });
+  				
+  					 tbl=tbl + "	      </tbody>" 
+  					 tbl=tbl + "  </table>"
+
+  					 if( dataCount >0){
+  					 	$("#resultcontainer").html(tbl)
+  					 	preparecsv("tblmonthlysstatusreports")
+  					  if( dataCount >10){
+  						  
+  						  
+  						$.extend( $.fn.dataTable.defaults, {
+  						    "searching": true,
+  						    "ordering": true,
+  						  "paging":   true,  				        
+	  				        "info":     true
+  						} );
+  						$('#tblmonthlysstatusreports').dataTable();
+  					  }
+  	  					  
+  					  else{
+  						  
+  						$.extend( $.fn.dataTable.defaults, {
+  						    "searching": true,
+  						    "ordering": true,
+	  						"paging":   false,  				        
+	  				        "info":     true
+  						} );
+  						
+  						
+  						$('#tblmonthlysstatusreports').dataTable();
+  					  }	
+  					 }
+  					 else
+  						 showerror("resultcontainer","No Data Available to show")
+  					
+  						 
+  						// $('#example').dataTable();
+  				  
+  			  }
+  		  });
+    	  
+        event.preventDefault();
+			
+    	});
+	
+	
+  });
+</script>

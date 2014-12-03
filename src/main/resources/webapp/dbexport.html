@@ -1,0 +1,64 @@
+
+
+
+<div>
+	<form id="frmdbexport" target="_blank" action="/services/exportdb"
+		method="POST">
+		<table cellpadding="10" cellspacing="10" border="0">
+			<tr>
+				<td>Database Export &nbsp;</td>
+				<td><select id="dbtype" name="dbtype" style="width: 350px">
+						<option value="">Select</option>
+						<option value="userdb">User Database</option>
+						<option value="fetchdb">Fetcher Database</option>
+				</select></td>
+
+
+				<td id="selectprojectplaceholder">&nbsp;</td>
+			</tr>
+
+			<tr>
+				<td colspan="4" style="text-align: right"><input type="button"
+					id="export" value="Export" style="width: 120px"></td>
+			</tr>
+
+		</table>
+
+		<div id="errdiv" class="alert-box error"></div>
+
+	</form>
+</div>
+
+<div>
+
+	<span id="resultcontainer" />
+
+</div>
+<script>
+
+
+		  
+  $(function() {
+	  $('#errdiv').hide();
+	  
+	  $("select#dbtype").selectmenu();
+	  
+	  $( "input#export" )
+      .button()
+      .click(function( event ) {
+    	  
+    	  $('#errdiv').hide();
+		  
+		  if( $("#dbtype").val() ==""){		  
+			$('#errdiv').show();
+			$('#errdiv').html("<span>error: </span> Select a Database to export")
+			return
+		}
+		
+		  
+		  $("form#frmdbexport").submit();
+		  });
+		  
+	  
+  });
+  </script>

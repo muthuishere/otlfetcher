@@ -1,0 +1,59 @@
+
+
+
+<div style="padding-top: 10px">
+	<span class="top_custom_slogan">Admin Jobs</span>
+	<div style="float: right">
+		<select id="jobtype" name="jobtype" style="width: 350px">
+			<option value="">Select</option>
+			<option value="dbexport">Database Export</option>
+			<option value="dbimport">Database Import</option>
+		</select>
+	</div>
+</div>
+<div style="clear: both">&nbsp;</div>
+
+
+<div id="overlay" class="main_content" style="">&nbsp;</div>
+<div>
+
+	<span id="jobtypecontainer" />
+
+
+</div>
+
+<script>
+
+
+		  
+  $(function() {
+	  
+	  
+	  
+	  
+	  $( "#jobtype" ).selectmenu({
+	      change: function( event, data ) {
+	    	  
+	    	  if(data.item.value == ""){
+	    		  $("#jobtypecontainer").html("")
+	    		  
+	    	  }	    		 
+	    	  else{
+	    		  
+	    		  
+	    		  $( "#jobtypecontainer" ).load( data.item.value+".html?session_id="+Math.random() );
+	    		  
+	    		  
+	    		
+	    	  }	
+	        
+	      }
+	     });
+	    
+
+ 
+
+
+
+  });
+  </script>
