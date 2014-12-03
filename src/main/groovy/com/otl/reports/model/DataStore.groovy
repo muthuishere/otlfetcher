@@ -90,8 +90,167 @@ class DataStore {
 		updateProjectCache();
 		//println(fetcherDB.dump())
 	}
+	
+	
+	public def getDBHandler(def importfileName){
+		
+		//Split the function to get the db handler.
+		try{
+			if(importfileName != null && importfileName!= ""){
+				tmpImpDB = Sql.newInstance("jdbc:sqlite:"+importfileName, "org.sqlite.JDBC")
+				}
+		}
+		catch(Exception e){
+			Log.error("Error while obtaining database connection of importing db file. " + e.printStackTrace())
+		}
+		
+		return tmpImpDB
+	}
 
+	public def getDataFromDB(def curdbobj, def tableName){
+		
+		//Get the data from the 
+		if(curdbobj == null){
+			Log.error("Database connection is null and data arraylist cannont be retrieved. ")
+		}
+		else{
+			println "Value of the curdbobj : " + curdbobj
+		}
+		ArrayList recordList = null
+		if( tableName == "timeentry" ){
+			Log.info( "Obtaining record set from timeentry table")
+			recordList = curdbobj.rows("select * from timeentry")
+		}else if( tableName == "projectdetails" ){
+			Log.info( "Obtaining record set from projectdetails table")
+			recordList = curdbobj.rows("select * from projectdetails")
+		}else if( tableName == "userInfo" ){
+			Log.info( "Obtaining record set from userInfo table")
+			recordList = curdbobj.rows("select * from userInfo")
+		}
+		//println "Value of the record list : " + recordList
+		return recordList
+		
+	}
+	
+	public def backupCurrentDB(){
+		
+		def BACKUP_DIRECTORY = "C:/uk/backup"
+		BACKUP_DIRECTORY = Configurator.globalconfig.dbbkp_path
+		try{
+			FileOutputStream fosFetcherDB = new FileOutputStream(new File(Configurator.globalconfig.dbbkp_path+"\\otlfetcher.db_"+new Date().getTime()+"_bkp"))
+			InputStream fisFetcherDB = new FileInputStream(new File(Configurator.globalconfig.fetcherdb))
+			fosFetcherDB << fisFetcherDB
+			fisFetcherDB.close()
+			fosFetcherDB.close()
+			FileOutputStream fosUserDB = new FileOutputStream(new File(Configurator.globalconfig.dbbkp_path+"\\otluser.db_"+new Date().getTime()+"_bkp"))
+			InputStream fisUserDB = new FileInputStream(new File(Configurator.globalconfig.userdb))
+			fosUserDB << fisUserDB
+			fosUserDB.close()
+			fisUserDB.close()
+		}
+		catch(Exception e){
+			Log.error("Error while backing up the database. " + e.printStackTrace())
+			return false
+		}
+		
+		return true
+	}
 
+	
+	public def importDBRecords(def tableName, def chunkedRecords , def dboverride)
+	{
+		TimeEntry tmpTimeEntry = null
+		ProjectInfo tmpProjectInfo = null
+		UserInfo tmpUserInfo = null
+		String encryptFlag = "disabled"
+		def response = "Failure in importing database : Some exception happened"
+		try{
+						
+			if(tableName==null || tableName == "" || chunkedRecords == "" || chunkedRecords == null){
+				Log.error("Invalid table name selected for import. TableName or recordList seems to be null or empty")
+				response = "Failure in importing database : Invalid Table Name"
+			}
+			else if(tableName == "timeentry"){
+				
+				chunkedRecords.each{
+										
+					tmpTimeEntry = new TimeEntry(
+							entryDate: new Date(it.entryDate) ,
+							user:it.user,
+							projectcode:it.projectcode,
+							projecttask:it.projecttask,
+							tasktype:it.tasktype,
+							hours:it.hours,
+							details:it.details,
+							//isLeave:it.isLeave,
+							//fetchedDate:it.fetchedDate,
+							status:it.status,
+							//team:it.team,
+							//projectInfo:it.projectInfo
+
+							)
+
+					insertTimesheet(tmpTimeEntry,dboverride)
+					Log.debug( it.toString())
+					tmpTimeEntry = null
+				}
+				
+				response = "Successfully imported records to database: timeentry database"
+				
+			}
+			else if(tableName == "projectdetails"){
+				
+				chunkedRecords.each{
+					
+					tmpProjectInfo = new ProjectInfo(
+							name: it.name,
+							code: it.code,
+							projectid: it.projectid
+
+							)
+					insertProject(tmpProjectInfo,dboverride)
+					Log.debug( it.toString())
+
+					tmpProjectInfo = null
+				}
+				response = "Successfully imported records to database: projectdetails database"
+			}
+			else if(tableName == "userInfo"){
+				
+				chunkedRecords.each{
+						tmpUserInfo = new UserInfo(
+							user: it.user,
+							password: it.password,
+							ip: it.ip,
+							locked: it.locked,
+							team:it?.team	);
+					Log.debug( it.toString())
+					insertUser(tmpUserInfo, dboverride, encryptFlag)
+					tmpUserInfo = null
+				}
+				response = "Successfully imported records to database: userInfo database"
+			
+			}
+			else{
+				
+				Log.error("Invalid Table name. Following table Name is not available in OTL schema." + tableName)
+				response = "Failure in importing database : Some exception happened"
+			}
+		} catch(Exception e){
+			
+			response = "Failure in importing database : Some exception happened"
+		}
+		return response
+	}
+	
+	// get db instantce() => dbinstance , tablename
+	// get table as arraylist (dbinstance ,tablename)
+	/**
+	 * This funciton is to import the OTL database.
+	 * @deprecated - This function is deprecated. As we have moved on to Asynchronous thread based db import.
+	 * @param request
+	 * @return
+	 */
 	public def importDB(def importfileName, String override="enabled"){
 
 		def BACKUP_DIRECTORY = "C:/uk/backup"

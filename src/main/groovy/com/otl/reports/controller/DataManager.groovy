@@ -35,6 +35,33 @@ class DataManager {
 		dataStore.printData();
 	}
 
+	public def getDBHandler(def importdb_location){
+		
+		dataStore.getDBHandler(importdb_location)
+		
+	}
+	
+	public def backupCurrentDB(){
+		
+		dataStore.backupCurrentDB()
+	}
+	
+	public def getDataFromDB(def curdbobj, def tableName){
+		
+		return dataStore.getDataFromDB(curdbobj,tableName)
+	}
+	
+	public def importDBRecords(def tableName, def chunkedRecords , def dboverride){
+		
+		dataStore.importDBRecords(tableName, chunkedRecords, dboverride)
+		
+	}
+	/**
+	 * This function is to import the OTL database.
+	 * @deprecated - This function is deprecated. As we have moved on to Asynchronous thread based db import. 
+	 * @param request
+	 * @return
+	 */
 	public def importDB(def importfileName, String override){
 		dataStore.importDB(importfileName, override)
 	}

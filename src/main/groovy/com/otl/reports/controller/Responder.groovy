@@ -292,7 +292,7 @@ class Responder {
 
 
 			response.append("<updatestatus inprogress='${Configurator.isUpdating}' summary='${Configurator.fetchDbInfo.status}' description='${Configurator.fetchDbInfo.description}'  lastupdated='${Configurator.fetchDbInfo.lastupdated}'  />")
-
+			
 			response.append("<status code='0' error='false' description='Successfully Started Parsing'/>")
 
 		}catch(Exception e){
@@ -487,6 +487,57 @@ class Responder {
 
 	}
 
+	
+	
+	public String updateImportedDb(def importdb_location, def override){
+
+
+		
+		StringBuffer response= new StringBuffer()
+
+		response.append("<reply>")
+
+		if(Configurator.isDBImporting ){
+
+			response.append("<status code='1' error='true' description='Already import in progress'/>")
+
+		}else{
+
+			try{
+
+
+				
+
+
+
+				Thread.start {
+
+					
+					//Send information to thread
+					new DbImporter().start(importdb_location,override)
+
+
+				}
+
+				response.append("<status code='0' error='false' description='Successfully Started Parsing'/>")
+
+			}catch(Exception e){
+				response= new StringBuffer()
+
+				response.append("<reply>")
+
+				e.printStackTrace();
+				response.append("<status code='1' error='true' description='${xml_string(e.getMessage())}'/>")
+			}
+
+		}
+		response.append("</reply>")
+
+		return response;
+
+
+	}
+
 
 	public String importdb(HttpServletRequest request){
 		/*
@@ -524,7 +575,7 @@ class Responder {
 					else if(item.isFormField()){
 						if(item.getFieldName().equals("override")){
 							override = item.inputStream.getText()
-							Log.debug("Value of the override parameter selected is 3:" + override)
+							Log.debug("Value of the override parameter selected is :" + override)
 
 						}
 					}
@@ -534,6 +585,8 @@ class Responder {
 				Log.debug( "Size of the request parameters is : " + i)
 				//File uploaded successfully
 				request.setAttribute("message", "File Uploaded Successfully");
+				return updateImportedDb(importdb_location, override)
+				
 			} catch (Exception ex) {
 				request.setAttribute("message", "File Upload Failed due to " + ex);
 				Log.error( "Exception while parsing the parameters : " + ex)
@@ -543,10 +596,9 @@ class Responder {
 		}
 
 
-		dataManager.importDB(importdb_location, override)
+		
 
-		response.append("<status code='1' error='false' description='Successfully imported the file'/>")
-
+	
 		response.append("</reply>")
 		return response;
 

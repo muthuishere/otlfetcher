@@ -34,6 +34,7 @@ public class Configurator {
 			]
 		
 	}
+
 	public static void log(def msg){
 		
 		println "${new Date()} [${Thread.currentThread().getName()}]: ${msg}"
@@ -41,5 +42,6 @@ public class Configurator {
 	
 	
 	public static def worker_lbq = new LinkedBlockingQueue()
+	public static def import_worker_lbq = new LinkedBlockingQueue()
 	
 }
