@@ -1048,7 +1048,8 @@ class Responder {
 				users.push("")
 			}
 			ArrayList hashmaplist=new ArrayList();
-
+			
+			//Retrieving records in the database, no place holders will be retrieved.
 			ArrayList<TimesheetStatusReport>  summarylist=dataManager.getWeeklystatus( users, from,to)
 
 

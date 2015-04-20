@@ -2,6 +2,7 @@ package com.otl.reports.application
 
 import com.otl.reports.beans.UserInfo
 import com.otl.reports.controller.FetchUserReport
+import com.otl.reports.controller.JobScheduler
 import com.otl.reports.controller.OTLServer
 
 import groovy.json.JsonSlurper
@@ -9,6 +10,7 @@ import groovy.json.JsonSlurper
 
 import com.otl.reports.controller.Configurator;
 import com.otl.reports.model.WebBrowser
+import com.otl.scheduler.batch.BatchReportGenerator
 
 class OTLReportApplication {
 
@@ -63,6 +65,9 @@ class OTLReportApplication {
 		OTLServer server=new OTLServer()
 		server.init()
 		server.startServer()
+		BatchReportGenerator batchReporter = new BatchReportGenerator()
+
+		JobScheduler jc = new JobScheduler()
 		
 		
 		waitformore(server)
@@ -91,7 +96,9 @@ class OTLReportApplication {
 		//integrate()
 		
 		//browsertest();
+		
 		startAppServer()
+		
 	}
 
 }

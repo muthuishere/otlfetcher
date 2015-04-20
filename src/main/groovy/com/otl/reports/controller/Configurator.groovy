@@ -40,6 +40,12 @@ public class Configurator {
 		println "${new Date()} [${Thread.currentThread().getName()}]: ${msg}"
 	}
 	
+	public static def mailer_jobs_worker_lbq = new LinkedBlockingQueue()
+	public static def adhoc_jobs_worker_lbq = new LinkedBlockingQueue()
+	public static def hourly_jobs_worker_lbq = new LinkedBlockingQueue()
+	public static def daily_jobs_worker_lbq = new LinkedBlockingQueue()
+	public static def weekly_jobs_worker_lbq = new LinkedBlockingQueue()
+	
 	
 	public static def worker_lbq = new LinkedBlockingQueue()
 	public static def import_worker_lbq = new LinkedBlockingQueue()

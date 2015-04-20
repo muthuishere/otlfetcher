@@ -2,10 +2,9 @@ package com.otl.reports.controller
 
 import java.util.Date;
 
+import com.otl.reports.beans.JobDescription;
 import com.otl.reports.beans.TimesheetStatusReport;
-
-
-
+import com.otl.reports.beans.JobInstances;
 import com.otl.reports.beans.ProjectInfo
 import com.otl.reports.beans.TimeEntry
 import com.otl.reports.beans.UserInfo
@@ -27,7 +26,7 @@ class DataManager {
 
 
 		dataStore=new DataStore()
-		dataStore.init(Configurator.globalconfig.userdb, Configurator.globalconfig.fetcherdb)
+		dataStore.init(Configurator.globalconfig.userdb, Configurator.globalconfig.fetcherdb, Configurator.globalconfig.jobdb)
 	}
 
 	def print(){
@@ -51,10 +50,50 @@ class DataManager {
 		return dataStore.getDataFromDB(curdbobj,tableName)
 	}
 	
+	public def getUserListByTeam(String teamName){
+		return dataStore.getUserListByTeam(teamName)
+		//return dataStore.getUserListByTeam(teamName)
+		
+	}
+	
 	public def importDBRecords(def tableName, def chunkedRecords , def dboverride){
 		
 		dataStore.importDBRecords(tableName, chunkedRecords, dboverride)
 		
+	}
+	
+	
+	public void insertJobdescription(JobDescription jobdescription, String override="enabled"){
+		dataStore.insertJobdescription(jobdescription, override)
+	}
+	
+	public void updateJobInstance(JobInstances jobInstance){
+		dataStore.updateJobInstance(jobInstance)
+	}
+	
+	public ArrayList<JobInstances> getJobInstances(String strCondition){
+		dataStore.getJobInstances(strCondition)
+	}
+	
+	public boolean insertJobInstances(JobInstances jobInstance, String override="disabled"){
+		dataStore.insertJobInstances(jobInstance, override)
+	}
+	
+	
+	public boolean createJobInstances(JobDescription jobDescription){
+		
+		dataStore.createJobInstances(jobDescription)
+		
+	}
+	
+	/**
+	 * 
+	 * @param status
+	 * @return
+	 */
+	public def getJobDescription(String strCondition){
+	
+		dataStore.getJobDescription(strCondition)
 	}
 	/**
 	 * This function is to import the OTL database.

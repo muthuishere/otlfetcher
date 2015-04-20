@@ -18,6 +18,8 @@ import groovy.sql.DataSet
 import groovy.sql.Sql
 
 import com.gargoylesoftware.htmlunit.InsecureTrustManager2;
+import com.otl.reports.beans.JobDescription
+import com.otl.reports.beans.JobInstances;
 import com.otl.reports.beans.ProjectEmployeeReport
 import com.otl.reports.beans.ProjectInfo
 import com.otl.reports.beans.TimeEntry
@@ -36,6 +38,7 @@ class DataStore {
 	Sql fetcherDB =null;
 	Sql userDB =null;
 	Sql tmpImpDB = null;
+	Sql jobDB = null;
 
 	def users=[:]
 	def projects=[:]
@@ -44,24 +47,61 @@ class DataStore {
 		fetcherDB.close();
 		userDB.close();
 		tmpImpDB?.close();
+		jobDB?.close();
 	}
 
 
 
-	void init(def userfileName,def fetchfileName){
+	void init(def userfileName,def fetchfileName, def jobFileName){
 
 		Class.forName("org.sqlite.JDBC")
 
 		fetcherDB = Sql.newInstance("jdbc:sqlite:"+fetchfileName, "org.sqlite.JDBC")
 		userDB = Sql.newInstance("jdbc:sqlite:"+userfileName, "org.sqlite.JDBC")
+		jobDB = Sql.newInstance("jdbc:sqlite:"+jobFileName, "org.sqlite.JDBC")
+		
 		//create table if not exists TableName (col1 typ1, ..., colN typN)
 		/*
 		 public String user
 		 def password
 		 def ip
 		 */
-
-
+		
+		/*
+		 * 	def jobName
+			def jobID
+			def jobDesc
+			def jobValidity
+			def jobStartDate
+			def jobEndDate
+			def jobFrequency
+			def jobRetry
+			def jobReportFolder
+			def jobToAddress
+			def jobCCAddress
+			def jobBCCAddress
+			def jobSubject
+			def jobMailContent
+			def jobOwner
+		 */
+		//jobDB.execute("create table if not exists jobDescription (jobName string, jobID string,jobDesc string,jobValidity string,jobStartDate date, jobEndDate date,jobFrequency string, jobRetry integer, jobReportFolder string, jobToAddress string, jobCCAddress string, jobBCCAddress string, jobSubjectstring, jobMailContent string, jobOwner string)")
+		jobDB.execute("create table if not exists jobdescription (jobname string, jobid string,jobdesc string,jobvalidity string,jobstartdate date, jobenddate date,jobfrequency string, jobretry integer, jobreportfolder string, jobtoaddress string, jobccaddress string, jobbccaddress string, jobsubject string, jobmailcontent string, jobowner string, joblastcreatedinsttime date, jobtaskname string)")
+		
+		/*
+		 *
+		 *	def jobInstID
+			def jobInstDesc
+			def jobParentID
+			def jobInstActualStartTime
+			def jobInstRevisedStartTime
+			def jobInstResult
+			def jobInstRetry
+			def jobInstReportLocation
+			def jobInstReportName
+		 */
+		//jobDB.execute("create table if not exists jobInstance (jobInstID string ,jobInstDesc string , jobParentID string , jobInstActualStartTime Date,jobInstRevisedStartTime Date, jobInstResult string, jobInstRetry integer, jobInstReportLocation string, jobInstReportName string  )")
+		jobDB.execute("create table if not exists jobinstance (jobinstid string ,jobinstdesc string , jobparentid string , jobinstactualstarttime date,jobinstrevisedstarttime date, jobinstresult string, jobinstretry integer, jobinstreportlocation string, jobinstreportname string , jobinstfrequency string , jobinsttaskname string )")
+		
 		userDB.execute("create table if not exists userInfo (user string, password string,ip string,locked string,lastupdated date,team string,comment string)")
 
 		/*
@@ -107,6 +147,68 @@ class DataStore {
 		return tmpImpDB
 	}
 
+	public def getUserListByTeam(String teamName){
+		//UserInfo
+		
+		def userList
+		
+		if(teamName ==  null || teamName.trim()=="" )
+		{
+			userList = userDB.rows("select * from userInfo")
+		}
+		else{
+				
+			userList = userDB.rows("select * from userInfo where team='${teamName}'")
+		}
+		
+		return userList
+	}
+	
+	/*
+	public def getUserListByTeam(String teamName){
+		String strUserName = ""
+		int i = 0
+		String[] userList = new String[100]
+		if(teamName ==  null || teamName.trim()=="" )
+		{
+			userList = userDB.rows("select user from userInfo").each{
+				
+				if(strUserName.trim()==""){
+					strUserName = it.user.toString()
+				}
+				else{
+					strUserName = strUserName +"," + it.user.toString()
+				}
+				
+							
+				Log.error(strUserName)
+				
+			}
+		}
+		else{
+			userList = userDB.rows("select user from userInfo where team='${teamName}'").each{
+				
+				if(strUserName.trim()==""){
+					strUserName = it.user.toString()
+				}
+				else{
+					strUserName = strUserName +"," + it.user.toString()
+				}
+							
+				Log.error(strUserName)
+					
+				
+			}
+		}
+		
+		userList = strUserName.split(",")
+		Log.error("Value of the user list : " + userList)
+		
+		return userList
+	}
+	
+	
+	*/
 	public def getDataFromDB(def curdbobj, def tableName){
 		
 		//Get the data from the 
@@ -246,7 +348,7 @@ class DataStore {
 	// get db instantce() => dbinstance , tablename
 	// get table as arraylist (dbinstance ,tablename)
 	/**
-	 * This funciton is to import the OTL database.
+	 * This function is to import the OTL database.
 	 * @deprecated - This function is deprecated. As we have moved on to Asynchronous thread based db import.
 	 * @param request
 	 * @return
@@ -372,7 +474,13 @@ class DataStore {
 			result=fetcherDB.execute(sqlString)
 
 		}
+		
+		if(db.equals("SCHEDULER")){
+			result=fetcherDB.execute(sqlString)
 
+		}
+		
+		
 		if(db.equals())
 			return result
 
@@ -979,11 +1087,11 @@ class DataStore {
 
 		//		ArrayList<UserTimeSummary> timeEntries=new ArrayList<UserTimeSummary>()
 
-
+		
 
 		users.each{ user ->
-			def startDate = from
-			def endDate = to
+			def startDate = from.clearTime()
+			def endDate = to.clearTime()
 			Calendar c1 = GregorianCalendar.getInstance();
 			c1.setTime(startDate);
 			int w1 = c1.get(Calendar.DAY_OF_WEEK);
@@ -1005,9 +1113,10 @@ class DataStore {
 				//println "Number of days left in the week :" + daysInCurrentWeek
 				currStartDate = c1.getTime()
 				currEndDate = c1.getTime() + daysInCurrentWeek
-				//println "Current Start Date in the week :" + currStartDate
-				//println "Current End Date in the week :" + currEndDate
+				println "Current Start Date in the week :" + currStartDate
+				println "Current End Date in the week :" + currEndDate
 				nextFromDate = currEndDate + 1
+				println "Current Start Date in the week :" + currStartDate.getTime()
 				//println "nextFromDate computed is: " + nextFromDate
 				if(currEndDate > endDate) { currEndDate = endDate}
 				//println "Updated End Date in the week for last cycle :" + currEndDate
@@ -1057,12 +1166,13 @@ class DataStore {
 							)
 
 
-					Log.info("Query returned" + timeEntries.size())
+					Log.info("No of time sheet entries returned by Query :" + timeEntries.size())
 
 				}
 			}
 		}
 
+		Log.error("Value of the timesheet entries:  " + timeEntries)
 
 		return timeEntries
 
@@ -1169,6 +1279,458 @@ class DataStore {
 
 
 	}
+
+	def getNextJobScheduleTime(def jobLastCreatedInstTime, String frequency){
+		//Convert jobLastCreatedTime to Date field.
+		//Check what frequency type is, based on that add time or days to date field created.
+		
+		Date oldLastCreatedTime = jobLastCreatedInstTime
+		Date newLastCreatedTime = jobLastCreatedInstTime
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTime(oldLastCreatedTime)
+		
+		Log.info("Value of old time is :"  + oldLastCreatedTime)
+		
+		frequency = frequency.toLowerCase().trim()
+		if(frequency == "hourly"){
+			calendar.add(Calendar.HOUR, 1)
+			newLastCreatedTime = calendar.getTime() 
+			Log.info("Value of new time is :" + newLastCreatedTime)
+		}else if(frequency == "daily"){
+			
+			calendar.add(Calendar.DATE, 1)
+			newLastCreatedTime = calendar.getTime()
+			Log.info("Value of new time is :" + newLastCreatedTime)
+		}else if(frequency == "weekly"){
+		
+		
+			calendar.add(Calendar.DATE, 7)
+			newLastCreatedTime = calendar.getTime()
+			Log.info("Value of new time is :" + newLastCreatedTime)
+
+		}else if(frequency == "adhoc"){
+			
+			calendar.add(Calendar.MINUTE, 10)
+			newLastCreatedTime = calendar.getTime()
+			Log.info("Value of new time is :" + newLastCreatedTime)
+		
+		}else{
+			Log.error("Invalid time frequency type")
+			newLastCreatedTime = calendar.getTime()
+			Log.info("Value of new time is :" + newLastCreatedTime)
+		} 
+		
+		return newLastCreatedTime
+	}
+	
+	
+	/**
+	 * This function is to retrieve the list of job instance, based on the query passed. Though this function is implemented in crude way, it servers the purpose
+	 * @param status
+	 * @return
+	 */
+	ArrayList<JobInstances> getJobInstances(String strCondition){
+		
+		String query = "select * from jobinstance where "
+		strCondition = strCondition.trim()
+		JobInstances jobInstance = new JobInstances()
+		ArrayList<JobInstances> jobInstList=new ArrayList<JobInstances>()
+		
+		
+		if(strCondition == ""){
+			query = query + "1 = 1 "
+				
+		}
+		else {
+			query = query + strCondition
+		}
+		
+		try {
+				jobDB.rows(query).each{
+														
+					jobInstList.add(new JobInstances(
+						jobInstID : it.jobinstid ,
+						jobInstDesc : it.jobinstdesc ,
+						jobParentID : it.jobparentid ,
+						jobInstActualStartTime : new Date(it.jobinstactualstarttime ),
+						jobInstRevisedStartTime : new Date(it.jobinstrevisedstarttime ),
+						jobInstResult : it.jobinstresult ,
+						jobInstRetry : it.jobinstretry ,
+						jobInstReportLocation : it.jobinstreportlocation ,
+						jobInstReportName : it.jobinstreportname ,
+						jobInstFrequency: it.jobinstfrequency,
+						jobInstTaskName : it.jobinsttaskname
+						
+						) 
+					)
+				}
+		}catch(Exception e){
+		
+			Log.error("Exception while retriving the job instances from the database : " + e.printStackTrace())
+			return jobInstList
+		}
+		
+		return jobInstList
+	}
+	
+	
+	//TODO --- Check why the jobinstid is null
+	public boolean insertJobInstances(JobInstances jobInstance, String override="disabled"){
+		
+		//Log.info("_______________________________________________________Entering into the job instance creation_______________________________________________________________")
+			boolean insertSuccess = false
+		
+			boolean exists =false
+				
+			try{
+					def query="select jobinstid from jobinstance  where jobinstid='" +jobInstance.jobInstID +"'"
+			
+					exists=(jobDB.rows(query).size()>0)
+			
+					Log.debug( "Insert JobInstance Override key is set to : " + override)
+			
+			
+					if( exists){
+						if(override == "enabled")
+						{
+							Log.error("Key Already exists ${jobInstance.jobInstID} overWriting ");
+							query="delete from jobinstance  where jobinstid='${jobInstance.jobInstID}'"
+							jobDB.execute(query, []);
+			
+							DataSet jobInstDataSet = jobDB.dataSet("jobinstance")
+							
+							Log.debug("Value of the job instance if is :::::::::::::::::::::::::::::::" + jobInstance.jobInstID)
+							
+							jobInstDataSet.add(
+										jobinstid : jobInstance.jobInstID,
+										jobinstdesc : jobInstance.jobInstDesc,
+										jobparentid : jobInstance.jobParentID,
+										jobinstactualstarttime : jobInstance.jobInstActualStartTime?.getTime(),
+										jobinstrevisedstarttime : jobInstance.jobInstRevisedStartTime?.getTime(),
+										jobinstresult : jobInstance.jobInstResult,
+										jobinstretry : jobInstance.jobInstRetry,
+										jobinstreportlocation : jobInstance.jobInstReportLocation,
+										jobinstreportname : jobInstance.jobInstReportName,
+										jobinstfrequency : jobInstance.jobInstFrequency,
+										jobinsttaskname : jobInstance.jobInstTaskName
+									)
+						}
+			
+						else if(override=="disabled")
+						{
+							Log.error("Key Already exists ${jobInstance.jobInstID} and hence skipping the import ")
+			
+						}
+					}
+					else {
+			
+						DataSet curtimeEntry = jobDB.dataSet("jobinstance")
+						//user string, projectcode string,projecttask string,tasktype string,hours integer,details string,key string
+						//	curtimeEntry.
+						curtimeEntry.add(
+								
+										jobinstid : jobInstance.jobInstID,
+										jobInstDesc : jobInstance.jobInstDesc,
+										jobParentID : jobInstance.jobParentID,
+										jobInstActualStartTime : jobInstance.jobInstActualStartTime?.getTime(),
+										jobInstRevisedStartTime : jobInstance.jobInstRevisedStartTime?.getTime(),
+										jobInstResult : jobInstance.jobInstResult,
+										jobInstRetry : jobInstance.jobInstRetry,
+										jobInstReportLocation : jobInstance.jobInstReportLocation,
+										jobInstReportName : jobInstance.jobInstReportName,
+										jobinstfrequency : jobInstance.jobInstFrequency,
+										jobinsttaskname : jobInstance.jobInstTaskName
+	
+									
+								)
+			
+						}
+			
+				}catch(Exception e)
+				{
+					insertSuccess = false
+					Log.error("Exception occured while creating child instance for " + jobInstance.jobParentID)
+					Log.error(e.printStackTrace())
+					return insertSuccess
+				}
+		
+		
+		return insertSuccess
+	}
+	
+	
+	void updateJobInstance(JobInstances jobInstance){
+		
+				boolean exists =false
+				def query="select jobinstid from jobinstance  where jobinstid='" +jobInstance.jobInstID +"'"
+				exists=(jobDB.rows(query).size()>0)
+				
+				
+				if( exists){
+					
+						Log.error("Key Already exists ${jobInstance.jobInstID} overWriting ");
+						query="delete from jobinstance  where jobinstid='${jobInstance.jobInstID}'"
+						jobDB.execute(query, []);
+		
+						DataSet jobInstDataSet = jobDB.dataSet("jobinstance")
+
+						jobInstDataSet.add(
+									jobinstid : jobInstance.jobInstID,
+									jobInstDesc : jobInstance.jobInstDesc,
+									jobParentID : jobInstance.jobParentID,
+									jobInstActualStartTime : jobInstance.jobInstActualStartTime?.getTime(),
+									jobInstRevisedStartTime : jobInstance.jobInstRevisedStartTime?.getTime(),
+									jobInstResult : jobInstance.jobInstResult,
+									jobInstRetry : jobInstance.jobInstRetry,
+									jobInstReportLocation : jobInstance.jobInstReportLocation,
+									jobInstReportName : jobInstance.jobInstReportName,
+									jobinstfrequency : jobInstance.jobInstFrequency,
+									jobinsttaskname : jobInstance.jobInstTaskName
+
+								)
+					
+				}		
+						
+				else{
+		
+					throw new ServiceException("jobInstance did not exist in DB")
+				}
+		
+		
+		
+			}
+	
+	
+	public boolean createJobInstances(JobDescription jobDescription){
+		
+		//Check if the status of the jobDescription passed is valid. New, inprogress, failed
+		//Find the difference between the last created date and value configured in conf
+		//Once you have the start and end date for which new jobs has to be created
+			//Check the frequency in which the job has to be created
+			//Add the the frequency to the last created time, till its less than end date
+			//Status of the newly created jobInstance should be new
+		boolean jobCreated = false
+		String frequency
+		Date lastJobInstanceCreatedTime
+		Date newJobInstanceCreationTime
+		Date jobCreationLimit
+		Calendar calendar = GregorianCalendar.getInstance();
+		JobInstances newJobInstance = new JobInstances()
+		
+		int jobCreationWindow = 2 //Measured in number of days. Defaulting to 2 
+		try {
+			String strJobFrequency = ""
+			String validity = jobDescription.jobValidity?.toString().trim()
+			validity = validity.toLowerCase()
+			if(validity == "new" || validity == "valid" ||validity == "inprogress" || validity == "failed")
+			{
+				lastJobInstanceCreatedTime = jobDescription.jobLastCreatedInstTime
+				calendar.setTime(new Date())
+				jobCreationWindow = Configurator.globalconfig.job_creation_window
+				calendar.add(Calendar.DATE, jobCreationWindow)
+				jobCreationLimit = calendar.getTime() 
+				Log.debug("Value of the lastCreatedJob instance time : " + lastJobInstanceCreatedTime)
+				Log.debug("Job creation windown and the computed upper limit is: " + jobCreationWindow + " , " +  jobCreationLimit)
+				//Here creating new jobinstance object and filling up template
+				
+				newJobInstance.jobInstReportName = jobDescription.jobName
+				newJobInstance.jobInstDesc = "Job Instance of " + jobDescription.jobName
+				newJobInstance.jobInstRetry = jobDescription.jobRetry
+				newJobInstance.jobParentID  = jobDescription.jobID
+				newJobInstance.jobInstResult="new"
+				newJobInstance.jobInstReportLocation = jobDescription.jobReportFolder 
+				newJobInstance.jobInstFrequency = jobDescription.jobFrequency
+				newJobInstance.jobInstTaskName = jobDescription.jobTaskName
+				
+				strJobFrequency  =  jobDescription.jobFrequency
+				if(strJobFrequency == "adhoc" && jobDescription.jobValidity == "valid" ){
+					
+						newJobInstanceCreationTime = getNextJobScheduleTime(lastJobInstanceCreatedTime,jobDescription.jobFrequency )
+						Log.debug("Newly Created Job Window : " + newJobInstanceCreationTime )
+						lastJobInstanceCreatedTime = newJobInstanceCreationTime
+						newJobInstance.jobInstActualStartTime = lastJobInstanceCreatedTime
+						newJobInstance.jobInstRevisedStartTime = lastJobInstanceCreatedTime
+						Log.debug("-------------------------Insertintion of new job instances start here ------------------")
+						insertJobInstances(newJobInstance, "disabled")
+						jobDescription.jobValidity = "finished"
+						jobDescription.jobLastCreatedInstTime = lastJobInstanceCreatedTime
+						updateJobDescription(jobDescription)
+						jobCreated = true
+						return jobCreated
+				}
+				if (strJobFrequency == "hourly" || strJobFrequency == "daily" || strJobFrequency == "weekly") {
+					
+				
+					while(lastJobInstanceCreatedTime.compareTo(jobCreationLimit)<0){
+			
+					 				
+							newJobInstanceCreationTime = getNextJobScheduleTime(lastJobInstanceCreatedTime,jobDescription.jobFrequency )
+							Log.debug("Newly Created Job Window : " + newJobInstanceCreationTime )
+							lastJobInstanceCreatedTime = newJobInstanceCreationTime	
+							newJobInstance.jobInstActualStartTime = lastJobInstanceCreatedTime
+							newJobInstance.jobInstRevisedStartTime = lastJobInstanceCreatedTime
+							Log.debug("-------------------------Insertintion of new job instances start here ------------------")
+							insertJobInstances(newJobInstance, "disabled")
+
+					}
+					
+					
+					
+				}
+				Log.debug("The value of the job instance to be created is : " + newJobInstance)
+				Log.debug("-------------Value of new last created time is : " + lastJobInstanceCreatedTime)
+				jobDescription.jobLastCreatedInstTime = lastJobInstanceCreatedTime.getTime()
+				updateJobDescription(jobDescription)
+				
+			}
+			//YOu ahve to start testing, by executing this function.
+			//jobDescription.jobLastCreatedInstTime = (new Date()).getTime()  
+			
+			jobCreated = true
+		}catch(Exception e)
+		{
+			jobCreated = false
+			Log.error("Exception occured while creating child instance for " + jobDescription.jobID)
+			Log.error(e.printStackTrace())
+			return jobCreated
+		}    
+		
+		return jobCreated
+	}
+	
+	def getJobDescription(String strCondition){
+		
+		
+		ArrayList<JobDescription> jobDefList = new ArrayList<JobDescription>()
+		String query = "select * from jobdescription where "
+		strCondition = strCondition.trim()
+		
+		if(strCondition == ""){
+			query = query + "1 = 1 "
+				
+		}
+		else {
+			query = query + strCondition
+		}
+		
+		try{
+			
+			jobDB.rows(query).each{
+				
+				jobDefList.add(new JobDescription(
+					jobName : it.jobname,
+					//jobID : it.jobid,
+					jobDesc : it.jobdesc,
+					jobValidity : it.jobvalidity,
+					jobStartDate : new Date( it.jobstartdate),
+					jobEndDate :  new Date(it.jobenddate),
+					jobFrequency : it.jobfrequency,
+					jobRetry : it.jobretry,
+					jobReportFolder : it.jobreportfolder,
+					jobToAddress : it.jobtoaddress,
+					jobCCAddress : it.jobccaddress,
+					jobBCCAddress : it.jobbccaddress,
+					jobSubject : it.jobsubject,
+					jobMailContent : it.jobmailcontent,
+					jobOwner : it.jobowner,
+					jobLastCreatedInstTime :  new Date(it.joblastcreatedinsttime),
+					jobTaskName : it.jobtaskname
+										))
+			}
+		
+		}catch(Exception e){
+		
+			Log.error("Exception while retriving the job instances from the database : " + e.printStackTrace())
+			return jobDefList
+		}
+	
+		
+		Log.debug("Number of job description returned indata store is : " + jobDefList.size())
+		return jobDefList
+
+			
+	}
+	
+	
+	void insertJobdescription(JobDescription jobdescription, String override="disabled"){
+		
+		boolean exists =false
+		
+		def query="select jobid from timeentry  where jobid='" +jobdescription.jobID +"'"
+		
+		Log.debug( "Insert JobDescription Override key is set to : " + override)
+		
+		if( exists){
+			if(override == "enabled")
+			{
+				Log.error("Key Already exists ${jobdescription.jobID} overWriting ");
+				query="delete from jobdescription where key='${jobdescription.jobID}'"
+				jobDB.execute(query, []);
+
+				DataSet curJobDescription = jobDB.dataSet("jobdescription")
+				//user string, projectcode string,projecttask string,tasktype string,hours integer,details string,key string
+				//	curtimeEntry.
+						curJobDescription.add(
+							jobname:jobdescription.jobName,
+							jobid:jobdescription.jobID, // Yor are calling equivalent getter---> getjobID
+							jobdesc:jobdescription.jobDesc,
+							jobvalidity:jobdescription.jobValidity,
+							jobstartdate:jobdescription.jobStartDate?.getTime(),
+							jobenddate:jobdescription.jobEndDate?.getTime(),
+							jobfrequency:jobdescription.jobFrequency,
+							jobretry:jobdescription.jobRetry,
+							jobreportfolder:jobdescription.jobReportFolder,
+							jobtoaddress:jobdescription.jobToAddress,
+							jobccaddress:jobdescription.jobCCAddress,
+							jobbccaddress:jobdescription.jobBCCAddress,
+							jobsubject:jobdescription.jobSubject,
+							jobmailcontent:jobdescription.jobMailContent,
+							jobowner:jobdescription.jobOwner,
+							joblastcreatedinsttime:jobdescription.jobLastCreatedInstTime?.getTime(),
+							jobtaskname:jobdescription.jobTaskName
+							
+								)
+			}
+
+			else if(override=="disabled")
+			{
+				Log.error("Key Already exists ${jobdescription.jobID} and hence skipping the import ")
+
+			}
+		}
+		else {
+
+			DataSet curJobDescription = jobDB.dataSet("jobdescription")
+			//user string, projectcode string,projecttask string,tasktype string,hours integer,details string,key string
+			//	curtimeEntry.
+			curJobDescription.add(
+							jobname:jobdescription.jobName,
+							jobid:jobdescription.jobID, // Yor are calling equivalent getter---> getjobID
+							jobdesc:jobdescription.jobDesc,
+							jobvalidity:jobdescription.jobValidity,
+							jobstartdate:jobdescription.jobStartDate?.getTime(),
+							jobenddate:jobdescription.jobEndDate?.getTime(),
+							jobfrequency:jobdescription.jobFrequency,
+							jobretry:jobdescription.jobRetry,
+							jobreportfolder:jobdescription.jobReportFolder,
+							jobtoaddress:jobdescription.jobToAddress,
+							jobccaddress:jobdescription.jobCCAddress,
+							jobbccaddress:jobdescription.jobBCCAddress,
+							jobsubject:jobdescription.jobSubject,
+							jobmailcontent:jobdescription.jobMailContent,
+							jobowner:jobdescription.jobOwner,
+							joblastcreatedinsttime:jobdescription.jobLastCreatedInstTime?.getTime(),
+							jobtaskname:jobdescription.jobTaskName
+								
+					
+					)
+
+		}
+
+
+		
+	}
+	
 	void insertTimesheet(TimeEntry timeEntry, String override="enabled"){
 
 
@@ -1178,7 +1740,7 @@ class DataStore {
 
 		exists=(fetcherDB.rows(query).size()>0)
 
-		Log.debug( "Override key is set to : " + override)
+		Log.debug( "Timesheet Override key is set to : " + override)
 
 
 		if( exists){
@@ -1247,6 +1809,52 @@ class DataStore {
 
 	}
 
+	
+	void updateJobDescription(JobDescription jobdescription){
+		
+		//TODO: Change the implementation by deleting and creating new record.
+				boolean exists =false
+				def query="select jobid from jobdescription  where jobid='" + jobdescription.jobID + "'"
+				exists=(jobDB.rows(query).size()>0)
+				Log.info("-----------------------valu do f hehrwierhwi rhawehraw uhawe fluawheruiwahfliuasjizklsdb sfjib  " + jobdescription.jobID)		
+				if( exists){
+					
+					query="delete from jobdescription  where jobid='" + jobdescription.jobID + "'"
+					jobDB.execute(query, []);
+					
+					DataSet curJobDescription = jobDB.dataSet("jobdescription")
+					curJobDescription.add(
+							jobname:jobdescription.jobName,
+							jobid:jobdescription.jobID, // Yor are calling equivalent getter---> getjobID
+							jobdesc:jobdescription.jobDesc,
+							jobvalidity:jobdescription.jobValidity,
+							jobstartdate:jobdescription.jobStartDate?.getTime(),
+							jobenddate:jobdescription.jobEndDate?.getTime(),
+							jobfrequency:jobdescription.jobFrequency,
+							jobretry:jobdescription.jobRetry,
+							jobreportfolder:jobdescription.jobReportFolder,
+							jobtoaddress:jobdescription.jobToAddress,
+							jobccaddress:jobdescription.jobCCAddress,
+							jobbccaddress:jobdescription.jobBCCAddress,
+							jobsubject:jobdescription.jobSubject,
+							jobmailcontent:jobdescription.jobMailContent,
+							jobowner:jobdescription.jobOwner,
+							joblastcreatedinsttime:jobdescription.jobLastCreatedInstTime?.getTime(),
+							jobtaskname:jobdescription.jobTaskName
+								
+					
+					)
+
+		
+				}else{
+		
+					throw new ServiceException("jobDescription did not exist in DB")
+				}
+		
+		
+		
+			}
+	
 	void updateUserLock(UserInfo userInfo){
 
 

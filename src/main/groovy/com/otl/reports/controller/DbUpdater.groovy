@@ -158,10 +158,14 @@ class DbUpdater {
 
 			def projectcodes=datamanager.getOrphanProjectCodes()
 
+			Log.debug("Value of the project code : " + projectcodes)
+			
 			FetchUserReport fetchUserReport=new FetchUserReport()
 			fetchUserReport.init(Configurator.globalconfig?.proxy )
-
-			def projectdetails=fetchUserReport.getProjectDetails(userInfo,projectcodes)
+			def projectdetails
+			if(projectcodes!=null){
+				projectdetails=fetchUserReport.getProjectDetails(userInfo,projectcodes)
+			}
 
 			if(null ==projectdetails ||  projectdetails.size() ==0)
 				throw new Exception("Empty response for project details");

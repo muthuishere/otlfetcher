@@ -428,6 +428,8 @@ class FetchUserReport {
 		if(!login(userInfo))
 			throw new ServiceException("INVALID CREDENTIALS:Invalid User Credentials")
 
+		if(projectcodes == null )
+			throw new ServiceException("Project Information cannot be null")
 
 
 		if(!projectcodes && projectcodes.size() == 0)
