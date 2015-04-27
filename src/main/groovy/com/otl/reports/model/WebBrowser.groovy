@@ -31,13 +31,41 @@ class WebBrowser {
 
 
 
+	public getWebClient(){
+		/*
+		
+			WebClient client = super.newWebClient(browserVersion);
+			DefaultCredentialsProvider provider = new DefaultCredentialsProvider();
+			provider.addCredentials(USERNAME, PASSWORD);
+			client.setCredentialsProvider(provider);
+			return client;
+		
+		*/
+	}
+	
+	def setCredentials(WebClient webClient,def otlcredentials)
+	{
+	
+	  String base64encodedUsernameAndPassword = base64Encode(otlcredentials.user + ":" + otlcredentials.pwd);
+	  webClient.addRequestHeader("Authorization", "Basic " + base64encodedUsernameAndPassword);
+	}
+  
+	private static String base64Encode(String stringToEncode)
+	{
+	  return javax.xml.bind.DatatypeConverter.printBase64Binary(stringToEncode.getBytes());
+	}
+	
 
-	def init(def proxy){
-
+	def init(def proxy,def otlcredentials){
+		
+	
+		
 		curWebWindowListener=new CurWebWindowListener()
 
 		//println(proxy)
 
+	
+		
 		if(null != proxy){
 
 			println("Setting proxy")
@@ -45,16 +73,40 @@ class WebBrowser {
 
 			//set proxy username and password
 			//if(null != proxy?.user && null != proxy?.pwd ){
-			final DefaultCredentialsProvider credentialsProvider = (DefaultCredentialsProvider) webClient.getCredentialsProvider();
-			credentialsProvider.addCredentials(proxy?.user, proxy?.pwd );
-			println("Setting credentials")
+			
+			
+			
+			
+		
 			//	}
 
 
 		}else{
 			webClient = new WebClient(BrowserVersion.CHROME);
 		}
+		
+		
+		final DefaultCredentialsProvider credentialsProvider = (DefaultCredentialsProvider) webClient.getCredentialsProvider();
+		
+		
+		if(null != proxy){
+			if(proxy?.user &&  proxy?.pwd)
+			credentialsProvider.addCredentials(proxy?.user, proxy?.pwd,proxy.host, proxy.port, null	)
+			
+			
+			println("Setting credentials")
+			
+			
+		}
+		println("Setting OTL credentials")
+		//println(otlcredentials)
+		
+		//setCredentials(webClient,otlcredentials)
+		//credentialsProvider.addCredentials(otlcredentials.user,otlcredentials.pwd,otlcredentials.host, -1, null	)
 
+		credentialsProvider.addCredentials(otlcredentials.user,otlcredentials.pwd);
+		webClient.setCredentialsProvider(credentialsProvider);
+		
 		//webClient.getWebWindowByName(selectedBrowser).getEnclosedPage()
 
 		webClient.waitForBackgroundJavaScript(50000);

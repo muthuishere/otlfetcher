@@ -17,6 +17,17 @@ class OTLReportApplication {
 	
 	
 	
+	static void browserAuthenticatetest(){
+		
+				WebBrowser webBrowser=new WebBrowser()
+				webBrowser.init(Configurator.globalconfig.proxy,	[host: 'ebiz.uk.three.com', user: 'mnavaneethakrishnan@corpuk.net', pwd: 'April#2015'])
+				webBrowser.Navigate("http://ebiz.uk.three.com/oa_servlets/AppsLogin")
+				webBrowser.printAll()
+		
+		
+			}
+	
+	
 	static parseconfig(def configFileName){
 		
 		// Read the configuration file into a map called "global".
@@ -96,8 +107,9 @@ class OTLReportApplication {
 		//integrate()
 		
 		//browsertest();
+		browserAuthenticatetest()
 		
-		startAppServer()
+		//startAppServer()
 		
 	}
 

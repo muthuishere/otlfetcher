@@ -680,6 +680,17 @@ class FetchReportsTest {
 		println("$projectname $projectid $selectedprojnumber")
 
 	}
+	
+	static void browserAuthenticatetest(){
+		
+				WebBrowser webBrowser=new WebBrowser()
+				webBrowser.init(Configurator.globalconfig.proxy,	[host: 'ebiz.uk.three.com', user: 'mnavaneethakrishnan@corpuk.net', pwd: 'April#2015'])
+				webBrowser.Navigate("http://ebiz.uk.three.com:80/OA_HTML/RF.jsp?function_id=10129&resp_id=51959&resp_appl_id=808&security_group_id=0&lang_code=US")
+				webBrowser.printAll()
+		
+		
+			}
+	
 
 	static main(args) {
 		//	displayClassPath();
@@ -692,19 +703,19 @@ class FetchReportsTest {
 		//	servertest()
 
 		def configFileName
-		/*
+		
 		 if(args.size() != 1)
 		 {
 		 println "Usage: FetchReports.groovy <configuration file>"
 		 System.exit(1)
 		 }
 		 configFileName=args[0]
-		 */
+		 
 
-		configFileName="C:\\muthu\\otl\\otlfetcher\\origotlfetcher.conf"
+		//configFileName="C:\\muthu\\otl\\otlfetcher\\origotlfetcher.conf"
 		parseconfig(configFileName)
 
-		updateprojectcodetest();
+		browserAuthenticatetest();
 
 
 
