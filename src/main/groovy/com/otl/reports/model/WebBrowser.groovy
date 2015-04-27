@@ -29,7 +29,71 @@ class WebBrowser {
 	//The Navigator item which is currently active, by active we mean it was the last item returned from the browser which is a NonEmptyNavigator
 	HtmlPage  currentPage = null
 
+	public testapp(){
+		
+		curWebWindowListener=new CurWebWindowListener()
+		//"http://ebiz.uk.three.com/oa_servlets/AppsLogin
+		try{
+		webClient = new WebClient(BrowserVersion.CHROME, "10.248.44.17", 8080);
+		//webClient = new WebClient(BrowserVersion.CHROME);
+		
+		final DefaultCredentialsProvider credentialsProvider = (DefaultCredentialsProvider) webClient.getCredentialsProvider();
+		
+		
+//		if(null != proxy){
+//			if(proxy?.user &&  proxy?.pwd)
+//			credentialsProvider.addCredentials(proxy?.user, proxy?.pwd,proxy.host, proxy.port, null	)
+//			
+//			
+//			println("Setting credentials")
+//			
+//			
+//		}
+//		println("Setting OTL credentials")
+		//println(otlcredentials)
+		
+		//setCredentials(webClient,otlcredentials)
+		credentialsProvider.addCredentials("mnavaneethakrishnan", "April#2015","10.248.44.17", 8080, null	)
+		
+		//credentialsProvider.addCredentials("mnavaneethakrishnan@corpuk.net","April#2015","https://ebiz.uk.three.com", -1, null	)
+		
+		credentialsProvider.addCredentials("mnavaneethakrishnan@corpuk.net","April#2015","ebiz.uk.three.com", -1, null	)
+		credentialsProvider.addCredentials("mnavaneethakrishnan@corpuk.net","April#2015","ebiz.uk.three.com", -1, null	)
+		credentialsProvider.addCredentials("mnavaneethakrishnan@corpuk.net","April#2015","idmssop02.three.com", -1, null	)
+		
+		
+		//credentialsProvider.addCredentials(otlcredentials.user,otlcredentials.pwd);
+		webClient.setCredentialsProvider(credentialsProvider);
+		
+		//webClient.getWebWindowByName(selectedBrowser).getEnclosedPage()
 
+		webClient.waitForBackgroundJavaScript(50000);
+		//  webClient.getOptions().setThrowExceptionOnScriptError(false);
+		//   webClient.getOptions().setThrowExceptionOnFailingStatusCode(true);
+		webClient.getOptions().setCssEnabled(true);
+		webClient.getOptions().setJavaScriptEnabled(true);
+	//	webClient.setThrowExceptionOnFailingStatusCode(false);
+		webClient.getOptions().setPrintContentOnFailingStatusCode(true)
+		webClient.getOptions().setRedirectEnabled(true);
+		webClient.getOptions().setUseInsecureSSL(true);
+		webClient.addWebWindowListener(curWebWindowListener);
+		
+		// webClient.getOptions().setTimeout(config.getMaxTimeoutMS());
+		//webClient.set
+
+		currentPage=webClient.getPage("http://ebiz.uk.three.com/oa_servlets/AppsLogin")
+		print(currentPage.asXml()) 
+		}catch(Exception e){
+		
+		e.printStackTrace();
+		
+		
+		
+		//currentPage=webClient.getPage("https://ebiz.three.com/OA_HTML/OA.jsp?OAFunc=OAHOMEPAGE")
+		
+		}	
+		
+	}
 
 	public getWebClient(){
 		/*

@@ -1,5 +1,5 @@
 
 
 
-gradle clean run -PappArgs="['./otlfetcher.conf']" 
+gradle clean run -PappArgs="['./app.conf']" 
 pause
