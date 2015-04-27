@@ -1,6 +1,7 @@
 package com.otl.reports.model
 
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider
+import com.gargoylesoftware.htmlunit.Page
 import com.gargoylesoftware.htmlunit.ScriptResult
 import com.gargoylesoftware.htmlunit.WebClient
 import com.gargoylesoftware.htmlunit.WebWindowEvent
@@ -72,6 +73,7 @@ class WebBrowser {
 		//   webClient.getOptions().setThrowExceptionOnFailingStatusCode(true);
 		webClient.getOptions().setCssEnabled(true);
 		webClient.getOptions().setJavaScriptEnabled(true);
+		webClient.setRefreshHandler(null)
 	//	webClient.setThrowExceptionOnFailingStatusCode(false);
 		webClient.getOptions().setPrintContentOnFailingStatusCode(true)
 		webClient.getOptions().setRedirectEnabled(true);
@@ -81,8 +83,14 @@ class WebBrowser {
 		// webClient.getOptions().setTimeout(config.getMaxTimeoutMS());
 		//webClient.set
 
-		currentPage=webClient.getPage("http://ebiz.uk.three.com/oa_servlets/AppsLogin")
-		print(currentPage.asXml()) 
+		
+		
+		Page textpage=webClient.getPage("http://ebiz.uk.three.com/oa_servlets/AppsLogin")
+		
+		if(textpage.isHtmlPage())
+			currentPage=textpage
+		
+		print(textpage.dump()) 
 		}catch(Exception e){
 		
 		e.printStackTrace();
