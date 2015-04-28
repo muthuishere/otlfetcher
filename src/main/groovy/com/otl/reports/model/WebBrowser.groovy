@@ -1,8 +1,10 @@
 package com.otl.reports.model
 
 import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page
 import com.gargoylesoftware.htmlunit.ScriptResult
+import com.gargoylesoftware.htmlunit.TextPage
 import com.gargoylesoftware.htmlunit.WebClient
 import com.gargoylesoftware.htmlunit.WebWindowEvent
 import com.gargoylesoftware.htmlunit.WebWindowListener
@@ -13,8 +15,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlElement
 import com.gargoylesoftware.htmlunit.html.HtmlFrame
 import com.gargoylesoftware.htmlunit.html.HtmlInput
 import com.gargoylesoftware.htmlunit.html.HtmlPage
+
 import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.control.CompilerConfiguration
+
 import com.gargoylesoftware.htmlunit.BrowserVersion
 import com.otl.reports.exceptions.ServiceException
 import com.otl.reports.helpers.BrowserHelper
@@ -78,6 +82,8 @@ class WebBrowser {
 		webClient.getOptions().setPrintContentOnFailingStatusCode(true)
 		webClient.getOptions().setRedirectEnabled(true);
 		webClient.getOptions().setUseInsecureSSL(true);
+		webClient.getOptions().setThrowExceptionOnFailingStatusCode(false)
+		//getOptions().isThrowExceptionOnFailingStatusCode()
 		webClient.addWebWindowListener(curWebWindowListener);
 		
 		// webClient.getOptions().setTimeout(config.getMaxTimeoutMS());
@@ -85,34 +91,86 @@ class WebBrowser {
 
 		
 		
-		Page textpage=webClient.getPage("http://ebiz.uk.three.com/oa_servlets/AppsLogin")
+		Page textpage=webClient.getPage("https://ebiz.uk.three.com/oa_servlets/AppsLogin")
 		
 		if(textpage.isHtmlPage())
 			currentPage=textpage
+		else{
+			
+			println("============")
+			println(textpage.getUrl().toString())
+			println("============")
+			println(textpage.getWebResponse().contentAsString)
+			println("============")
+		}	
 		
 		print(textpage.dump()) 
+		
 		}catch(Exception e){
 		
 		e.printStackTrace();
 		
 		
-		
+		print
 		//currentPage=webClient.getPage("https://ebiz.three.com/OA_HTML/OA.jsp?OAFunc=OAHOMEPAGE")
 		
 		}	
 		
 	}
 
-	public getWebClient(){
-		/*
+	
+	public login(String url){
 		
-			WebClient client = super.newWebClient(browserVersion);
-			DefaultCredentialsProvider provider = new DefaultCredentialsProvider();
-			provider.addCredentials(USERNAME, PASSWORD);
-			client.setCredentialsProvider(provider);
-			return client;
+		
+		try{
+			
+			Page textpage=webClient.getPage(url)
+			
+			
+			if(textpage.isHtmlPage()){
+				currentPage=textpage
+				println (currentPage.asXml())
+				
+			}else
+				println(textpage.getUrl().toString())
+				
+				
+			
+			}catch(FailingHttpStatusCodeException ex){
+			
+			ex.printStackTrace();
+				//login(curWebWindowListener.lastpage)
+			}
+		
+		/*
+		if(textpage.isHtmlPage()){
+			
+			println ("HTML page found")
+			currentPage=textpage
+			println( currentPage.asXml())
+			
+		}
+		else{
+			
+			
+			
+			println(textpage.getUrl().toString())
+			println("Attempting to go to login again")
+			
+			textpage=webClient.getPage("https://ebiz.three.com/OA_HTML/OA.jsp?OAFunc=OAHOMEPAGE")
+			
+			println("==After logging in ==========")
+			if(textpage.isHtmlPage()){
+				currentPage=textpage
+				println (currentPage.asXml())
+				
+			}else
+				println(textpage.getUrl().toString())
+			
+		}
 		
 		*/
+		
 	}
 	
 	def setCredentials(WebClient webClient,def otlcredentials)
@@ -128,7 +186,7 @@ class WebBrowser {
 	}
 	
 
-	def init(def proxy,def otlcredentials){
+	def init(def webconfig){
 		
 	
 		
@@ -137,6 +195,9 @@ class WebBrowser {
 		//println(proxy)
 
 	
+		def proxy=webconfig?.proxy
+		def otlcredentials=webconfig?.otlcredentials
+		def authsites=webconfig?.authsites
 		
 		if(null != proxy){
 
@@ -164,6 +225,13 @@ class WebBrowser {
 		if(null != proxy){
 			if(proxy?.user &&  proxy?.pwd)
 			credentialsProvider.addCredentials(proxy?.user, proxy?.pwd,proxy.host, proxy.port, null	)
+			//credentialsProvider.addCredentials("mnavaneethakrishnan", "April#2015","10.248.44.17", 8080, null	)
+			
+			//credentialsProvider.addCredentials("mnavaneethakrishnan@corpuk.net","April#2015","https://ebiz.uk.three.com", -1, null	)
+			
+			//credentialsProvider.addCredentials("mnavaneethakrishnan@corpuk.net","April#2015","ebiz.uk.three.com", -1, null	)			
+			//credentialsProvider.addCredentials("mnavaneethakrishnan@corpuk.net","April#2015","idmssop02.three.com", -1, null	)
+			
 			
 			
 			println("Setting credentials")
@@ -176,7 +244,16 @@ class WebBrowser {
 		//setCredentials(webClient,otlcredentials)
 		//credentialsProvider.addCredentials(otlcredentials.user,otlcredentials.pwd,otlcredentials.host, -1, null	)
 
-		credentialsProvider.addCredentials(otlcredentials.user,otlcredentials.pwd);
+		
+		for(def site:authsites){
+			
+			credentialsProvider.addCredentials(otlcredentials.user,otlcredentials.pwd,site, -1, null	)
+			
+		}
+		
+		
+		
+		
 		webClient.setCredentialsProvider(credentialsProvider);
 		
 		//webClient.getWebWindowByName(selectedBrowser).getEnclosedPage()
@@ -186,12 +263,18 @@ class WebBrowser {
 		//   webClient.getOptions().setThrowExceptionOnFailingStatusCode(true);
 		webClient.getOptions().setCssEnabled(true);
 		webClient.getOptions().setJavaScriptEnabled(true);
-		// webClient.getOptions().setTimeout(config.getMaxTimeoutMS());
-		//webClient.set
-
-
+		webClient.setRefreshHandler(null)
+	//	webClient.setThrowExceptionOnFailingStatusCode(false);
+		webClient.getOptions().setPrintContentOnFailingStatusCode(true)
+		webClient.getOptions().setRedirectEnabled(true);
+		webClient.getOptions().setUseInsecureSSL(true);
+		webClient.getOptions().setSSLClientProtocols(null)
+		//webClient.getOptions().setThrowExceptionOnFailingStatusCode(false)
+		//getOptions().isThrowExceptionOnFailingStatusCode()
+		//webClient.setCookieManager(null)
 		webClient.addWebWindowListener(curWebWindowListener);
-
+		
+		
 
 	}
 

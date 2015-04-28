@@ -8,12 +8,15 @@ class CurWebWindowListener implements WebWindowListener {
 
 	def curpage=null
 	def pageChanged=false
+	def lastpage=null
 	
 	void webWindowContentChanged(WebWindowEvent event) {
-		println(event)
-		println("webWindowContentChanged  Page : "+event.getNewPage().url);
+		//println(event)
+		println("********** webWindowContentChanged  Page : "+event.getNewPage().url);
 		
-		curpage=(HtmlPage)event.getNewPage();
+		lastpage=event.getNewPage().url.toString()
+		curpage=event.getNewPage();
+	//	print(curpage.dump())
 //		   webClient.closeAllWindows();
 		pageChanged=true
 	}

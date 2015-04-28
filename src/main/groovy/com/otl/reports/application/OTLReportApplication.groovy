@@ -20,11 +20,17 @@ class OTLReportApplication {
 	static void browserAuthenticatetest(){
 		
 				WebBrowser webBrowser=new WebBrowser()
-//				webBrowser.init(Configurator.globalconfig.proxy,	[host: 'ebiz.uk.three.com', user: 'mnavaneethakrishnan@corpuk.net', pwd: 'April#2015'])
-//				webBrowser.Navigate("http://ebiz.uk.three.com/oa_servlets/AppsLogin")
-//				webBrowser.printAll()
-				webBrowser.testapp();
-		
+				
+				def webconfig=[:]
+				
+				webconfig.proxy=Configurator.globalconfig.proxy
+				webconfig.authsites=Configurator.globalconfig.authsites
+				webconfig.otlcredentials=[user: 'mnavaneethakrishnan@corpuk.net', pwd: 'April#2015']
+				
+				webBrowser.init(webconfig)
+				webBrowser.login("https://ebiz.three.com/OA_HTML/OA.jsp?OAFunc=OAHOMEPAGE")
+				
+				//webBrowser.printAll()
 			}
 	
 	
@@ -98,6 +104,7 @@ class OTLReportApplication {
 			System.exit(1)
 		}
 		
+		System.setProperty( "sun.security.ssl.allowUnsafeRenegotiation", "true" );
 		
 		configFileName=args[0]
 		
