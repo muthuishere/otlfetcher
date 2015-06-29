@@ -6,8 +6,10 @@ import com.gargoylesoftware.htmlunit.Page
 import com.gargoylesoftware.htmlunit.ScriptResult
 import com.gargoylesoftware.htmlunit.TextPage
 import com.gargoylesoftware.htmlunit.WebClient
+import com.gargoylesoftware.htmlunit.WebRequest
 import com.gargoylesoftware.htmlunit.WebWindowEvent
 import com.gargoylesoftware.htmlunit.WebWindowListener
+import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider.AuthScopeProxy;
 import com.gargoylesoftware.htmlunit.html.DomElement
 import com.gargoylesoftware.htmlunit.html.DomNode
 import com.gargoylesoftware.htmlunit.html.DomNodeList
@@ -15,6 +17,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlElement
 import com.gargoylesoftware.htmlunit.html.HtmlFrame
 import com.gargoylesoftware.htmlunit.html.HtmlInput
 import com.gargoylesoftware.htmlunit.html.HtmlPage
+import com.gargoylesoftware.htmlunit.util.Cookie
+import com.gargoylesoftware.htmlunit.util.NameValuePair
 
 import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.control.CompilerConfiguration
@@ -27,7 +31,7 @@ class WebBrowser {
 
 	WebClient webClient = null;
 	CurWebWindowListener curWebWindowListener=null;
-
+	def otlcredentials
 
 
 
@@ -119,20 +123,94 @@ class WebBrowser {
 	}
 
 	
+	public static void saveCookies(WebClient webClient,String fileName)
+	throws IOException {
+		CookieManager cookieMan = webClient.getCookieManager();
+		java.util.Iterator it = cookieMan.getCookies().iterator();
+		FileWriter fstream = new FileWriter(fileName);
+		BufferedWriter out = new BufferedWriter(fstream);
+		while (it.hasNext()) {
+			Cookie cookie = (Cookie)it.next();
+			out.write(cookie.getDomain()+"t");
+			out.write("TRUEt"); // Tail Match
+			out.write(cookie.getPath()+"t");
+			out.write(cookie.isSecure()+"t");
+			out.write(cookie.getExpires().getTime()+"t");
+			out.write(cookie.getName()+"t");
+			out.write(cookie.getValue()+"n");
+		}
+		out.close();
+	}
+	
+	public static void loadCookies(WebClient webClient,String fileName)
+	throws IOException {
+		CookieManager cookieMan = webClient.getCookieManager();
+	 
+		FileReader input = new FileReader(fileName);
+		BufferedReader bufRead = new BufferedReader(input);
+		String line;
+	 
+		while ((line = bufRead.readLine()) != null) {
+			if (line.startsWith("#") || line.equals("")) continue;
+			String[] cookieData = line.split("t");
+	 
+			cookieMan.addCookie( new Cookie(
+					cookieData[0],      // Domain
+					cookieData[5],      // Name
+					cookieData[6],      // Value
+					cookieData[2],      // Path
+					new java.util.Date(Long.parseLong(cookieData[4])), // Expires
+					(cookieData[3].toLowerCase() == "true")            // Secure
+					));
+		}
+	 
+		bufRead.close();
+	}
+	
 	public login(String url){
 		
 		
 		try{
 			
+			 
+			//WebRequest webRequest=new WebRequest(new URL(url));
+			
+			
+			//String base64encodedUsernameAndPassword = base64Encode(otlcredentials.user + ":" + otlcredentials.pwd);
+			
+		/*	webRequest.additionalHeaders.put("Authorization", "Basic " + base64encodedUsernameAndPassword)
+			final DefaultCredentialsProvider credentialsProvider = (DefaultCredentialsProvider) webClient.getCredentialsProvider();
+			credentialsProvider.addCredentials(otlcredentials.user, otlcredentials.pwd)
+			*/
+			
+			
+			//webRequest.setCredentials(credentialsProvider.getCredentials(org.apache.http.auth.AuthScope.ANY))
+			
+			webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+			webClient.getCookieManager().setCookiesEnabled(true);
+				// Incorrect authentication data
+				/*DefaultCredentialsProvider userCredentials = new DefaultCredentialsProvider();
+				userCredentials.addCredentials(otlcredentials.user, otlcredentials.pwd);
+				webClient.setCredentialsProvider(userCredentials);
+				*/
+				
 			Page textpage=webClient.getPage(url)
+			
+			List response =textpage.getWebResponse().getResponseHeaders();
+			for (NameValuePair header : response) {
+				println(header.getName() + " = " + header.getValue());
+			 }
 			
 			
 			if(textpage.isHtmlPage()){
 				currentPage=textpage
 				println (currentPage.asXml())
 				
-			}else
+			}else{
 				println(textpage.getUrl().toString())
+				//println(textpage.get)
+				println(textpage.dump())
+			}
 				
 				
 			
@@ -192,11 +270,11 @@ class WebBrowser {
 		
 		curWebWindowListener=new CurWebWindowListener()
 
-		//println(proxy)
+	
 
 	
 		def proxy=webconfig?.proxy
-		def otlcredentials=webconfig?.otlcredentials
+		otlcredentials=webconfig?.otlcredentials
 		def authsites=webconfig?.authsites
 		
 		if(null != proxy){
@@ -242,13 +320,13 @@ class WebBrowser {
 		//println(otlcredentials)
 		
 		//setCredentials(webClient,otlcredentials)
-		//credentialsProvider.addCredentials(otlcredentials.user,otlcredentials.pwd,otlcredentials.host, -1, null	)
+	
 
 		
 		for(def site:authsites){
 			
-			credentialsProvider.addCredentials(otlcredentials.user,otlcredentials.pwd,site, -1, null	)
-			
+			credentialsProvider.addCredentials(otlcredentials.user,otlcredentials.pwd,site, -1, "OAM 11g"	)
+			println("Adding "+ site + " with "+ otlcredentials.user + "--" + otlcredentials.pwd )
 		}
 		
 		

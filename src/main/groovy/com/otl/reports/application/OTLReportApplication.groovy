@@ -25,11 +25,15 @@ class OTLReportApplication {
 				
 				webconfig.proxy=Configurator.globalconfig.proxy
 				webconfig.authsites=Configurator.globalconfig.authsites
-				webconfig.otlcredentials=[user: 'mnavaneethakrishnan@corpuk.net', pwd: 'April#2015']
+				webconfig.otlcredentials=[user: 'mnavaneethakrishnan@corpuk.net', pwd: 'June#2015']
 				
 				webBrowser.init(webconfig)
-				webBrowser.login("https://ebiz.three.com/OA_HTML/OA.jsp?OAFunc=OAHOMEPAGE")
+				webBrowser.login("https://ebiz.three.com/OA_HTML/AppsLogin")
 				
+				//https://ebiz.three.com/OA_HTML/OA.jsp?OAFunc=OAHOMEPAGE
+				
+				//https://idmssop02.three.com/oam/CredCollectServlet/WNA?spnegotoken=string&OverrideRetryLimit=2&challenge_url=%2Foam%2FCredCollectServlet%2FWNAauthn_try_count=0&locale=en_US&resource_url=https%253A%252F%252Febiz.three.com%252Faccessgate%252Fdossologin
+				//https://ebiz.three.com/OA_HTML/OA.jsp?OAFunc=OAHOMEPAGE
 				//webBrowser.printAll()
 			}
 	
