@@ -8,6 +8,7 @@ import cookielib
 import httplib
 import logging
 import sys
+import base64
 from imaplib import Response_code
 
 
@@ -78,8 +79,10 @@ def navigate( url ,auth = None):
     webresponse = None
     if( auth ):
        br.add_password( url , auth['user'],  auth['pwd'])
-       br.add_password( 'https://idmssop02.three.com' , auth['user'],  auth['pwd'])
-       br.add_password( 'https://ebiz.uk.three.com' , auth['user'],  auth['pwd'])  
+       br.addheaders.append(('Authorization', 'Basic %s' % base64.encodestring('%s:%s' % (auth['user'], auth['pwd']))))
+       #br.add_password( 'idmssop02.three.com' , auth['user'],  auth['pwd'])
+       #br.add_password( 'ebiz.uk.three.com' , auth['user'],  auth['pwd'])
+       #br.add_password( 'https://ebiz.uk.three.com' , auth['user'],  auth['pwd'])  
        
        print("Added Authentication")
         

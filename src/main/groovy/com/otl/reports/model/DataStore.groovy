@@ -17,7 +17,7 @@ import org.sqlite.SQLite
 import groovy.sql.DataSet
 import groovy.sql.Sql
 
-import com.gargoylesoftware.htmlunit.InsecureTrustManager2;
+//import com.gargoylesoftware.htmlunit.InsecureTrustManager2;
 import com.otl.reports.beans.JobDescription
 import com.otl.reports.beans.JobInstances;
 import com.otl.reports.beans.ProjectEmployeeReport

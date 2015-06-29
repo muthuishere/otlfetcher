@@ -43,7 +43,7 @@ BrowserHelper.init_browser( proxyobj )
 
 #BrowserHelper.addproxy(proxyobj)
 authobj={'user':scrapconfig['username'] , 'pwd': scrapconfig['password']}
-res = BrowserHelper.login("http://ebiz.uk.three.com/oa_servlets/AppsLogin",authobj)
+res = BrowserHelper.login("https://ebiz.three.com/OA_HTML/OA.jsp?OAFunc=OAHOMEPAGE",authobj)
 print res
 BrowserHelper.printresponse()
  
