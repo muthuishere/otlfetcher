@@ -3,6 +3,7 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.handler.ContextHandler
 import org.eclipse.jetty.servlet.*
 
+import com.otl.reports.model.PollerSocketServlet
 import com.otl.reports.model.ServiceServlet
 import groovy.servlet.*
 
@@ -46,6 +47,9 @@ class OTLServer {
 		 context.addServlet(new ServletHolder(dataServlet), "/services/*");
 		 context.addServlet(new ServletHolder(staticServlet), "/*");
 		
+		 PollerSocketServlet webSockServlet = new PollerSocketServlet();
+		  context.addServlet(new ServletHolder(webSockServlet), "/OtlHelperSocket/*");
+			 
 		   
 		   
 	}

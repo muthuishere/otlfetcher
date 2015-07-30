@@ -384,11 +384,45 @@ var Utils = {
 
 };
 
+
+
 var Messenger = {
-	address : "127"
-	getcredential : function () {},
-	onCommandReceived : function () {},
-	sendCommand : function (cmd) {}
+	host : "127"
+	ws:null,
+	onSocketopen:function(evt){
+	
+	},
+	onCommandReceived:function(evt){
+	
+	/*
+	logm("Message received sessionid["+ sessionid +"] data ["+ event.data +"]")
+		 		
+				if($("#div"+sessionid).size() > 0)
+		 				{
+			 				$("#div"+sessionid).append(event.data);
+			 				 modiyhighlight(sessionid)
+			 				 
+		 				}
+						*/
+	},
+	onSocketclose:function(evt){
+	
+	},
+	init:function(){
+	
+		Messenger.ws = new WebSocket("ws://"+document.location.host+"/OtlHelperSocket/start?sessionid="+sessionid);
+		Messenger.ws.onopen = Messenger.onSocketopen;
+		
+		Messenger.ws.onmessage = Messenger.onCommandReceived;
+		Messenger.ws.onclose = Messenger.onSocketclose;
+	
+	},
+	getcredential : function () {},	
+	sendCommand : function (cmd) {
+	
+		Messenger.ws.send(cmd);
+	
+	}
 
 }
 var PageHandler = {
