@@ -1,0 +1,47 @@
+on crawl menu
+
+Ensure no updates only new
+	
+	Start fetch
+													<=============   Loop users , Open Chrome
+	Open chrome browser
+			The extension should establish socket    =============> Server found chrome extension initialized , 
+													<===========			send username/password , from date ,todate to extension
+			
+			Extension goto webpage apps/login with credentials
+			On each page a helper js is injected
+							clickelement
+			
+			click goto timesheet page
+			split up dates by 7  & 7
+			
+			currentcommand[]  TYPEDATE | LIST ENTRIES | LIST DETAILS
+			
+			set currentcommand TYPEDATE
+			Type date for first 7 			
+				click submit
+					wait for page load					
+			
+			if	currentcommand TYPEDATE and page contains list
+				set currentcommand LIST ENTRIES 
+				
+					select the first row , click button
+					wait for page load
+					
+			if	currentcommand LIST ENTRIES  and page contains details
+				set currentcommand ""
+				
+						crawl all data
+						construct xml
+							date
+							code
+							hrs
+							user
+						send it to bg page
+			append xml
+		repeat loop
+		
+		if all data received , send data to websocket , updatedata
+																				=> get xml insert or update in db
+       																			<=	Close chrome browser
+																			End loop			
