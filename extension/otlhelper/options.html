@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Autologin Options</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900" rel="stylesheet" />
+<link href="css/default.css" rel="stylesheet" type="text/css" media="all" />
+<link href="css/options.css" rel="stylesheet" type="text/css" media="all" />
+<script type="text/javascript" src="scripts/Helper.js"></script>
+<script type="text/javascript" src="scripts/options.js"></script>
+
+
+</head>
+<body>
+
+<div  style="background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f2f6f8), color-stop(50%,#d8e1e7), color-stop(51%,#b5c6d0), color-stop(100%,#e0eff9));">
+<div id="header" class="container">
+	<table width="100%"><tbody><tr><td valign="middle">
+	
+	<div style="float:left"><img src="images/autologin-128.png"></div>
+	<div id="logo" style="float:left;padding-top:48px;">
+		<h1 >
+		
+		<a href="#">Autologin Options</a></h1>
+		
+      </div></td><td align="right">
+	<div id="navigation" style="visibility:hidden;float:right">
+	
+		<ul style="margin-top:15px">
+			<li id="mnusitesparent" class="current"><a  id="mnusites" href="#">Sites</a></li>
+			<li id="mnuchangepasswordparent" ><a id="mnuchangepassword" href="#">Settings</a></li>	
+			<li ><a target="_blank" href="https://www.facebook.com/pages/Auto-Login/433751853437039">Support</a></li>	
+			
+			
+		</ul>
+	
+      </div></td></tr></tbody></table>
+</div>
+</div>
+<hr/>
+<div class="container">
+<div id="page-wrapper">
+	
+	<div id="" class="boxA">
+		<div id="divSites"  style="display:none;width:800px">
+			<div id="sitechangedstatus" style="float:left;margin-left:50px;text-align:center;font-size:14px;font-weight:bold;font-family: Calibri, Verdana, sans-serif"></div>
+			
+			<table id="tblOptions" style="width:680px" >
+			<tbody>
+			<tr>
+			<th>Domain</th>
+			<th>Username</th>
+			<th>Password</th>
+			<th>Enabled</th>
+			<th>Remove</th>
+			</tr>
+			
+			</tbody>
+			</table>
+			<div style="height:20px"> &nbsp; </div>
+			
+			<div style="width:680px">
+			<div style="float:right"> 
+			<a id="btnUpdate"  href="#" class="buttondisable">Update </a>
+			</div>
+			
+			</div>
+			<div style="height:20px;clear:both"> &nbsp; </div>
+		</div>
+		
+		<div id="divpasswordask"  style="width:800px">
+			<table id="" style="width:680px" >
+			<tbody>
+			<tr>
+			<th>Enter Password to view options:</th>
+			<th> <input type="password" id="txtaskpassword" /> </th>			
+			<th> <input type="button" id="btnaskpassword" value="Show" /> </th>			
+			</tr>
+			<tr>
+			<td colspan="3" align="right">
+			<span id="validatepwdstatus" style="float:right;text-align:center;color:red;font-size:14px;font-weight:bold;font-family: Calibri, Verdana, sans-serif"></span>
+			</td>
+			</tr>
+			
+			</tbody>
+			</table>
+			
+			<div style="height:20px"> &nbsp; </div>
+			
+			<div style="height:20px;clear:both"> &nbsp; </div>
+		</div>
+		
+			<div id="divpasswordchange"  style="display:none;width:800px">
+			
+			
+			
+			<table id="tblsettings" style="width: 680px;" cellpadding="10">
+			<tbody>
+			<tr>
+			
+			<th align="left"><u>Settings</u></th>			
+			
+			</tr>
+			
+			
+			<tr>
+		
+			<td style="text-align:left"> <input type="checkbox" id="chkpromptAutologin" value="1">Prompt Password before Autologin  per session </td>			
+			
+			</tr>
+			<tr>
+			
+			<td style="text-align:left"> <input type="button" id="btnshowchangepwd" value="Change Password"> </td>			
+			
+			</tr>
+			
+			
+			<tr>
+			<td colspan="2" align="right">
+			<span id="settingssuccess" style="float:right;text-align:center;color:green;font-size:14px;font-weight:bold;font-family: Calibri, Verdana, sans-serif"></span>
+			<span id="settingsfailure" style="float:right;text-align:center;color:red;font-size:14px;font-weight:bold;font-family: Calibri, Verdana, sans-serif"></span>
+			</td>
+			</tr>
+			
+			</tbody>
+			</table>
+			
+			
+			
+			
+			<table id="tblchangepwd" style="width:680px;display:none" >
+			<tbody>
+			<tr>
+			<th>&nbsp;</th>
+			<th align="right"><div style="float:right"> </div></th>			
+			
+			</tr>
+			
+			<tr id="rowoldpassword" >
+			<th>Enter Old Password :</th>
+			<th> <input type="password" id="txtoldpassword" /> </th>			
+			
+			</tr>
+			<tr>
+			<th>Enter New Password :</th>
+			<th> <input type="password" id="txtnewpassword" /> </th>			
+			
+			</tr>
+			<tr>
+			<th>Confirm New Password :</th>
+			<th> <input type="password" id="txtrepeatnewpassword" /> </th>			
+			
+			</tr>
+			<tr>
+			<th><input type="button" id="btncancelchangepassword" value="Cancel" /> </th>
+			<th> <input type="button" id="btnchangepassword" value="Change" /></th>			
+			
+			</tr>
+			<tr>
+			<td colspan="2" align="right">
+			<span id="validatepwderror" style="float:right;text-align:center;color:red;font-size:14px;font-weight:bold;font-family: Calibri, Verdana, sans-serif"></span>
+				<span id="validatepwdsuccess" style="float:right;text-align:center;color:green;font-size:14px;font-weight:bold;font-family: Calibri, Verdana, sans-serif"></span>
+			</td>
+			</tr>
+			
+			</tbody>
+			</table>
+			
+			<div style="height:20px"> &nbsp; </div>
+			
+			<div style="height:20px;clear:both"> &nbsp; </div>
+		</div>
+	
+	
+	
+	<table  style="width:680px;" >
+			<tbody>
+			<tr>
+			
+			<th align="right">
+			
+			
+			
+			<span id="statusError" style="float:right;text-align:center;color:red;font-size:14px;font-weight:bold;font-family: Calibri, Verdana, sans-serif"></span>
+				<span id="statusSuccess" style="float:right;text-align:center;color:green;font-size:14px;font-weight:bold;font-family: Calibri, Verdana, sans-serif"></span>
+				</th>			
+				</tr></tbody></table>
+	</div>
+	
+	
+				
+</div>
+</div>
+<div id="copyright">
+	&nbsp;
+</div>
+</body>
+</html>

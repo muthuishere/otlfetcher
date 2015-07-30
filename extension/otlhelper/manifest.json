@@ -1,0 +1,29 @@
+{
+  
+  "manifest_version": 2,
+  "name": "OTL Fetch Helper",
+  "short_name": "OTL Fetch Helper",
+  "version": "1.0.0",
+
+
+  "description": "OTL Fetcher",
+  "icons": {  
+   "48" : "images/autologin-48.png",
+   "64" : "images/autologin-64.png",
+    "128" : "images/autologin-128.png"
+	},
+
+  
+  
+  "author": "Muthukumaran Navaneethakrishnan(https://github.com/muthuishere)",
+ "background": { "scripts": ["scripts/Helper.js","global.js"] },
+ 
+  
+ "web_accessible_resources": [
+    "images/*.png"  
+  ],
+  
+  "options_page": "options.html",
+  "permissions": ["tabs", "http://*/*", "https://*/*"]
+  
+}
