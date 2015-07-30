@@ -5,6 +5,16 @@ import com.gargoylesoftware.htmlunit.util.*
 import  net.sourceforge.htmlunit.corejs.javascript.*
 import org.apache.xml.utils.*
 import XTrustProvider;
+import io.netty.handler.codec.http.DefaultHttpRequest
+import io.netty.handler.codec.http.HttpObject
+import io.netty.handler.codec.http.HttpRequest
+import io.netty.handler.codec.http.HttpResponse
+import org.littleshoot.proxy.HttpFilters
+import org.littleshoot.proxy.HttpFiltersAdapter
+import org.littleshoot.proxy.HttpFiltersSourceAdapter
+import org.littleshoot.proxy.HttpProxyServer
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer
+import org.apache.commons.codec.binary.Base64;
 
 
 /*
@@ -99,20 +109,62 @@ webClient.setHTMLParserListener(new HTMLParserListener() {
 
 */
 
+String buildBasicAuthorizationString(String username, String password) {
+
+    String credentials = username + ":" + password;
+    return "Basic " + new String(Base64.encodeBase64(credentials.getBytes()));
+}
+
+  System.setProperty("basicAuth", buildBasicAuthorizationString("mnavaneethakrishnan@corpuk.net", "July#2015"));
+  
 			XTrustProvider.install();
 			
+			
+// LittleProxy setup
+def proxyPort = 8888
+HttpProxyServer server = DefaultHttpProxyServer.bootstrap()
+    .withPort(proxyPort)
+    .withFiltersSource(
+    new HttpFiltersSourceAdapter() {
+        @Override
+        HttpFilters filterRequest(HttpRequest originalRequest) {
+            return new HttpFiltersAdapter(originalRequest) {
+                @Override
+                HttpResponse requestPre(HttpObject httpObject) {
+                    if (httpObject instanceof DefaultHttpRequest) {
+                        if (httpObject.getUri().startsWith(baseUrl)) {
+                            if (httpObject.headers().contains("Authorization")) {
+                                println "Already contains the Authorization header: " + httpObject.getUri()
+                            } else {
+                                println "Adding Authorization header to request: " + httpObject.getUri()
+                                httpObject.headers().add("Authorization",  System.getProperty("basicAuth"))
+                            }
+                        } else {
+                            println "Ignoring request: " + httpObject.getUri()
+                        }
+                    } else {
+                        println "Ignoring event: " + httpObject
+                    }
+                    return null
+                }
+            }
+        }
+    })
+    .start();
+	
+	
 			  BrowserVersion bv = BrowserVersion.CHROME;
         bv.setUserAgent("Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36");
-       WebClient webClient = new WebClient(bv, "127.0.0.1", 8888);
+       WebClient webClient = new WebClient(bv, "127.0.0.1", proxyPort);
 		
 				//WebClient webClient = new WebClient(BrowserVersion.CHROME);
 
 webClient.getOptions().setThrowExceptionOnScriptError(false);
 webClient.getOptions().setPrintContentOnFailingStatusCode(false)
 
-   DefaultCredentialsProvider userCredentials = new DefaultCredentialsProvider();
-    userCredentials.addCredentials("mnavaneethakrishnan@corpuk.net", "July#2015");
-    webClient.setCredentialsProvider(userCredentials);
+   //DefaultCredentialsProvider userCredentials = new DefaultCredentialsProvider();
+    //userCredentials.addCredentials("mnavaneethakrishnan@corpuk.net", "July#2015");
+    //webClient.setCredentialsProvider(userCredentials);
 	webClient.getOptions().setTimeout(240000);
 	 
 	// oracle.uix=0^^GMT+5:30^p
@@ -128,8 +180,8 @@ webClient.getOptions().setPrintContentOnFailingStatusCode(false)
 	
 	
 		
-final HtmlPage page = webClient.getPage("https://ebiz.three.com/OA_HTML/AppsLogin");
-// final HtmlPage page = webClient.getPage("http://localhost:9999/redirect.php");
+//final HtmlPage page = webClient.getPage("https://ebiz.three.com/OA_HTML/AppsLogin");
+ final HtmlPage page = webClient.getPage("http://localhost:9999/redirect.php");
  
  println page.asXml()
  
