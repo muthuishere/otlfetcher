@@ -1,21 +1,37 @@
-
-
-echo %CLASSPATH% |findstr /C:"htmlunit-" >nul 2>&1
-if not errorlevel 1 (
-
-echo "value"
-	
-) else (
-    FOR /R ./lib %%a in (*.jar) DO CALL :AddToPath %%a
-	
-	
-)
-
-
-
-
-:AddToPath
-SET CLASSPATH=%1;%CLASSPATH%
-GOTO :EOF
-
-
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.codehaus.groovy/groovy-all/2.2.1/7ae565d50d24167c4e5d74b96f4126d4c56f16f/groovy-all-2.2.1.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.xerial/sqlite-jdbc/3.7.2/7a3d67f00508d3881650579f7f228c61bfc1b196/sqlite-jdbc-3.7.2.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.aggregate/jetty-all/7.6.15.v20140411/b78c54305c62d3aff26ed3438257fdda97df62bd/jetty-all-7.6.15.v20140411.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/net.sourceforge.htmlunit/htmlunit/2.17/162c371a2ab148d1734acf27abf31b5255b332b8/htmlunit-2.17.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/commons-fileupload/commons-fileupload/1.3.1/c621b54583719ac0310404463d6d99db27e1052c/commons-fileupload-1.3.1.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/commons-io/commons-io/2.4/b1b6ea3b7e4aa4f492509a4952029cd8e48019ad/commons-io-2.4.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.littleshoot/littleproxy/1.0.0-beta8/319339a5139289e36f57631850298df0c0b45332/littleproxy-1.0.0-beta8.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.orbit/javax.servlet/2.5.0.v201103041518/9c16011c06bc6fe5e9dba080fcb40ddb4b75dc85/javax.servlet-2.5.0.v201103041518.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/xml-apis/xml-apis/1.4.01/3789d9fada2d3d458c4ba2de349d48780f381ee3/xml-apis-1.4.01.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/xalan/serializer/2.7.2/24247f3bb052ee068971393bdb83e04512bb1c3c/serializer-2.7.2.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/xalan/xalan/2.7.2/d55d3f02a56ec4c25695fe67e1334ff8c2ecea23/xalan-2.7.2.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/commons-collections/commons-collections/3.2.1/761ea405b9b37ced573d2df0d1e3a4e0f9edc668/commons-collections-3.2.1.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.4/5fe28b9518e58819180a43a850fbc0dd24b7c050/commons-lang3-3.4.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/commons-codec/commons-codec/1.10/4b95f4897fa13f2cd904aee711aeafc0c5295cd8/commons-codec-1.10.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.2/4bfc12adfe4842bf07b657f0369c4cb522955686/commons-logging-1.2.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpcore/4.4.1/f5aa318bda4c6c8d688c9d00b90681dcd82ce636/httpcore-4.4.1.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpclient/4.4.1/16d0bc512222f1253ee6b64d389c84e22f697f0/httpclient-4.4.1.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.apache.httpcomponents/httpmime/4.4.1/2f8757f5ac5e38f46c794e5229d1f3c522e9b1df/httpmime-4.4.1.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/net.sourceforge.htmlunit/htmlunit-core-js/2.17/4316d68f449d42f69faf4ee255aa31b03e4f7dd5/htmlunit-core-js-2.17.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/xerces/xercesImpl/2.11.0/9bb329db1cfc4e22462c9d6b43a8432f5850e92c/xercesImpl-2.11.0.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/net.sourceforge.nekohtml/nekohtml/1.9.22/4f54af68ecb345f2453fb6884672ad08414154e3/nekohtml-1.9.22.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.w3c.css/sac/1.3/cdb2dcb4e22b83d6b32b93095f644c3462739e82/sac-1.3.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/net.sourceforge.cssparser/cssparser/0.9.16/3f751904d467537b8ee99c612e69d4e79d6271cf/cssparser-0.9.16.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-util/9.2.11.v20150529/5f547da1eb601c2a4697ecfeb425f8f6961800c3/jetty-util-9.2.11.v20150529.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty/jetty-io/9.2.11.v20150529/8d13b907fcc1bc190901f6842752fc6be8d406cf/jetty-io-9.2.11.v20150529.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.websocket/websocket-api/9.2.11.v20150529/ded6ab7af4989e92efe5f602a57e231dc1ffa319/websocket-api-9.2.11.v20150529.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.websocket/websocket-common/9.2.11.v20150529/3df0afdd4a9cf3ba9b6fe48226cc8917ee2a14f5/websocket-common-9.2.11.v20150529.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.eclipse.jetty.websocket/websocket-client/9.2.11.v20150529/7e2597d596a1e99a6ca3d95356563befd9ec501b/websocket-client-9.2.11.v20150529.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/14.0.1/69e12f4c6aeac392555f1ea86fab82b5e5e31ad4/guava-14.0.1.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/commons-cli/commons-cli/1.2/2bf96b7aa8b611c177d329452af1dc933e14501c/commons-cli-1.2.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/io.netty/netty-all/4.0.14.Final/d59f464000413051914494663213a1b7ed6e2341/netty-all-4.0.14.Final.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/com.barchart.udt/barchart-udt-bundle/2.3.0/3d1a29b2b08d20533ad08918411528dd1880515e/barchart-udt-bundle-2.3.0.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.2/81d61b7f33ebeab314e07de0cc596f8e858d97/slf4j-api-1.7.2.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/log4j/log4j/1.2.17/5af35056b4d257e4b64b9e8069c0746e8b08629f/log4j-1.2.17.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-log4j12/1.7.2/7539c264413b9b1ff9841cd00058c974b7cd1ec9/slf4j-log4j12-1.7.2.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.littleshoot/dnsjava/2.1.3/9065ed71c7a7b12b642526eabf08c93f833b4f56/dnsjava-2.1.3.jar
+C:/Users/hutchuk/.gradle/caches/modules-2/files-2.1/org.littleshoot/dnssec4j/0.1/afa280cefd07a6b2eb4e6ac6185bb8291c85994/dnssec4j-0.1.jar
